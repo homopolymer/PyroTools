@@ -1,7 +1,7 @@
 PyroTools
 ===============
 
-**Sincere apology to users** that PyroHMMsnp and PyroHMMvar have been out of maintenance for a period because the important change of my life and job.  God blesses.  Everything is fine at the end.  And then, we are on the way to integrate these two tools into the toolkit, named PyroTools.  The code is changed frequently and will be launched ASAP.
+**Sincere apology to users** that PyroHMMsnp and PyroHMMvar have been out of maintenance for a period because the important change of my life and job.  God blesses.  Everything is fine at the end.  And then, we are on the way to integrate these two tools into the toolkit, named PyroTools.  The code is changed frequently and will be launched soon.
 
 ## Introduction
 
@@ -10,12 +10,9 @@ PyroTools
 **Methods** in PyroTools include
 
 - ProbAlign, a program to estimate the parameters of the alignment scoring function, and to correct the misalignments.
-- SnpCall, a program to call SNPs in the sequencing data of an individual.[^1]
-- IndelCall, a program to call insertions and deletions in the sequencing data of an individual.[^2]
+- SnpCall, a program to call SNPs in the sequencing data of an individual [1].
+- IndelCall, a program to call insertions and deletions in the sequencing data of an individual [2].
 
-[^1]:Zeng F., Jiang R., Chen T. PyroHMMsnp: a SNP caller for 454 and Ion Torrent sequencing data. _Nucleic Acids Research_, 2013.
-
-[^2]:Zeng F., Jiang R., Chen T. PyroHMMvar: a sensitive and accurate method to detect short Indels and SNPs for Ion Torrent and 454 data. _Bioinformatics_, 2013.
 
 **Features** of PyroTools include
 
@@ -29,9 +26,7 @@ PyroTools
 
 ### A example
 
-- The original mappings of 454 WGS data of NA12878[^3]
-
-[^3]: The BAM files of 454 WGS data of NA12878 are available in 1KG project ftp site.
+- The original mappings of 454 WGS data of NA12878 [3]
 
 ![Resize icon][ex2_rawdata]
 [ex2_rawdata]:./realignment_examples/ex2_rawdata.png
@@ -69,8 +64,13 @@ PyroTools
 [more_ex4]:./realignment_examples/ex13_chr21_11061190-11061240.png
 
 
+=================================================================
 
+[1]:Zeng F., Jiang R., Chen T. PyroHMMsnp: a SNP caller for 454 and Ion Torrent sequencing data. _Nucleic Acids Research_, 2013.
 
+[2]:Zeng F., Jiang R., Chen T. PyroHMMvar: a sensitive and accurate method to detect short Indels and SNPs for Ion Torrent and 454 data. _Bioinformatics_, 2013.
+
+[3]: The BAM files of 454 WGS data of NA12878 are available in 1KG project ftp site.
 
 
 
