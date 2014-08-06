@@ -22,9 +22,9 @@ PyroTools
 -  Feasible computational time
 
 
-## Re-alignment
+## ProbAlign
 
-### A example
+### A re-alignment example
 
 - The original mappings of 454 WGS data of NA12878 \[3\]
 
