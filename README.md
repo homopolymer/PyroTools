@@ -63,6 +63,19 @@ PyroTools
 ![Resize icon][more_ex4]
 [more_ex4]:./realignment_examples/ex13_chr21_11061190-11061240.png
 
+- Example 5.
+
+![Resize icon][more_ex5]
+[more_ex5]:./realignment_examples/ex25_chr21_9416155-9416184.png
+
+
+## SnpCall
+
+
+
+## IndelCall
+
+
 
 ===================================================================
 
