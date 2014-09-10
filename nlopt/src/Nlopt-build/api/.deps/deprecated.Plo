@@ -1,0 +1,8 @@
+deprecated.lo: \
+  /Users/fengzeng/workspace/test_pyrotools/nlopt/api/deprecated.c \
+  /Users/fengzeng/workspace/test_pyrotools/nlopt/api/nlopt.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.1/include/stddef.h
+
+/Users/fengzeng/workspace/test_pyrotools/nlopt/api/nlopt.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.1/include/stddef.h:

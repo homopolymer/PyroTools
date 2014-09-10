@@ -1,0 +1,79 @@
+Parameter setting of probabilistic alignment
+TransitionFeature 0 PreviousState:BEGIN CurrentState:MATCH	0.724433
+TransitionFeature 1 PreviousState:BEGIN CurrentState:MISMATCH	-0.0141499
+TransitionFeature 2 PreviousState:BEGIN CurrentState:INSERT	-0.721553
+TransitionFeature 3 PreviousState:MATCH CurrentState:MATCH	3.734
+TransitionFeature 4 PreviousState:MATCH CurrentState:MISMATCH	-0.00993933
+TransitionFeature 5 PreviousState:MATCH CurrentState:INSERT	-1.36689
+TransitionFeature 6 PreviousState:MATCH CurrentState:DELETE	-0.731195
+TransitionFeature 7 PreviousState:MISMATCH CurrentState:MATCH	-0.000640719
+TransitionFeature 8 PreviousState:MISMATCH CurrentState:MISMATCH	-0.00159604
+TransitionFeature 9 PreviousState:MISMATCH CurrentState:INSERT	-0.0172659
+TransitionFeature 10 PreviousState:MISMATCH CurrentState:DELETE	-0.00965521
+TransitionFeature 11 PreviousState:INSERT CurrentState:MATCH	-1.13154
+TransitionFeature 12 PreviousState:INSERT CurrentState:MISMATCH	-0.0139181
+TransitionFeature 13 PreviousState:INSERT CurrentState:INSERT	-0.0218036
+TransitionFeature 14 PreviousState:INSERT CurrentState:DELETE	-0.779446
+TransitionFeature 15 PreviousState:DELETE CurrentState:MATCH	-0.476359
+TransitionFeature 16 PreviousState:DELETE CurrentState:MISMATCH	-0.00815856
+TransitionFeature 17 PreviousState:DELETE CurrentState:INSERT	-0.712551
+TransitionFeature 18 PreviousState:DELETE CurrentState:DELETE	-0.00504888
+TransitionFeature 19 PreviousState:MATCH CurrentState:END	1.19622
+TransitionFeature 20 PreviousState:MISMATCH CurrentState:END	-0.00937529
+TransitionFeature 21 PreviousState:INSERT CurrentState:END	-0.884132
+TransitionFeature 22 PreviousState:DELETE CurrentState:END	-0.319633
+ReadHomopolymerFeature 0 CurrentState:INSERT Length:2 Delta:1	-0.201277
+ReadHomopolymerFeature 1 CurrentState:INSERT Length:3 Delta:1	-0.0930191
+ReadHomopolymerFeature 2 CurrentState:INSERT Length:3 Delta:2	-0.00105736
+ReadHomopolymerFeature 3 CurrentState:INSERT Length:4 Delta:1	-0.028544
+ReadHomopolymerFeature 4 CurrentState:INSERT Length:4 Delta:2	-0.00032693
+ReadHomopolymerFeature 5 CurrentState:INSERT Length:4 Delta:3	-4.86359e-06
+ReadHomopolymerFeature 6 CurrentState:INSERT Length:5 Delta:1	-0.00530563
+ReadHomopolymerFeature 7 CurrentState:INSERT Length:5 Delta:2	-5.10835e-05
+ReadHomopolymerFeature 8 CurrentState:INSERT Length:5 Delta:3	-7.3039e-07
+ReadHomopolymerFeature 9 CurrentState:INSERT Length:5 Delta:4	-2.03328e-08
+ReadHomopolymerFeature 10 CurrentState:INSERT Length:6 Delta:1	-0.00313253
+ReadHomopolymerFeature 11 CurrentState:INSERT Length:6 Delta:2	-3.84215e-05
+ReadHomopolymerFeature 12 CurrentState:INSERT Length:6 Delta:3	-6.02621e-07
+ReadHomopolymerFeature 13 CurrentState:INSERT Length:6 Delta:4	-9.64382e-09
+ReadHomopolymerFeature 14 CurrentState:INSERT Length:6 Delta:5	-4.5987e-09
+GenomeHomopolymerFeature 0 CurrentState:DELETE Length:2 Delta:1	-0.0913475
+GenomeHomopolymerFeature 1 CurrentState:DELETE Length:3 Delta:1	-0.0302116
+GenomeHomopolymerFeature 2 CurrentState:DELETE Length:3 Delta:2	-0.000115836
+GenomeHomopolymerFeature 3 CurrentState:DELETE Length:4 Delta:1	-0.00933964
+GenomeHomopolymerFeature 4 CurrentState:DELETE Length:4 Delta:2	-3.81042e-05
+GenomeHomopolymerFeature 5 CurrentState:DELETE Length:4 Delta:3	-2.77828e-07
+GenomeHomopolymerFeature 6 CurrentState:DELETE Length:5 Delta:1	-0.00362179
+GenomeHomopolymerFeature 7 CurrentState:DELETE Length:5 Delta:2	-1.57053e-05
+GenomeHomopolymerFeature 8 CurrentState:DELETE Length:5 Delta:3	-1.10011e-07
+GenomeHomopolymerFeature 9 CurrentState:DELETE Length:5 Delta:4	-5.63856e-09
+GenomeHomopolymerFeature 10 CurrentState:DELETE Length:6 Delta:1	-0.00101492
+GenomeHomopolymerFeature 11 CurrentState:DELETE Length:6 Delta:2	-4.29534e-06
+GenomeHomopolymerFeature 12 CurrentState:DELETE Length:6 Delta:3	-2.76075e-08
+GenomeHomopolymerFeature 13 CurrentState:DELETE Length:6 Delta:4	-6.01556e-11
+GenomeHomopolymerFeature 14 CurrentState:DELETE Length:6 Delta:5	-3.0374e-09
+EmissionFeature 0 CurrentState:MATCH GenomeAllele:A ReadAllele:A	0.780847
+EmissionFeature 1 CurrentState:MATCH GenomeAllele:C ReadAllele:C	0.709075
+EmissionFeature 2 CurrentState:MATCH GenomeAllele:G ReadAllele:G	0.635015
+EmissionFeature 3 CurrentState:MATCH GenomeAllele:T ReadAllele:T	0.7289
+EmissionFeature 4 CurrentState:MISMATCH GenomeAllele:A ReadAllele:C	-0.0126356
+EmissionFeature 5 CurrentState:MISMATCH GenomeAllele:A ReadAllele:G	-0.011687
+EmissionFeature 6 CurrentState:MISMATCH GenomeAllele:A ReadAllele:T	-0.0119391
+EmissionFeature 7 CurrentState:MISMATCH GenomeAllele:C ReadAllele:A	-0.012159
+EmissionFeature 8 CurrentState:MISMATCH GenomeAllele:C ReadAllele:G	-0.0101741
+EmissionFeature 9 CurrentState:MISMATCH GenomeAllele:C ReadAllele:T	-0.0120827
+EmissionFeature 10 CurrentState:MISMATCH GenomeAllele:G ReadAllele:A	-0.0120448
+EmissionFeature 11 CurrentState:MISMATCH GenomeAllele:G ReadAllele:C	-0.0103044
+EmissionFeature 12 CurrentState:MISMATCH GenomeAllele:G ReadAllele:T	-0.0114955
+EmissionFeature 13 CurrentState:MISMATCH GenomeAllele:T ReadAllele:A	-0.0120505
+EmissionFeature 14 CurrentState:MISMATCH GenomeAllele:T ReadAllele:C	-0.0121905
+EmissionFeature 15 CurrentState:MISMATCH GenomeAllele:T ReadAllele:G	-0.0111282
+EmissionFeature 16 CurrentState:INSERT GenomeAllele:- ReadAllele:A	-0.780146
+EmissionFeature 17 CurrentState:INSERT GenomeAllele:- ReadAllele:C	-0.709498
+EmissionFeature 18 CurrentState:INSERT GenomeAllele:- ReadAllele:G	-0.637579
+EmissionFeature 19 CurrentState:INSERT GenomeAllele:- ReadAllele:T	-0.728936
+EmissionFeature 20 CurrentState:DELETE GenomeAllele:A ReadAllele:-	-0.39434
+EmissionFeature 21 CurrentState:DELETE GenomeAllele:C ReadAllele:-	-0.383595
+EmissionFeature 22 CurrentState:DELETE GenomeAllele:G ReadAllele:-	-0.376521
+EmissionFeature 23 CurrentState:DELETE GenomeAllele:T ReadAllele:-	-0.392615
+
