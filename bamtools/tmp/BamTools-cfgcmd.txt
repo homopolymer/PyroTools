@@ -1,0 +1,1 @@
+cmd='/opt/local/bin/cmake;-DCMAKE_INSTALL_PREFIX=/Users/fengzeng/workspace/PyroTools/bamtools;-GUnix Makefiles;/Users/fengzeng/workspace/PyroTools/bamtools'
