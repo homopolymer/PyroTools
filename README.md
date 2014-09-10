@@ -99,7 +99,7 @@ Coming soon
 
 
 ===================================================================
-\[1\]: Zeng F., Jiang R., Ji G., Chen T. GraphReAlign: a re-alignment method for long sequencing reads. _biorXiv.org_, 2014.
+\[1\]: Zeng F., Jiang R., Ji G., Chen T. GraphReAlign: a re-alignment method for long sequencing reads. [_biorXiv.org_](http://biorxiv.org/content/early/2014/09/02/008698), 2014.
 
 \[2\]: Zeng F., Jiang R., Chen T. PyroHMMsnp: a SNP caller for 454 and Ion Torrent sequencing data. _Nucleic Acids Research_, 2013.
 
