@@ -21,7 +21,7 @@ PyroTools
 -  Haplotype based variant calling
 -  Feasible computational time
 
-### Compile
+#### Clone and compile
 	> git clone https://github.com/homopolymer/PyroTools.git
 	> cd PyroTools
 	> mkdir build
