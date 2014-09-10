@@ -27,18 +27,18 @@ PyroTools
 	> mkdir build
 	> cd build && cmake .. && make 
 
-## Usage
+## A few typical uses
 
-### Re-align Illumina shotgun data
+#### Re-align Illumina shotgun data
 	> bin/PyroTools GraphReAlign -realign -bam <BAMFILE> -ref <GENOME> -c -out <BAMFILE> -config <MODEL> [-region <ROI>] -min-read-len 10
 	
-### Re-align Roche/454 or Ion Torrent shotgun data
+#### Re-align Roche/454 or Ion Torrent shotgun data
 	> bin/PyroTools GraphReAlign -realign -bam <BAMFILE> -ref <GENOME> -c -out <BAMFILE> -config <MODEL> [-region <ROI>] -large-homopolymer -update-graph-by-read
 	
-### Re-align PacificBiosciences SMRT shotgun data
+#### Re-align PacificBiosciences SMRT shotgun data
 	> bin/PyroTools GraphReAlign -realign -bam <BAMFILE> -ref <GENOME> -c -out <BAMFILE> -config <MODEL> [-region <ROI>] -max-mismatches 0.3 -include-mnp -update-graph-by-read
 	
-### Train model parameters
+#### Train model parameters
 	> bin/PyroTools GraphReAlign -train -bam <BAMFILE> -ref <GENOME> -region <ROI> -config <OUTPUT>
 
 ## GraphReAlign
