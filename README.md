@@ -9,9 +9,9 @@ PyroTools
 
 **Methods** in PyroTools include
 
-- ProbAlign, a program to estimate the parameters of the alignment scoring function, and to correct the misalignments.
-- SnpCall, a program to call SNPs in the sequencing data of an individual \[1\].
-- IndelCall, a program to call insertions and deletions in the sequencing data of an individual \[2\].
+- GraphReAlign, a program to estimate the parameters of the alignment scoring function, and to correct the misalignments \[1\].
+- SnpCall, a program to call SNPs in the sequencing data of an individual \[2\].
+- IndelCall, a program to call insertions and deletions in the sequencing data of an individual \[3\].
 
 
 **Features** of PyroTools include
@@ -28,11 +28,11 @@ PyroTools
 	cd build && cmake .. && make 
 
 
-## ProbAlign
+## GraphReAlign
 
 ### A re-alignment example
 
-- The original mappings of 454 WGS data of NA12878 \[3\]
+- The original mappings of 454 WGS data of NA12878 \[4\]
 
 ![Resize icon][ex2_rawdata]
 [ex2_rawdata]:./realignment_examples/ex2_rawdata.png
@@ -77,19 +77,22 @@ PyroTools
 
 ## SnpCall
 
+Coming soon
 
 
 ## IndelCall
 
+Coming soon
 
 
 ===================================================================
+\[1\]: Zeng F., Jiang R., Ji G., Chen T. GraphReAlign: a re-alignment method for long sequencing reads. _biorXiv.org_, 2014.
 
-\[1\]: Zeng F., Jiang R., Chen T. PyroHMMsnp: a SNP caller for 454 and Ion Torrent sequencing data. _Nucleic Acids Research_, 2013.
+\[2\]: Zeng F., Jiang R., Chen T. PyroHMMsnp: a SNP caller for 454 and Ion Torrent sequencing data. _Nucleic Acids Research_, 2013.
 
-\[2\]: Zeng F., Jiang R., Chen T. PyroHMMvar: a sensitive and accurate method to detect short Indels and SNPs for Ion Torrent and 454 data. _Bioinformatics_, 2013.
+\[3\]: Zeng F., Jiang R., Chen T. PyroHMMvar: a sensitive and accurate method to detect short Indels and SNPs for Ion Torrent and 454 data. _Bioinformatics_, 2013.
 
-\[3\]: The BAM files of 454 WGS data of NA12878 are available in 1KG project ftp site.
+\[4\]: The BAM files of 454 WGS data of NA12878 are available in 1KG project ftp site.
 
 
 
