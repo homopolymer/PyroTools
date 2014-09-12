@@ -7,7 +7,6 @@
 
 add_subdirectory( api )
 add_subdirectory( third_party )
-add_subdirectory( toolkit )
 add_subdirectory( utils )
 
 # export shared headers
