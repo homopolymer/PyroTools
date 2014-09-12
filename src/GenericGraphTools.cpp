@@ -3,6 +3,7 @@
 using namespace GenericSequenceTools;
 
 #include <cmath>
+#include <algorithm>
 using namespace std;
 
 // build the graph from a given reference genome and a set of alignments
