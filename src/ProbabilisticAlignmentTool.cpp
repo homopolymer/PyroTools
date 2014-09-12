@@ -11,10 +11,12 @@ using namespace GenericSequenceTools;
 using namespace BamTools;
 
 #include <ctime>
+#include <tuple>
 #include <vector>
 #include <string>
 #include <random>
 #include <chrono>
+#include <functional>
 #include <unordered_map>
 #include <unordered_set>
 #include <algorithm>
@@ -2403,7 +2405,7 @@ int windowRealignmentAmplicon(GenericProbabilisticAlignment &ProbAligner, BamRea
 
 struct SortSnpByPosition
 {
-    bool operator()(tuple<long,char>& a ,tuple<long,char>& b)
+    bool operator()(const tuple<long,char>& a, const tuple<long,char>& b)
     {
         return (get<0>(a) < get<0>(b));
     }
