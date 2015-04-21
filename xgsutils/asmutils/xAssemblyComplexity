@@ -1,0 +1,262 @@
+#!/bin/bash
+
+# function to parse region string
+function parseRegion {
+  if [ ! -z "$1" ]
+  then
+    CHR_REGION=$(echo $1 | grep ":")
+    if [ ! -z "$CHR_REGION" ]
+    then
+      regionChrName=$(echo $1 | perl -nle 'm/^(.*):/;print $1')
+      regionChrBeg=$(echo $1 | perl -nle 'm/:([0-9]+)-/;print $1')
+      regionChrEnd=$(echo $1 | perl -nle 'm/-([0-9]+)/; print $1')
+      echo -e "$regionChrName\t$regionChrBeg\t$regionChrEnd"
+    else
+      echo $1
+    fi 
+  fi
+}
+
+# check environment variable BIOINFO_TOOL_XGSUTILS is already set
+# http://stackoverflow.com/questions/11686208/check-if-environment-variable-is-already-set
+bamutil_exist=`env | awk '/^BIOINFO_TOOL_XGSUTILS=/{print 1}'`
+if [ -z "$bamutil_exist" ]
+then
+  BIOINFO_TOOL_XGSUTILS=/Users/fengzeng/tool/xgsutils
+fi
+
+# check environment variable BIOINFO_TOOL_CELERA is already set
+# http://stackoverflow.com/questions/11686208/check-if-environment-variable-is-already-set
+bamutil_exist=`env | awk '/^BIOINFO_TOOL_CELERA=/{print 1}'`
+if [ -z "$bamutil_exist" ]
+then
+  echo "please make sure Celera Assembler(http://http://wgs-assembler.sourceforge.net/) installed and export the executable path in BIOINFO_TOOL_CELERA"
+  echo "abort"
+  exit 1
+fi
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xAssemblyComplexity [OPTIONS] <GENOME_FASTA_FILE> <BAM_FILE>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Compute the complexity of assembly in genome regions"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -r,--roi     region of interesting [STR]"
+  >&2 echo "    -g,--gt      skip genomic sites with depth less than the value (default:5) [INT]"
+  >&2 echo "    -n,--num     skip genomic regions with read counts less than the value (default:30) [INT]"
+  >&2 echo "    -q,--mq      skip reads with mapping quality less than the value (default:5) [INT]"
+  >&2 echo "    -f,--ff      skip reads with the specified flats [INT]"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# print help message if no arguments provided
+if [ "$#" = "0" ]
+then
+  help
+fi
+
+# parse command arguments
+PARSED_OPTIONS=$(getopt -n "$0" -o g:r:n:q:f:h --long gt:,roi:,num:,mq:,ff:,help -- "$@")
+
+# bad argument
+if [ $? -ne 0 ]
+then
+  help
+fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+gt=5
+num=30
+roi=""
+mq="-q 5"
+ff=0
+# parsing
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -r | --roi )
+      roi=$2
+      shift 2;;
+    -g | --gt )
+      gt=$2
+      shift 2;;
+    -n | --num )
+      num=$2
+      shift 2;;
+    -q | --mq )
+      mq="-q $2"
+      shift 2;;
+    -f | --ff )
+      ff=$(( $ff | $2 ))
+      shift 2;;
+    -- )
+      shift
+      break;;
+  esac
+done
+
+genomeFastaFile=$1
+shift
+bamFile=$1
+
+# check the existence of genome fasta file
+if [ ! -f "$genomeFastaFile" ]
+then
+  echo "file $genomeFastaFile not existed"
+  echo "abort"
+  exit 1
+fi
+
+# check the existence of the index file of genome
+if [ ! -f "$genomeFastaFile.fai" ]
+then
+  echo "index file of genome fasta not existed"
+  echo "abort"
+  exit 1
+fi
+
+# check the existence of bam file
+if [ ! -f "$bamFile" ]
+then
+  echo "file $bamFile not existed"
+  echo "abort"
+  exit 1
+fi
+
+# make a temoprary directory and use it as work directory
+CWD=$(echo -e "temporary_$(date "+%Y%m%d_%H_%M_%S")")
+if [ -d "$CWD" ]
+then
+  rm -rf $CWD
+fi
+mkdir $CWD
+cd $CWD
+
+roi2=$(parseRegion $roi)
+roiChrName=$(echo $roi2 | awk '{print $1}')
+roiChrBeg=$(echo $roi2 | awk '{print $2}')
+roiChrEnd=$(echo $roi2 | awk '{print $3}')
+
+# loop over all chromosome
+while read chrInfo
+do
+  chrName=$(echo $chrInfo | awk '{print $1}')
+  chrLen=$(echo $chrInfo | awk '{print $2}')
+
+  # reference: http://stackoverflow.com/questions/19850529/bash-check-if-string-contains-characters-in-regex-pattern
+  # grep -qv "^$chrName\s" <<< $roi2
+  # if [[ ( ! $? -eq 0 ) || ( -z $roi2 ) ]]
+  if [[ ( "$chrName" = "$roiChrName" ) || ( -z $roi2 ) ]]
+  then
+    if [[ ( $roiChrBeg -lt 1 ) || ( -z $roiChrBeg ) ]];then roiChrBeg=1;fi
+    if [[ ( $roiCheEnd -gt $chrLen ) || ( -z $roiChrEnd ) ]];then roiChrEnd=$chrLen;fi
+    # generate a knot sequence
+    # reference: http://www.linuxquestions.org/questions/programming-9/bash-sequence-of-numbers-into-an-array-%5Bsolved%5D-933031/
+    chrKnots=($(seq $roiChrBeg 1000 $roiChrEnd))
+    # if the last position not equal to the roiChrEnd, and then append roiChrEnd to the end
+    # reference: http://stackoverflow.com/questions/5276393/command-inside-if-statement-of-bash-script
+    if (( $(echo ${chrKnots[@]} | awk '{printf "%.0f", $NF}') != $roiChrEnd ))
+    then
+      # reference: http://stackoverflow.com/questions/1951506/bash-add-value-to-array-without-specifying-a-key
+      chrKnots+=($roiChrEnd)
+    fi
+
+    ##########################
+    # loop over genomic knots
+    for i in $(seq 0 $((${#chrKnots[@]}-2)))
+    do
+      roiBeg=$(printf "%.0f" ${chrKnots[$i]})
+      if (( $(echo "${roiBeg: -1}") == 0 ));then roiBeg=$(((roiBeg+1)));fi
+      roiEnd=$(printf "%.0f" ${chrKnots[$i+1]})
+      if (( $(echo "${roiEnd: -1}") != 0 ));then roiEnd=$(((roiEnd-1)));fi
+      if (( $(((roiEnd+1))) >= $chrLen ));then roiEnd=$chrLen;fi
+      roi=$(printf "%s:%.0f-%.0f" $chrName $roiBeg $roiEnd)
+
+      # count the number of reads in this region
+      readCount=$(samtools view -c $mq -F $ff $bamFile $roi)
+
+      #####################
+      # there are no reads
+      if [ $readCount = 0 ];then printf "%s\t%.0f\t%.0f\tNotEnoughRead\t0\n" $chrName $roiBeg $roiEnd;continue;fi
+
+      ######################
+      # there are few reads
+      if [ $readCount -le $num ] && [ ! -z $num ]; then printf "%s\t%.0f\t%.0f\tNotEnoughRead\t%d\n" $chrName $roiBeg $roiEnd $readCount;continue;fi
+
+      # define BAM subregion by depth
+      GT_TOBED=""
+      if [ "$gt" -gt 0 ]
+      then
+        GT_TOBED="-g $gt"
+      fi
+      ROI_TOBED=""
+      if [ ! -z "$roi" ]
+      then
+        ROI_TOBED="-r $roi"
+      fi
+      $BIOINFO_TOOL_XGSUTILS/bamutils/xBamToBedByDepth -f $ff $mq $GT_TOBED $ROI_TOBED $bamFile > tempBamDepth.bed
+      # intersect with the sliding window
+      printf "%d\t%.0f\t%.0f" $chrName $roiBeg $roiEnd | bedtools intersect -a stdin -b tempBamDepth.bed > tempAsmRoi.bed
+
+      ##########################
+      # iterate over subregions
+      while read subRoi
+      do
+        subRoiChrName=$(echo $subRoi | awk '{print $1}')
+        subRoiChrBeg=$(echo $subRoi | awk '{print $2}')
+        subRoiChrEnd=$(echo $subRoi | awk '{print $3}')
+        subRoi2=$(echo "$subRoiChrName:$subRoiChrBeg-$subRoiChrEnd")
+   
+        # count the number of reads in this subregion
+        readCount=$(samtools view -c $mq -F $ff $bamFile $subRoi2)
+
+        # the size of subregion
+        subRoiSize=$(((subRoiChrEnd-subRoiChrBeg)))
+        if [[ "$subRoiSize" -lt 100 ]];then printf "%s\t%.0f\t%.0f\tSmallRegion\t%d\n" $subRoiChrName $subRoiChrBeg $subRoiChrEnd $readCount;continue;fi
+
+        # there are no reads
+        if [ $readCount = 0 ];then printf "%s\t%.0f\t%.0f\tNotEnoughRead\t0\n" $subRoiChrName $subRoiChrBeg $subRoiChrEnd;continue;fi
+
+        # there are few reads
+        if [ $readCount -le $num ] && [ ! -z $num ]; then printf "%s\t%.0f\t%.0f\tNotEnoughRead\t%d\n" $subRoiChrName $subRoiChrBeg $subRoiChrEnd $readCount;continue;fi
+
+        # extract reads in this region
+        $BIOINFO_TOOL_XGSUTILS/bamutils/xBamExtractReadToFastq -f $ff -r $subRoi2 $mq $bamFile > tempReads.fastq 2>tempLogBamExtractReadToFastq
+        # run celera assembler to built unitigs
+        $BIOINFO_TOOL_XGSUTILS/asmutils/xCeleraAssemblerUnitig tempReads.fastq tempAssembly >&tempLogCeleraAssembler
+        # index the contigs
+        samtools faidx tempAssembly.utg.fasta 2>tempLogSamtoolsIndex
+        # built the BWA dictionary
+        bwa index -p tempAssembly tempAssembly.utg.fasta 2>tempLogBwaIndex
+        # map reads to contigs
+        bwa mem tempAssembly tempReads.fastq > tempReads.sam 2>tempLogBwaAlign
+        # convert sam to bam
+        $BIOINFO_TOOL_XGSUTILS/bamutils/xBamFromSamToBam -f tempAssembly.utg.fasta tempReads.sam tempReads 2>tempLogBamConversion
+        # count the read number of each contig
+        $BIOINFO_TOOL_XGSUTILS/bamutils/xBamReadCountEachChr tempAssembly.utg.fasta tempReads.bam > tempUtgCounts 2>tempLogUnitigReadCounts
+        # count the number of contigs with sufficient reads
+        utgCount0=$($BIOINFO_TOOL_XGSUTILS/faxutils/xFastaSequenceCount tempAssembly.utg.fasta)
+        utgCount=$(awk -v n=2 -v m="$utgCount0" -v c="$readCount" 'BEGIN{uc=0;info=m}{if ($2>=n) {uc+=1};info=info ":"$2}END{print uc"\t"c"\t"info}' tempUtgCounts)
+        echo -e "$subRoi\t$utgCount"
+        # remove temporary files
+        rm tempReads* && rm tempUtgCounts
+      done < tempAsmRoi.bed
+      # remove temporary file
+      rm -rf temp* 2>/dev/null
+    done
+  fi
+done < "$genomeFastaFile.fai"
+
+
+
+# clean temporary
+cd ..
+rm -rf $CWD 2>/dev/null

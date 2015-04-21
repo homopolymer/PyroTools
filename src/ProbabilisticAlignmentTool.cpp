@@ -11,15 +11,14 @@ using namespace GenericSequenceTools;
 using namespace BamTools;
 
 #include <ctime>
-#include <tuple>
 #include <vector>
 #include <string>
 #include <random>
 #include <chrono>
-#include <functional>
 #include <unordered_map>
 #include <unordered_set>
 #include <algorithm>
+#include <functional>
 using namespace std;
 
 /**
@@ -77,7 +76,7 @@ ProbabilisticAlignmentTool::ProbabilisticAlignmentTool()
     , m_flankSize(5)
 {
     // set program details
-    Options::SetProgramInfo("GenericSequenceTools paln",
+    Options::SetProgramInfo("PyroTools GraphReAlign",
                             "probabilistic re-alignment tool",
                             "[-region <REGION>] [-config <CONFIG>] [-train] [-compress] -bam <INPUT> -ref <FASTA> [-out <OUTPUT>]");
 
@@ -143,7 +142,7 @@ int ProbabilisticAlignmentTool::Help()
 
 int ProbabilisticAlignmentTool::Run(int argc, char *argv[])
 {
-    // just 'GenericSequenceTools paln'
+    // just 'PyroTools GraphReAlign'
     if (argc==2)
         return Help();
 
@@ -157,20 +156,20 @@ int ProbabilisticAlignmentTool::Run(int argc, char *argv[])
 
         // BAM file
         if (!HasInput){
-            cerr << "GenericSequenceTools paln ERROR: BAM file not provided... Aborting" << endl;
+            cerr << "PyroTools GraphReAlign ERROR: BAM file not provided... Aborting" << endl;
             return false;
         }
 
         // open input files
         if (!m_bamReader.Open(InputFile)){
-            cerr << "GenericSequenceTools paln ERROR: could not open input BAM file... Aborting" << endl;
+            cerr << "PyroTools GraphReAlign ERROR: could not open input BAM file... Aborting" << endl;
             return false;
         }
 
         // if input is not stdin and a region is provided, look for index files
         if (HasInput && HasRegion){
             if (!m_bamReader.LocateIndex()){
-                cerr << "GenericSequenceTools paln ERROR: could not locate index file... Aborting" << endl;
+                cerr << "PyroTools GraphReAlign ERROR: could not locate index file... Aborting" << endl;
                 return false;
             }
         }
@@ -183,14 +182,14 @@ int ProbabilisticAlignmentTool::Run(int argc, char *argv[])
             if (BamTools::Utilities::ParseRegionString(RegionStr, m_bamReader, m_bamRegion)){
                 if (m_bamReader.HasIndex()){
                     if (!m_bamReader.SetRegion(m_bamRegion)){
-                        cerr << "GenericSequenceTools paln ERROR: set region failed... Aborting" << endl;
+                        cerr << "PyroTools GraphReAlign ERROR: set region failed... Aborting" << endl;
                         m_bamReader.Close();
                         return false;
                     }
                 }
 
             }else{
-                cerr << "GenericSequenceTools paln ERROR: could not parse REGION: " << RegionStr << endl;
+                cerr << "PyroTools GraphReAlign ERROR: could not parse REGION: " << RegionStr << endl;
                 m_bamReader.Close();
                 return false;
             }
@@ -201,7 +200,7 @@ int ProbabilisticAlignmentTool::Run(int argc, char *argv[])
 
         // Fasta file must be provided
         if (FastaFile.empty()){
-            cerr << "GenericSequenceTools paln ERROR: Fasta file not provided... Aborting" << endl;
+            cerr << "PyroTools GraphReAlign ERROR: Fasta file not provided... Aborting" << endl;
             return false;
         }
 
@@ -212,7 +211,7 @@ int ProbabilisticAlignmentTool::Run(int argc, char *argv[])
 
         // open Fasta file
         if (!m_fasta.Open(FastaFile, FastaIndexFilename)){
-            cerr << "GenericSequenceTools paln ERROR: " << FastaFile << " "
+            cerr << "PyroTools GraphReAlign ERROR: " << FastaFile << " "
                  << "can not be open... Aborting" << endl;
             return false;
         }
@@ -366,7 +365,7 @@ int ProbabilisticAlignmentTool::Train()
     // make sure output configure file is provided
     if (!HasConfig)
     {
-        cerr << "GenericSequenceTools paln ERROR: no output configure file provided... Aborting" << endl;
+        cerr << "PyroTools GraphReAlign ERROR: no output configure file provided... Aborting" << endl;
         return 0;
     }
 
@@ -642,7 +641,7 @@ int ProbabilisticAlignmentTool::Alignment()
     // make sure the config file is provide
     if (!HasConfig)
     {
-        cerr << "GenericSequenceTools paln ERROR: probabilistic model config file not provided... Aborting" << endl;
+        cerr << "PyroTools GraphReAlign ERROR: probabilistic model config file not provided... Aborting" << endl;
         return 0;
     }
     ifstream inputConfig;
@@ -833,14 +832,14 @@ int ProbabilisticAlignmentTool::Realignment()
     // make sure the output file is provided
     if (!HasOutput)
     {
-        cerr << "GenericSequenceTools paln ERROR: BAM output file not provided... Aborting" << endl;
+        cerr << "PyroTools GraphReAlign ERROR: BAM output file not provided... Aborting" << endl;
         return 0;
     }
 
     // make sure the config file is provide
     if (!HasConfig)
     {
-        cerr << "GenericSequenceTools paln ERROR: probabilistic model config file not provided... Aborting" << endl;
+        cerr << "PyroTools GraphReAlign ERROR: probabilistic model config file not provided... Aborting" << endl;
         return 0;
     }
     ifstream inputConfig;
@@ -915,10 +914,15 @@ int ProbabilisticAlignmentTool::Realignment()
                 {
                     cout << m_bamGenomes[t_LeftRefID].RefName << "\t"
                          << t_startPos+1 << "\t"
-                         << t_endPos+1+1 << endl;
+                         << t_endPos+1+1 << "\t";
                 }
 
                 int RealignSuccess = windowRealignment(ProbAligner, m_bamReader, m_fasta, t_LeftRefID, t_startPos, t_LeftRefID, t_endPos+1, realignObjects, HasDownSample, m_downSample, m_graphEdgePruneLevel, m_topK, HasHaplotypeLikeRank, HasUpdateGraph, HasProcLargeHomopolymer, HasKeepDuplicate, m_minLength, m_minMapQual, m_maxMismatches);
+
+                if (m_verboseLevel>=2)
+                {
+                    cout << (RealignSuccess==1?"processed":"skip") << endl;
+                }
 
                 numRealignRegion += RealignSuccess;
 
@@ -1009,10 +1013,17 @@ int ProbabilisticAlignmentTool::Realignment()
                     {
                         cout << m_bamGenomes[t_LeftRefID].RefName << "\t"
                              << t_startPos+1 << "\t"
-                             << t_endPos+1+1 << endl;
+                             << t_endPos+1+1 << "\t";
                     }
 
-                    numRealignRegion += windowRealignment(ProbAligner, m_bamReader, m_fasta, t_LeftRefID, t_startPos, t_LeftRefID, t_endPos+1, realignObjects, HasDownSample, m_downSample, m_graphEdgePruneLevel, m_topK, HasHaplotypeLikeRank, HasUpdateGraph, HasProcLargeHomopolymer, HasKeepDuplicate, m_minLength, m_minMapQual, m_maxMismatches);
+                    int RealignSuccess = windowRealignment(ProbAligner, m_bamReader, m_fasta, t_LeftRefID, t_startPos, t_LeftRefID, t_endPos+1, realignObjects, HasDownSample, m_downSample, m_graphEdgePruneLevel, m_topK, HasHaplotypeLikeRank, HasUpdateGraph, HasProcLargeHomopolymer, HasKeepDuplicate, m_minLength, m_minMapQual, m_maxMismatches);
+
+                    if (m_verboseLevel>=2)
+                    {
+                        cout << (RealignSuccess==1?"processed":"skip") << endl;
+                    }
+
+                    numRealignRegion += RealignSuccess;
                     numRegion ++;
 
                     t_lastEndPos = t_endPos+1;
@@ -1042,7 +1053,7 @@ int ProbabilisticAlignmentTool::Realignment()
                 {
                     cout << "time elapsed " << double(tEnd-tBegin)/CLOCKS_PER_SEC/60.0 << " minutes"
                          << ", process " << numRealignRegion << " of " << numRegion << " regions"
-                         <<", and "
+                         << ", and "
                          << "re-align " << realignObjects.size() << " reads." << endl;
                 }
             }
@@ -1153,7 +1164,7 @@ int windowRealignSites(BamReader &bamReader, Fasta &fasta,
     for (int i=0; i<tandemRepeatPos.size(); ++i)
     {
         int t_leftPos, t_rightPos;
-
+        int t_leftExt=0, t_rightExt=0;
         t_leftPos  = leftRefPos+tandemRepeatPos[i]-flankSize;
         t_rightPos = t_leftPos+tandemRepeatSize[i]+flankSize;
 
@@ -1162,12 +1173,24 @@ int windowRealignSites(BamReader &bamReader, Fasta &fasta,
             // enlong left position
             do{
                 t_leftPos--;
-            }while(t_leftPos>leftRefPos && (passSnpInWindow.count(t_leftPos)>0 || passDeleteInWindow.count(t_leftPos)>0 || precedeHomopolymerLength[t_leftPos-leftRefPos]>0 || leftNeighborHomopolymerLength[t_leftPos-leftRefPos]>2));
+                t_leftExt++;
+            }while(t_leftPos>leftRefPos &&
+                   t_leftExt<30 &&
+                   (passSnpInWindow.count(t_leftPos)>0 ||
+                    passDeleteInWindow.count(t_leftPos)>0 ||
+                    precedeHomopolymerLength[t_leftPos-leftRefPos]>0 ||
+                    leftNeighborHomopolymerLength[t_leftPos-leftRefPos]>2));
 
             // enlong right position
             do{
                 t_rightPos++;
-            }while (t_rightPos<rightRefPos && (passSnpInWindow.count(t_rightPos)>0 || passDeleteInWindow.count(t_rightPos)>0 || succedeHomopolymerLength[t_rightPos-leftRefPos]>0 || rightNeighborHomopolymerLength[t_rightPos-leftRefPos]>2));
+                t_rightExt++;
+            }while (t_rightPos<rightRefPos &&
+                    t_rightExt<30 &&
+                    (passSnpInWindow.count(t_rightPos)>0 ||
+                     passDeleteInWindow.count(t_rightPos)>0 ||
+                     succedeHomopolymerLength[t_rightPos-leftRefPos]>0 ||
+                     rightNeighborHomopolymerLength[t_rightPos-leftRefPos]>2));
         }
 
         // count SNPs in repeat region
@@ -1886,14 +1909,14 @@ int ProbabilisticAlignmentTool::RealignmentAmplicon()
     // make sure the output file is provided
     if (!HasOutput)
     {
-        cerr << "GenericSequenceTools paln ERROR: BAM output file not provided... Aborting" << endl;
+        cerr << "PyroTools GraphReAlign ERROR: BAM output file not provided... Aborting" << endl;
         return 0;
     }
 
     // make sure the config file is provide
     if (!HasConfig)
     {
-        cerr << "GenericSequenceTools paln ERROR: probabilistic model config file not provided... Aborting" << endl;
+        cerr << "PyroTools GraphReAlign ERROR: probabilistic model config file not provided... Aborting" << endl;
         return 0;
     }
     ifstream inputConfig;
@@ -1963,14 +1986,21 @@ int ProbabilisticAlignmentTool::RealignmentAmplicon()
 //                if (t_startPos<t_lastEndPos)
 //                    t_startPos = t_lastEndPos+1;
 
-                if (m_verboseLevel>=1)
+                if (m_verboseLevel>=2)
                 {
                     cout << m_bamGenomes[t_LeftRefID].RefName << "\t"
                          << t_startPos+1 << "\t"
-                         << t_endPos+1+1 << endl;
+                         << t_endPos+1+1 << "\t";
                 }
 
-                numRealignRegion += windowRealignmentAmplicon(ProbAligner, m_bamReader, m_fasta, t_LeftRefID, t_startPos, t_LeftRefID, t_endPos+1, realignObjects, m_graphEdgePruneLevel, m_topK, HasHaplotypeLikeRank, HasUpdateGraph, HasProcLargeHomopolymer, HasKeepDuplicate, m_minLength, m_minMapQual, m_maxMismatches);
+                int RealignSuccess = windowRealignmentAmplicon(ProbAligner, m_bamReader, m_fasta, t_LeftRefID, t_startPos, t_LeftRefID, t_endPos+1, realignObjects, m_graphEdgePruneLevel, m_topK, HasHaplotypeLikeRank, HasUpdateGraph, HasProcLargeHomopolymer, HasKeepDuplicate, m_minLength, m_minMapQual, m_maxMismatches);
+
+                if (m_verboseLevel>=2)
+                {
+                    cout << (RealignSuccess==1?"processed":"skip") << endl;
+                }
+
+                numRealignRegion += RealignSuccess;
                 numRegion ++;
 
                 t_lastEndPos = t_endPos+1;
@@ -2054,14 +2084,21 @@ int ProbabilisticAlignmentTool::RealignmentAmplicon()
 //                    if (t_startPos<t_lastEndPos)
 //                        t_startPos = t_lastEndPos+1;
 
-                    if (m_verboseLevel>=1)
+                    if (m_verboseLevel>=2)
                     {
                         cout << m_bamGenomes[t_LeftRefID].RefName << "\t"
                              << t_startPos+1 << "\t"
-                             << t_endPos+1+1 << endl;
+                             << t_endPos+1+1 << "\t";
                     }
 
-                    numRealignRegion += windowRealignmentAmplicon(ProbAligner, m_bamReader, m_fasta, t_LeftRefID, t_startPos, t_LeftRefID, t_endPos+1, realignObjects, m_graphEdgePruneLevel, m_topK, HasHaplotypeLikeRank, HasUpdateGraph, HasProcLargeHomopolymer, HasKeepDuplicate, m_minLength, m_minMapQual, m_maxMismatches);
+                    int RealignSuccess = windowRealignmentAmplicon(ProbAligner, m_bamReader, m_fasta, t_LeftRefID, t_startPos, t_LeftRefID, t_endPos+1, realignObjects, m_graphEdgePruneLevel, m_topK, HasHaplotypeLikeRank, HasUpdateGraph, HasProcLargeHomopolymer, HasKeepDuplicate, m_minLength, m_minMapQual, m_maxMismatches);
+
+                    if (m_verboseLevel>=2)
+                    {
+                        cout << (RealignSuccess==1?"processed":"skip") << endl;
+                    }
+
+                    numRealignRegion += RealignSuccess;
                     numRegion ++;
 
                     t_lastEndPos = t_endPos+1;
@@ -2206,7 +2243,7 @@ int windowRealignmentAmplicon(GenericProbabilisticAlignment &ProbAligner, BamRea
         t_seqInLocalRegion.push_back(t_seq);
     }
 
-    // resort sequences into unique sequence
+    // restore sequences into unique sequences
     for (int i=0; i<t_seqInLocalRegion.size(); ++i)
     {
         Realigner_Sequence_t t_seq = t_seqInLocalRegion[i];
@@ -2405,7 +2442,7 @@ int windowRealignmentAmplicon(GenericProbabilisticAlignment &ProbAligner, BamRea
 
 struct SortSnpByPosition
 {
-    bool operator()(const tuple<long,char>& a, const tuple<long,char>& b)
+    bool operator()(const tuple<long,char>& a ,const tuple<long,char>& b)
     {
         return (get<0>(a) < get<0>(b));
     }

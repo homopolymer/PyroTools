@@ -201,3 +201,84 @@ void GenericVcfTools::write(RefVector& chromosomes, string &vcfFileName, Variant
 
     out.close();
 }
+
+//----------------------------------------------------------------
+// new version
+// file format
+void VcfFileformat(ostream& out){
+    out << "##fileformat=VCFv4.1" << endl;
+}
+// format
+void VcfFormat(ostream& out){
+    out << "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">" << endl;
+}
+
+// meta-information
+void VcfMetainfo(ostream& out){
+    // file format
+    VcfFileformat(out);
+}
+// head line
+void VcfHeadline(ostream& out, vector<string>& samples){
+    out << "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT";
+    for (auto s : samples)
+        out << "\t" << s;
+    out << endl;
+}
+// data record
+void VcfRecord(ostream& out, RefVector& chromosomes, vector<string>& samples, GenericVariant& variant){
+    int i,j;
+    // chrom
+    out << chromosomes[variant.m_chrID].RefName << "\t";
+    // pos
+    out << variant.m_chrPosition+1 << "\t";
+    // id
+    out << "." << "\t";
+    // reference allele
+    out << variant.m_reference << "\t";
+    // alternative alleles
+    for (i=0; i<variant.m_alleles.size()-1; i++){
+        if (variant.m_alleles[i].m_allele==variant.m_reference)
+            continue;
+        out << variant.m_alleles[i].m_allele << "/";
+    }
+    out << variant.m_alleles[i].m_allele << "\t";
+    // qual
+    out << "." << "\t";
+    // filter
+    out << "." << "\t";
+    // info
+    out << "." << "\t";
+    // format
+    out << "GT" << "\t";
+    // samples
+    for (i=0; i<samples.size()-1; i++){
+        if (variant.m_samples.count(samples[i])==0){
+            out << 0 << "\t";
+        }else{
+            out << variant.m_samples[samples[i]][j]+1 << "\t";
+        }
+    }
+    if (variant.m_samples.count(samples[i])==0){
+        out << 0 << endl;
+    }else{
+        out << variant.m_samples[samples[i]][j] << endl;
+    }
+}
+
+void GenericVcfTools::write(RefVector &chromosomes, string &vcfFileName, vector<string> &samples, map<int, GenericVariant> &variants){
+    ofstream out(vcfFileName);
+
+    // meta-information
+    VcfMetainfo(out);
+
+    // head line
+    VcfHeadline(out, samples);
+
+    // data record
+    for (auto var : variants){
+        VcfRecord(out, chromosomes, samples, var.second);
+    }
+
+    out.close();
+}

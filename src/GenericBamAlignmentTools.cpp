@@ -12,6 +12,7 @@ using namespace BamTools;
 #include <vector>
 #include <iterator>
 #include <iostream>
+#include <algorithm>
 #include <sstream>
 using namespace std;
 
@@ -1576,6 +1577,43 @@ int GenericBamAlignmentTools::maxGapLength(Cigar &cigar)
     return len;
 }
 
+int GenericBamAlignmentTools::numGap(string &alignRead, string &alignGenome)
+{
+    int num_gap = numInsert(alignRead,alignGenome) +
+                  numDelete(alignRead,alignGenome);
+    return num_gap;
+}
+
+int GenericBamAlignmentTools::numInsert(string &alignRead, string &alignGenome)
+{
+    Cigar cigar;
+    calculateCigar(alignRead, alignGenome, cigar);
+
+    int num_insert = 0;
+    for (auto op : cigar)
+    {
+        if (isInsert(op.Type))
+            num_insert++;
+    }
+
+    return num_insert;
+}
+
+int GenericBamAlignmentTools::numDelete(string &alignRead, string &alignGenome)
+{
+    Cigar cigar;
+    calculateCigar(alignRead, alignGenome, cigar);
+
+    int num_delete = 0;
+    for (auto op : cigar)
+    {
+        if (isDelete(op.Type))
+            num_delete++;
+    }
+
+    return num_delete;
+}
+
 bool GenericBamAlignmentTools::goodAlignment(BamAlignment &alignObj, bool keepDuplicate)
 {
     bool good = true;
@@ -1602,40 +1640,44 @@ bool GenericBamAlignmentTools::goodAlignment(BamAlignment &alignObj, bool keepDu
 
 
 
-void GenericBamAlignmentTools::getLocalAlignment(BamAlignment &alignObj, int position, int size,
+int GenericBamAlignmentTools::getLocalAlignment(BamAlignment &alignObj, int position, int size,
                                                  string &localRead, string &localGenome,
                                                  Cigar &cigar, BamMD &md,
                                                  int &numMismatch, int &numInDel)
 {
+    int numDiff = 0;
+
     // get the whole alignment
     string alignRead, alignGenome;
     getAlignmentSequences(alignObj, alignRead, alignGenome);
 
-    // move insert/delete to right
-    moveInDelRight(alignRead, alignGenome);
+//    // move insert/delete to right
+//    moveInDelRight(alignRead, alignGenome);
 
-    // the shift from position to the begin of alignment
-    int genomeShift = position-alignObj.Position;
+    int p0 = position;
+    int p1 = position+size;
 
     // local alignment
     string localAlignRead(""), localAlignGenome("");
 
     // pointer on aligned read and aligned genome
-    int readPointer = -1, genomePointer = -1;
+    int p = alignObj.Position-1;
 
     // iterate from first align position to last align position
     for (int i=0; i<alignRead.length(); ++i)
     {
-        if (alignRead[i]!=Spa)
-            readPointer += 1;
-
         if (alignGenome[i]!=Spa)
-            genomePointer += 1;
+        {
+            p += 1;
+        }
 
-        if (genomePointer>=genomeShift && genomePointer<genomeShift+size)
+        if (p>=p0 && p<p1)
         {
             localAlignRead   += alignRead[i];
             localAlignGenome += alignGenome[i];
+
+            if (alignRead[i]!=alignGenome[i] && alignRead[i]!='N' && alignGenome[i]!='N')
+                numDiff++;
         }
     }
 
@@ -1693,6 +1735,79 @@ void GenericBamAlignmentTools::getLocalAlignment(BamAlignment &alignObj, int pos
         if (localAlignGenome[i]!=Spa)
             localGenome += localAlignGenome[i];
     }
+
+    return numDiff;
+}
+
+
+int GenericBamAlignmentTools::getLocalAlignment(BamAlignment &alignObj, int position, int size, string &localRead, string &localReadQual, string &localGenome)
+{
+    int numDiff = 0;
+    // get the whole alignment
+    string alignRead, alignGenome;
+    getAlignmentSequences(alignObj, alignRead, alignGenome);
+
+    int p0 = position;
+    int p1 = position+size;
+
+    // position on the read
+    int r0 = 0;
+    for (auto cigar : alignObj.CigarData){
+        if (!isClip(cigar.Type)) break;
+        r0 += cigar.Length;
+    }
+
+    int rl = 0;
+
+    // local alignment
+    string localAlignRead(""), localAlignGenome("");
+
+    // pointer on aligned read and aligned genome
+    int p = alignObj.Position-1;
+
+    // iterate from first align position to last align position
+    for (int i=0; i<alignRead.length(); ++i)
+    {
+        if (alignGenome[i]!=Spa)
+        {
+            p += 1;
+        }
+
+        if (p>=p0 && p<p1)
+        {
+            localAlignRead   += alignRead[i];
+            localAlignGenome += alignGenome[i];
+
+            if (alignRead[i]!=Spa)
+            {
+                rl += 1;
+            }
+
+            if (alignRead[i]!=alignGenome[i] && alignRead[i]!='N' && alignGenome[i]!='N')
+                numDiff += 1;
+        }
+
+        if (p<p0 && alignRead[i]!=Spa)
+        {
+            r0 += 1;
+        }
+    }
+
+    // remove all spaces
+    localRead   = "";
+    localGenome = "";
+    for (int i=0; i<localAlignRead.size(); ++i)
+    {
+        if (localAlignRead[i]!=Spa)
+            localRead += localAlignRead[i];
+
+        if (localAlignGenome[i]!=Spa)
+            localGenome += localAlignGenome[i];
+    }
+
+    localReadQual = alignObj.Qualities.substr(r0,rl);
+
+    return numDiff;
 }
 
 string GenericBamAlignmentTools::getBamAlignmentID(BamAlignment &alignObj)
@@ -1849,4 +1964,81 @@ bool GenericBamAlignmentTools::validReadIdentity(BamAlignment &alignObj, double 
     int nX  = numBamAlignmentMismatches(alignObj);
     int len = getBamAlignmentReadLength(alignObj);
     return (nX<len*maxMismatchFrac);
+}
+
+bool GenericBamAlignmentTools::isUnmappedAlignment(BamAlignment &alignObj)
+{
+    return ( (alignObj.AlignmentFlag&0x4) != 0 );
+}
+
+bool GenericBamAlignmentTools::isSecondaryAlignment(BamAlignment &alignObj)
+{
+    return ( (alignObj.AlignmentFlag&0x100) != 0 );
+}
+
+bool GenericBamAlignmentTools::isQcFailedAlignment(BamAlignment &alignObj)
+{
+    return ( (alignObj.AlignmentFlag&0x200) != 0 );
+}
+
+bool GenericBamAlignmentTools::isDuplicateAlignment(BamAlignment &alignObj)
+{
+    return ( (alignObj.AlignmentFlag&0x400) != 0 );
+}
+
+bool GenericBamAlignmentTools::isSupplementaryAlignment(BamAlignment &alignObj)
+{
+    return ( (alignObj.AlignmentFlag&0x800) != 0 );
+}
+
+
+bool GenericBamAlignmentTools::isFilteredByFlag(BamAlignment &alignObj, int flag)
+{
+    if (flag==0)
+        return false;
+
+    return ( (alignObj.AlignmentFlag&flag) != 0 );
+}
+
+void GenericBamAlignmentTools::convertCigarToString(Cigar &cigar, string &cigarStr)
+{
+    stringstream ss;
+
+    for (auto &op : cigar)
+    {
+        ss << op.Length << op.Type;
+    }
+
+    cigarStr = ss.str();
+}
+
+void GenericBamAlignmentTools::printBamAlignment(RefVector &genomeDict, BamAlignment &alignObj)
+{
+//    string cigar;
+//    convertCigarToString(alignObj.CigarData, cigar);
+
+//    cout << alignObj.Name << "\t"
+//         << alignObj.AlignmentFlag << "\t"
+//         << genomeDict[alignObj.RefID].RefName << "\t"
+//         << (alignObj.Position+1) << "\t"
+//         << alignObj.MapQuality << "\t"
+//         << cigar << "\t";
+
+//    if (alignObj.IsPaired()){
+//        cout << genomeDict[alignObj.MateRefID] << "\t"
+//             << (alignObj.MatePosition+1) << "\t"
+//    }
+}
+
+string GenericBamAlignmentTools::getBamAlignmentName(BamAlignment &alignObj)
+{
+    string name = alignObj.Name;
+    if (alignObj.IsPaired())
+    {
+        if (alignObj.IsFirstMate())
+            name += ".1";
+        else
+            name += ".2";
+    }
+    return name;
 }

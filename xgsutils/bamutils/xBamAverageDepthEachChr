@@ -1,0 +1,76 @@
+#!/bin/bash
+BIOINFO_TOOL_XGSUTILS=/Users/fengzeng/tool/xgsutils
+xgsutils_averageDepth="$BIOINFO_TOOL_XGSUTILS/bamutils/xBamAverageDepth"
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamAverageDepthEachChr [OPTIONS] <GENOME_FASTA> <BAM_FILE>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Compute the average depth for each chromosome"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -r,--roi       specify the region of interest [STR]"
+  >&2 echo "    -q,--mq        skip reads with mapping quality less than the value [INT]"
+  >&2 echo "    -f,--ff        skip reads with the specified flags [INT]"
+  >&2 echo "    -s,--strand    read strand (\"+\" or \"-\")" 
+  >&2 echo "    -h,--help      print help message"
+  exit 0
+}
+
+# print help message if no arguments provided
+if [ $# = 0 ];then help;fi
+
+PARSED_OPTIONS=$(getopt -n "$0" -o r:q:f:h --long roi:,mq:,ff:,help -- "$@")
+
+# bad argument
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+roi=""
+mq=""
+ff=""
+rf=""
+# parse arguments
+while true;do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -r | --roi )
+      roi="-r $2"
+      shift 2;;
+    -q | --mq )
+      mq="-q $2"
+      shift 2;;
+    -f | --ff )
+      ff="-F $2 $ff"
+      shift 2;;
+    -s | --strand )
+      if [ "$2" = "+" ];then rf="-F 0x10";fi
+      if [ "$2" = "-" ];then rf="-f 0x10";fi
+      shift 2;;
+    -- )
+      shift
+      break;;
+  esac
+done
+
+genomeFile=$1 && shift
+bamFile=$1
+
+# number of chromosomes
+numChr=$(wc -l "$genomeFile.fai" | awk '{print $1}')
+# loop over chromosomes
+for i in $(seq 1 $numChr)
+do
+  chrName=$(awk -v n=$i 'NR==n{print $1}' "$genomeFile.fai")
+  samtools view -b $rf $ff $mq $bamFile $chrName > xgstemp.bam
+  samtools index xgstemp.bam
+  chrDepth=$($xgsutils_averageDepth xgstemp.bam | awk '{print $3}')
+  echo "$chrName    $chrDepth"
+  rm xgstemp.bam*
+done

@@ -4,6 +4,9 @@
 #include "DarkAlignmentsTool.h"
 #include "GenericProbabilisticAlignment.h"
 #include "GenericIndividualSnpCall.h"
+#include "GenericGraphTools.h"
+#include "SimpleVariantCallTool.h"
+#include "GenericBamAlignmentTools.h"
 using namespace GenericSequenceTools;
 
 #include <iostream>
@@ -16,6 +19,12 @@ static const string REALIGNER   = "GraphReAlign";
 static const string SNPCALLER   = "SnpCall";
 static const string INDELCALLER = "IndelCall";
 static const string ERRORSTAT   = "ErrStat";
+static const string CNSGRAPH    = "GraphConsensus";
+static const string SIMPLEVC    = "SimpleVarCall";
+static const string CROPBAM     = "CropBam";
+static const string MAPERRCLN   = "MapErrorClean";
+static const string LOCALSC     = "LocalStrainCall";
+static const string STRAINBIN   = "StrainBinning";
 
 // PyroTools help/version constants
 static const string HELP          = "help";
@@ -48,9 +57,28 @@ GenericAbstractTool* CreateTool(const string& arg){
         return new DataStatisticsTool(bins);
     }
 
+    // realigner
     if (arg == REALIGNER) return new ProbabilisticAlignmentTool;
 
+    // snp calling
     if (arg == SNPCALLER) return new IndividualSnpCallTool;
+    // simple variant calling
+    if (arg == SIMPLEVC)  return new SimpleVariantCallTool;
+
+    // consensus graph
+    if (arg == CNSGRAPH)  return new ConsensusGraphTool;
+
+    // chop bam file
+    if (arg == CROPBAM)   return new CropBamTool;
+
+    // clean map error
+    if (arg == MAPERRCLN) return new MapErrorCleanTool;
+
+    // local strain call
+    if (arg == LOCALSC) return new LocalStrainCallTool;
+
+    // strain binning
+    if (arg == STRAINBIN) return new StrainBinning;
 
     // unknown arg
     return 0;
@@ -68,18 +96,41 @@ int Help(int argc, char* argv[]){
     }
 
     // print general PyroTools help message
-    cerr << endl;
-    cerr << "usage: PyroTools [--help] COMMAND [ARGS]" << endl;
-    cerr << endl;
-    cerr << "Available PyroTools commands:" << endl;
+    cerr << "SYNOPSIS" << endl;
+    cerr << "    PyroTools COMMAND [ARGS]" << endl;
     cerr << "" << endl;
-    cerr << "\tGraphReAlign     Local realignment around homopolymers, dinucleotide repeats and MNP sites" << endl;
-    cerr << "\tSnpCall          Haplotype-based SNP calling algorithm for sequencing data of an individual sample [coming soon]" << endl;
-    cerr << "\tIndelCall        Haplotype-based Indel calling algorithm for sequencing data of an individual sample [coming soon]" << endl;
-    cerr << "\tErrStat          Count the frequency of errors in data" << endl;
+    cerr << "DESCRIPTION" << endl;
+    cerr << "    a toolkit to process the high throughput sequencing data" << endl;
+    cerr << "" << endl;
+    cerr << "COMMANDS" << endl;
+    cerr << "--Variant calling programs" << endl;
+    cerr << "    SimpleVarCall      profile the variants by using the heuristic method, parallel mode supported" << endl;
+    cerr << "    SnpCall            detect the SNPs after alignment adjust and mapping error clean" << endl;
+    cerr << "    IndelCall          detect the indels by by using the haplotype-based method" << endl;
+    cerr << "" << endl;
+    cerr << "--Strain calling programs" << endl;
+    cerr << "    StrainCall         reconstruct the strains in the viral/microbial sequencing data," << endl;
+    cerr << "                       and inclusively output the SNPs and/or Indels in the strains" << endl;
+    cerr << "    StrainBinning      aggregate long reads or assembled contigs/scaffolds into strain-" << endl;
+    cerr << "                       specific bin" << endl;
+    cerr << "    LocalStrainCall    reconstruct the strains in a local region by using the viral/microbial" << endl;
+    cerr << "                       sequencing data, and inclusively output the SNPs and/or Indels in the strains," << endl;
+    cerr << "                       the size of the local region is recommended not larger than 500bp" << endl;
+    cerr << "--Bias correction programs" << endl;
+    cerr << "    ReAligner          correct the alignment bias" << endl;
+    cerr << "    MapErrorClean      clean mapping errors" << endl;
+    cerr << "" << endl;
+    cerr << "--Haplotype reconstruction programs" << endl;
+    cerr << "    GraphConsensus     output the top-k paths in the consensus graph" << endl;
+    cerr << "    HaplotypeBuild     reconstruct the haplotype/consensus sequences" << endl;
+    cerr << "" << endl;
+    cerr << "--Error statistics programs" << endl;
+    cerr << "    ErrStat            count the errors in data" << endl;
+    cerr << "" << endl;
+    cerr << "--BAM processing programs" << endl;
+    cerr << "    CropBam            extract reads that might be partial in a region" << endl;
     cerr << endl;
     cerr << "See 'PyroTools help COMMAND' for more information on a specific command." << endl;
-    cerr << endl;
     return EXIT_SUCCESS;
 }
 

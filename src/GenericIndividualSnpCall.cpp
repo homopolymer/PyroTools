@@ -18,6 +18,7 @@ using namespace BamTools;
 #include <random>
 #include <chrono>
 #include <ctime>
+#include <functional>
 using namespace std;
 
 GenericIndividualSnpCall::GenericIndividualSnpCall(int downSample, int minReadLength, int minMapQuality, double maxMismatchFrac, int minSnpRead, int minSnpFrac, int verbosity)

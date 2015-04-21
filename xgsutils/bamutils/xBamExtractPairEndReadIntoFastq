@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# check samtools installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash samtools &> /dev/null
+if [ $? -eq 1 ]
+then
+  echo "require samtools installed"
+  echo "abort"
+  exit 1
+fi
+
+# check environment variable BIOINFO_TOOL_BAMUTIL is already set
+# http://stackoverflow.com/questions/11686208/check-if-environment-variable-is-already-set
+bamutil_exist=`env | awk '/^BIOINFO_TOOL_BAMUTIL=/{print 1}'`
+if [ -z "$bamutil_exist" ]
+then
+  echo "please make sure bamUtil(https://github.com/statgen/bamUtil) installed and export the executable path in BIOINFO_TOOL_BAMUTIL"
+  echo "abort"
+  exit 1
+fi
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamExtractPairEndReadToFastq [OPTIONS] <BAMFILE> <PREFIX>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Extract paired-end reads in a specified region and save in a fastq file"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -r,--roi     specify the region of interest [STR]"
+  >&2 echo "    -q,--mq      skip reads with map quality less than the value [INT]"
+  >&2 echo "    -f,--ff      skip reads with the specified flags [INT]"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# print help message if no argument provided
+if [ $# = 0 ];then help;fi
+
+# parse command arguments
+PARSED_OPTIONS=$(getopt -n "$0" -o r:q:f:h --long roi:,mq:,ff:,help -- "$@")
+
+# bad argument
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+# parse argument
+mq=""
+roi=""
+ff=""
+# parse argument
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -r | --roi )
+      roi="$roi $2"
+      shift 2;;
+    -q | --mq )
+      mq="-q $2"
+      shift 2;;
+    -f | --ff )
+      ff="$ff -F $2"
+      shift 2;;
+    -- )
+      shift
+      break;;
+  esac
+done
+
+bamfile=$1 && shift
+prefix=$1
+
+# check BAM file valid
+if [ ! -f "$bamfile" ]
+then
+  >&2 echo "invalid bam file"
+  >&2 echo "abort"
+  exit 1
+fi
+
+# extract sequencing reads in region of interest and convert to fastq
+samtools view -bh $ff $mq $bamfile $roi > xgsutils.tmp.bam
+samtools index xgsutils.tmp.bam
+bam bam2FastQ --firstRNExt "" --secondRNExt "" --in xgsutils.tmp.bam --outBase $prefix
+rm xgsutils.tmp.bam*

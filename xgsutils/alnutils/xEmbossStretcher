@@ -1,0 +1,81 @@
+#!/bin/bash
+
+# check emboss-needle installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash stretcher &> /dev/null
+if [ $? -eq 1 ]
+then
+  echo "require stretcher (emboss package) installed"
+  echo "abort"
+  exit 1
+fi
+
+# help message
+help(){
+  echo "SYNOPSIS"
+  echo "    xEmbossStretcher [OPTIONS] <SeqA> <SeqB>"
+  echo ""
+  echo "DESCRIPTION"
+  echo "    Compute the global alignment between two sequences"
+  echo ""
+  echo "OPTIONS"
+  echo "    --gapopen      gap open penalty [10.0]"
+  echo "    --gapextend    gap extend penalty [0.5]"
+  echo "    --aformat      output format: pair, markx0, markx1,"
+  echo "                   markx2, markx3, markx10, match, sam,"
+  echo "                   bam, score, srspair [srspair]"
+  echo "    -h,--help      print help message"
+  exit 0
+}
+
+# parse arguments
+# print help message if no arguments provided
+if [ "$#" = 0 ]
+then
+  help
+fi
+
+# parse arguments
+gapopen="-gapopen 10"
+gapextend="-gapextend 0.5"
+aformat="-aformat srspair"
+
+# parse command line
+PARSED_OPTIONS=$(getopt -n "$0" -o h -l gapopen:,gapextend:,aformat:,help -- "$@")
+
+# Bad arguments, something has gone wrong with the getopt command
+if [ $? -ne 0 ]
+then
+  help
+fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    --gapopen )
+      gapopen="-gapopen $2"
+      shift 2;;
+    --gapextend )
+      gapextend="-gapextend $2"
+      shift 2;;
+    --aformat )
+      aformat="-aformat $2"
+      shift 2;;
+    --)
+      shift
+      break;;
+  esac
+done
+
+seqa=$1 && shift
+seqb=$1
+
+# stretcher alignment
+stretcher $gapopen $gapextend -asequence $seqa -bsequence $seqb -outfile temp.stretcher 
+cat temp.stretcher
+rm temp.stretcher

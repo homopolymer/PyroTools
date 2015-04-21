@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# verbose function
+Verbose(){
+  >&2 echo "[$(date) xFastqFilterBlacklist] $1"
+}
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xFastqKeepWhitelist <FASTQFILE> <WHITELIST>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Print the reads in the whitelist"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# check the fastqutils
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash fastqutils &> /dev/null
+if [ $? -eq 1 ]
+then
+  >&2 echo "require fastqutils installed"
+  >&2 echo "abort"
+  exit 1
+fi
+
+
+# print help message if no arguments provided
+if [ $# = 0 ];then help;fi
+
+# parse the command line
+if [ $1 = "-h" ];then help;fi
+if [ $1 = "--help" ];then help;fi
+
+myrealpath='realpath -s'
+if [[ $OSTYPE =~ darwin* ]];then myrealpath='grealpath -s';fi
+
+fastqFile=$($myrealpath $1) && shift
+whitelist=$($myrealpath $1)
+
+# print reads in the whitelist
+fastqutils filter -whitelist $whitelist $fastqFile
+

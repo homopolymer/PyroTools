@@ -16,7 +16,10 @@ class GenericVcfTools
         GenericVcfTools();
 
     public:
+        // routine for write the vcf file
         static void write(RefVector& chromosomes, string& vcfFileName, VariantCallSetting& variantCallSettings, vector<GenericVariant>& variantsToReport);
+        // routine for write the vcf file
+        static void write(RefVector& chromosomes, string& vcfFileName, vector<string>& samples, map<int,GenericVariant>& variants);
 };
 }   // namespace
 

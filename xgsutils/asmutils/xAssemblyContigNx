@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# check environment variable BIOINFO_TOOL_XGSUTILS is already set
+# http://stackoverflow.com/questions/11686208/check-if-environment-variable-is-already-set
+xgsutils_exist=`env | awk '/^BIOINFO_TOOL_XGSUTILS=/{print 1}'`
+if [ -z "$xgsutils_exist" ]
+then
+  BIOINFO_TOOL_XGSUTILS=/Users/fengzeng/tool/xgsutils
+fi
+
+# help message 
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xAssemblyContigNx <FASTA_FILE>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Compute the Nx statistics of the assembled contigs"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# print help message if no arguments provided
+if [ "$#" = 0 ];then help;fi
+
+# set command argument parser
+PARSED_OPTIONS=$(getopt -n "$0" -o h --long help -- "$@")
+
+# bad argument
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+# parse arguments
+while true;do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -- )
+      shift
+      break;;
+  esac
+done
+
+fastaFile=$1
+# check the existence of the fasta file
+if [ ! -f $fastaFile ];then echo -e "file $fastaFile not existed;\nabort";exit;fi
+
+# compute the sum of the lengths of assembly contigs
+totalLength=$($BIOINFO_TOOL_XGSUTILS/faxutils/xFastaSequenceLength $fastaFile | awk '{n=n+$2}END{print n}')
+halfLength=$(( totalLength / 2 ))
+# compute the length of the largest contig
+largestLength=$($BIOINFO_TOOL_XGSUTILS/faxutils/xFastaSequenceLength $fastaFile | awk 'NR==1{print $2}')
+# compute Nx
+for f in $(seq 0.1 0.1 1);do
+  fracLength=$(echo "scale=6;${totalLength}*${f}" | bc)
+  $BIOINFO_TOOL_XGSUTILS/faxutils/xFastaSequenceLength $fastaFile | sort -rn -k2,2 | awk -v tl="$fracLength" -v fc="$f" -v xl="$largestLength" '{if(l<=tl && l+$2>=tl){x=$2+xl;x=x/2;print "N"(fc*100)"="x}l=l+$2;xl=$2}'
+done

@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+# help message
+function help
+{
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamInsertSize [OPTION] <BAM>"
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    It estimates the insert size from read mapping"
+  >&2 echo "OPTIONS"
+  >&2 echo "    -r,--roi     specify region of interest"
+  >&2 echo "    -h,--help    print help message"
+  exit 1
+}
+
+# print help, if no argument provided
+if [ $# = 0 ];then help;fi
+
+# parse the command line
+PARSED_OPTIONS=$(getopt -n "$0" -o r:h --long roi:,help -- "$@")
+
+# Bad arguments, something has gone wrong with the getopt command
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+# Now goes through all the options with a case and using shift to analyse 1 argument at a time
+# $1 identifies the first argument, and when we use shift we discard the first argument, 
+# so $2 becomes $1 and goes again through the case
+ROI=""
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -r | --roi )
+      ROI="$2"
+      shift 2;;
+    --)
+      shift
+      break;;
+  esac
+done
+
+BAM=$1;shift
+
+Z=$(samtools view -f3 -F4 $BAM $ROI | wc -l)
+N=0
+samtools view -f3 -F4 $BAM $ROI | while read -r REC;do
+  RNAME1=$(echo "$REC" | awk '{print $1}')
+  RPOS1=$(echo "$REC" | awk '{print $4}')
+  RNAME2=$(echo "$REC" | awk '{print $7}')
+  RPOS2=$(echo "$REC" | awk '{print $8}')
+  >&2 echo -ne "$Z\t$(($N+1))\r"
+  if [ "$RNAME1" != "$RNAME2" ] && [ "$RNAME2" != "=" ];then continue;fi
+  INSERT=$(echo "$REC" | awk '{print $9}')
+  if [[ "$INSERT" -lt 0 ]];then
+    INSERT=$(echo "-($INSERT)" | bc)
+  fi
+  if [[ ! $INSERT =~ ^[0-9]+$ ]];then >&2 echo -e "$INSERT,${#INSERT},$((INSERT+1))\n";fi
+  echo $INSERT
+  N=$(($N+1))
+done | awk '{a=a+$1}END{print "\n"a"\t"NR"\t"(a/NR)}'

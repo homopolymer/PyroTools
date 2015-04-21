@@ -1,0 +1,181 @@
+#!/bin/bash
+
+myrealpath='realpath -s'
+if [[ $OSTYPE =~ darwin* ]]
+then
+  myrealpath='grealpath -s'
+fi
+
+# check environment variable BIOINFO_TOOL_XGSUTILS is already set
+# http://stackoverflow.com/questions/11686208/check-if-environment-variable-is-already-set
+xgsutils_exist=`env | awk '/^BIOINFO_TOOL_XGSUTILS=/{print 1}'`
+if [ -z "$xgsutils_exist" ]
+then
+  BIOINFO_TOOL_XGSUTILS=/Users/fengzeng/tool/xgsutils
+fi
+
+# parse the region
+parseRegion(){
+  if [ ! -z $1 ]
+  then
+    if [[ $1 =~ ":" ]]
+    then
+      [[ $1 =~ (.+):([0-9]+)-([0-9]+) ]]
+      echo -e "${BASH_REMATCH[1]}\t${BASH_REMATCH[2]}\t${BASH_REMATCH[3]}"
+    else
+      len=$(grep $1 $2.fai | awk '{print $2}')
+      echo -e "$1\t1\t$len"
+    fi
+  fi
+}
+
+# verbose function
+Verbose(){
+  >&2 echo "[$(date) xBamQuickFindLargeDelete] $1"
+}
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamQuickFindLargeDelete [OPTIONS] <GENOME> <BAM>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Quickly find the large deletion (length>10bp) in the region of interest"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -r,--roi            specify the region of interest [STR]"
+  >&2 echo "    -q,--mq             skip reads with map quality less than the value [INT]"
+  >&2 echo "    -f,--ff             skip reads with the specified flags [INT]"
+  >&2 echo "    -c,--clip-length    skip the hard/soft clippings shorter than the value [INT]"
+  >&2 echo "    --flank             specify the flanking size [INT]"
+  >&2 echo "    -h,--help           print help message"
+  exit 0
+}
+
+# print help message if no arguments provided
+if [ $# = 0 ];then help;fi
+
+# parse the command line
+PARSED_OPTIONS=$(getopt -n "$0" -o q:r:f:c:h --long mq:,roi:,ff:,clip-length:,bt2dict:,flank:,help -- "$@")
+
+# Bad arguments, something has gone wrong with the getopt command
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+ROI=""
+roi=""
+mq=""
+ff=""
+cl=0
+flank=500
+# Now goes through all the options with a case and using shift to analyse 1 argument at a time
+# $1 identifies the first argument, and when we use shift we discard the first argument, 
+# so $2 becomes $1 and goes again through the case
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -r | --roi )
+      ROI="$2"
+      roi="-r $2"
+      shift 2;;
+    -q | --mq )
+      mq="-q $2"
+      shift 2;;
+    -f | --ff )
+      ff="$ff -f $2"
+      shift 2;;
+    -c | --clip-length )
+      cl="-c $2"
+      shift 2;;
+    --flank )
+      flank=$2
+      shift 2;;
+    --)
+      shift
+      break;;
+  esac
+done
+
+genomeFile=$($myrealpath $1) && shift
+bamFile=$($myrealpath $1)
+
+# current working directory
+cwd=$(pwd)
+# the temporary working directory
+twd="$cwd/temporary"
+# make the temporary directory
+if [ -d "$twd" ];then rm -rf $twd;fi
+mkdir $twd
+
+# change to the temporary working directory
+cd $twd
+
+# mark the clipping sites in the region of interest
+$BIOINFO_TOOL_XGSUTILS/bamutils/xBamMarkClipSite $mq $roi $ff $cl $bamFile 1>temporary_clipsite.bed 2>/dev/null
+
+# sort the bed by the genome coordinate
+$BIOINFO_TOOL_XGSUTILS/bedutils/xBedSortByGenomeCoordinate temporary_clipsite.bed 1>temporary_clipsite.sort.bed
+mv temporary_clipsite.sort.bed temporary_clipsite.bed
+
+# use bedtools intersect to filter the soft clippings that out of the region of interest
+parseRegion $ROI | bedtools intersect -a temporary_clipsite.bed -b stdin > temporary_clipsite.flt.bed
+mv temporary_clipsite.flt.bed temporary_clipsite.bed
+
+# extract the clip sites to be fastq
+awk '{print "@"$4;print $6;print "+";print $7}' temporary_clipsite.bed > temporary_clipsite.fastq
+
+# extract the regional genome sequence
+chrName=$(parseRegion $ROI | awk '{print $1}')
+chrLP=$(parseRegion $ROI | awk '{print $2}')
+chrRP=$(parseRegion $ROI | awk '{print $3}')
+chrLP=$(($chrLP-$flank))
+chrRP=$(($chrRP+$flank))
+tgn=$(printf "%s_%s_%s" $chrName $chrLP $chrRP)
+echo -e "$chrName\t$chrLP\t$chrRP\t$tgn" | bedtools getfasta -name -fi $genomeFile -fo temporary_genome.fasta -bed -
+samtools faidx temporary_genome.fasta
+
+# make the bowtie2 index dictionary
+mkdir bt2 && cd bt2 && bowtie2-build ../temporary_genome.fasta temporary_genome >/dev/null 2>&1 && cd ..
+
+# map the clipping sequences to the temporary genome
+mkdir bt2-result && cd bt2-result && bowtie2 -x ../bt2/temporary_genome -U ../temporary_clipsite.fastq -S temporary_clipsite.sam >/dev/null 2>&1 && $BIOINFO_TOOL_XGSUTILS/bamutils/xBamFromSamToBam -f ../temporary_genome.fasta temporary_clipsite.sam temporary_clipsite && cd ..
+
+# convert the bam to bed
+$BIOINFO_TOOL_XGSUTILS/bamutils/xBamToBedByRead $mq bt2-result/temporary_clipsite.bam > temporary_clipsite.aln.bed
+
+# read the mapped clipping sequences one by one
+while read one
+do
+  mChrName=$(echo $one | awk '{print $3}')
+  # skip if it is unmapped
+  if [ "$mChrName" = "*" ];then continue;fi
+  # skip if the identity is less than 0.85
+  mIden=$(echo $one | awk '{print $7}')
+  if [[ $mIden < 0.85 ]];then continue;fi
+  # skip if the soft-clip fraction is greater than 0.15
+  mScf=$(echo $one | awk '{print $8}')
+  if [[ $mScf > 0.15 ]];then continue;fi
+  mScf=$(echo $one | awk '{print $9}')
+  if [[ $mScf > 0.15 ]];then continue;fi
+  # left position
+  mChrLP=$(echo $one | awk '{print $2}')
+  mChrLP=$(($mChrLP+$chrLP))
+  # right position
+  mChrRP=$(echo $one | awk '{print $3}')
+  mChrRP=$(($mChrRP+$chrLP))
+  # the name
+  mName=$(echo $one | awk '{print $4}')
+  # the original position
+  scp=$(grep $mName temporary_clipsite.bed | awk '{print $2}')
+  # print out
+  if [[ $mChrRP < $scp ]];then echo -e "$chrName\t$mChrRP\t$scp";fi
+  if [[ $mChrLP > $scp ]];then echo -e "$chrName\t$scp\t$mChrLP";fi 
+done <temporary_clipsite.aln.bed
+
+# return to the up-level working director
+cd $cwd
+rm -rf $twd

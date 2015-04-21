@@ -1,0 +1,136 @@
+#!/bin/bash
+
+# check environment variable BIOINFO_TOOL_XGSUTILS is already set
+# http://stackoverflow.com/questions/11686208/check-if-environment-variable-is-already-set
+xgsutils_exist=`env | awk '/^BIOINFO_TOOL_XGSUTILS=/{print 1}'`
+if [ -z "$xgsutils_exist" ]
+then
+  BIOINFO_TOOL_XGSUTILS=/Users/fengzeng/tool/xgsutils
+fi
+
+# verbose
+Verbose(){
+  >&2 echo "[$(date) xBamMarkClipSite] $1"
+}
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamExtractClipSite [OPTIONS] <BAM>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Extract the hard/soft clipping sites on the genome"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -q,--mq             skip the reads with mapping quality less than the value [INT]"
+  >&2 echo "    -r,--roi            specify the region of interest [STR]"
+  >&2 echo "    -f,--ff             skip the reads with the specified flags [INT]"
+  >&2 echo "    -c,--clip-length    print clips with length not less than the value [INT]"
+  >&2 echo "    --format            print format, valid argument: fastq or fasta [STR]"
+  >&2 echo "    -h,--help           print help message"
+  exit 0
+}
+
+# print help message if the number of command arguments is zero
+if [ "$#" = "0" ];then help;fi
+
+PARSED_OPTIONS=$(getopt -n "$0" -o q:r:f:c:h --long mq:,roi:,ff:,clip-length:,format:,help -- "$@")
+
+# Bad arguments, something has gone wrong with the getopt command
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+mq=""
+roi=""
+ff=""
+cl=0
+format="fastq"
+# Now goes through all the options with a case and using shift to analyse 1 argument at a time
+# $1 identifies the first argument, and when we use shift we discard the first argument, 
+# so $2 becomes $1 and goes again through the case
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -r | --roi )
+      roi="-r $2"
+      shift 2;;
+    -q | --mq )
+      mq="-q $2"
+      shift 2;;
+    -f | --ff )
+      ff="$ff -f $2"
+      shift 2;;
+    -c | --clip-length )
+      cl=$2
+      shift 2;;
+    --format )
+      format=$2
+      shift 2;;
+    --)
+      shift
+      break;;
+  esac
+done
+
+
+bamfile=$1
+$BIOINFO_TOOL_XGSUTILS/bamutils/xBamToBedByRead $roi $mq $ff $bamfile 2>/dev/null | awk -v fmt="$format" -v t="$cl" '/[0-9]+[HS]/{ \
+  split($6,chars,""); \
+  m=0; \
+  n=0; \
+  u=0; \
+  x=""; \
+  y=""; \
+  v=""; \
+  for (i=1; i<=length($6); i++) { \
+    if (chars[i]!="H" && chars[i]!="S" && chars[i]!="M" && chars[i]!="I" && chars[i]!="D") { \
+      x=x chars[i]; \
+      y=y chars[i]; \
+      v=v chars[i]; \
+    } \
+    else { \
+      if (chars[i]=="M" || chars[i]=="I") { \
+        u=u+v+0.0; \
+      } \
+      if ( chars[i]=="H" || chars[i]=="S" ) { \
+        if (u==0) { m=m+x+0.0; } \
+        if (u>0) { n=n+y+0.0; } \
+      } \
+      x=""; \
+      y=""; \
+      v=""; \
+    } \
+  } \
+  hs=substr($10,1,m); \
+  hq=substr($11,1,m); \
+  ts=substr($10,length($10)-n,n); \
+  tq=substr($11,length($11)-n,n); \
+  if (m>=t) { \
+    if (fmt=="fasta") { \
+      print ">"$4"-head"; \
+      print hs; \
+    } \
+    if (fmt=="fastq") { \
+      print "@"$4"-head"; \
+      print hs; \
+      print "+"; \
+      print hq; \
+    } \
+  } \
+  if (n>=t) { \
+    if (fmt=="fasta") { \
+      print ">"$4"-tail"; \
+      print ts; \
+    } \
+    if (fmt=="fastq") { \
+      print "@"$4"-tail"; \
+      print ts; \
+      print "+"; \
+      print tq; \
+    } \
+  } \
+}'

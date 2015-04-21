@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# check seqtk installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash seqtk &> /dev/null
+if [ $? -eq 1 ]
+then
+  echo "require seqtk installed"
+  echo "abort"
+  exit 1
+fi
+
+# help message
+help(){
+  echo "Simulate a mutated genome by using the given variant annotation"
+  echo "Usage: xHaploidGenomeSimulator <FASTA_FILE> <VCF_FILE>"
+  echo "-h,--help    print help message"
+  exit 1
+}
+
+if [ ! -f "$1" ]
+then
+  echo "file $1 not exist"
+  echo "abort"
+  exit 1
+fi
+
+# parse argument
+if [ \( "$1" = "-h" \) -o \( "$1" = "-help" \) -o \( "$1" = "--help" \) ]
+then
+  help
+fi
+
+# run the program
+cat $2 | awk '!/^#/{print $1"\t"$2"\t"$4"\t"$5}' > xgsutils.tmp.tbl
+seqtk mutfa $1 xgsutils.tmp.tbl
+rm xgsutils.tmp.tbl

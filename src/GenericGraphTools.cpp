@@ -2,9 +2,17 @@
 #include "GenericFastaTools.h"
 using namespace GenericSequenceTools;
 
+#include <list>
+#include <vector>
+#include <tuple>
+#include <map>
+#include <set>
 #include <cmath>
 #include <algorithm>
+#include <numeric>
+#include <parallel/algorithm>
 using namespace std;
+
 
 // build the graph from a given reference genome and a set of alignments
 void GenericDagGraph::buildDagGraph(string &genome, vector<string> &reads, vector<Cigar> &cigars, vector<int> &starts, vector<int> &counts)
@@ -23,6 +31,12 @@ void GenericDagGraph::buildDagGraph(string &genome, vector<string> &reads, vecto
             updateDagGraphByRead(reads[i], cigars[i], starts[i]);
         }
     }
+
+    // third, merge the identical vertices by traversing in backward direction
+//    backwardRefineDagGraph();
+
+    // mark the difference
+    markDifference();
 
     // edge weight normalization
     edgeProbWeight();
@@ -48,10 +62,12 @@ void GenericDagGraph::buildDagGraphBackbone(string &genome)
     m_labels[t_begin]   = DAG_BEGIN_VERTEX;
     m_precedeHomopolymerLengths[t_begin] = 0;
     m_succedeHomopolymerLengths[t_begin] = 0;
-    m_isOnGenome[t_begin] = false;
-    m_isMismatch[t_begin] = false;
-    m_begin = t_begin;
-    m_skip[t_begin] = false;
+    m_isOnGenome[t_begin]     = false;
+    m_isMismatch[t_begin]     = false;
+    m_isInsert[t_begin]       = false;
+    m_begin                   = t_begin;
+    m_skip[t_begin]           = false;
+    m_genomePosition[t_begin] = t_begin;
 
     // iterately insert a base in genome
     for (int i=0; i<genome.length(); ++i)
@@ -89,6 +105,9 @@ void GenericDagGraph::buildDagGraphBackbone(string &genome)
         // not mismatch
         m_isMismatch[t_curr] = false;
 
+        // not insert
+        m_isInsert[t_curr] = false;
+
         // genomic position
         m_genomePosition[t_curr] = t_curr;
 
@@ -119,20 +138,20 @@ void GenericDagGraph::buildDagGraphBackbone(string &genome)
     m_precedeHomopolymerLengths[t_end] = 0;
     // succeding homopolymer length
     m_succedeHomopolymerLengths[t_end] = 0;
-
     // the number of vertexs at current stage
-    m_numVertexs = t_vertex;
+    m_numVertexs            = t_vertex;
     // the number of edges at current stage
-    m_numEdges   = m_numVertexs-1;
-
+    m_numEdges              = m_numVertexs-1;
     // on genome
-    m_isOnGenome[t_end] = false;
-
+    m_isOnGenome[t_end]     = false;
     // not mismatch
-    m_isMismatch[t_end] = false;
-
+    m_isMismatch[t_end]     = false;
+    // not insert
+    m_isInsert[t_end]       = false;
     // skip state
-    m_skip[t_end] = false;
+    m_skip[t_end]           = false;
+    // genome position
+    m_genomePosition[t_end] = t_end;
 
     m_end = t_end;
 }
@@ -140,11 +159,14 @@ void GenericDagGraph::buildDagGraphBackbone(string &genome)
 // update the graph by giving an alignment
 void GenericDagGraph::updateDagGraphByRead(string &read, Cigar &cigar, int &start, int& count, bool sorting)
 {
+    int index = 0;            // the index of vertex
     Vertex prev = start;      // previous vertex
     Vertex curr;              // current vertex
 
     Vertex g = start+1;       // genome vertex
     int    j = 0;             // pointer in read
+
+    list<Vertex> verticesOfRead;
 
     curr=prev;
     for (Cigar::iterator iter=cigar.begin(); iter!=cigar.end(); ++iter)
@@ -152,7 +174,7 @@ void GenericDagGraph::updateDagGraphByRead(string &read, Cigar &cigar, int &star
         // is match or mismatch
         if (GenericBamAlignmentTools::isMatch(iter->Type) || GenericBamAlignmentTools::isMismatch(iter->Type))
         {
-            for (int i=0; i<iter->Length; i++, j++, g++)
+            for (int i=0; i<iter->Length; i++, j++, g++, index++)
             {
                 // if read base is 'N'
                 if (read[j]==Amb)
@@ -160,6 +182,22 @@ void GenericDagGraph::updateDagGraphByRead(string &read, Cigar &cigar, int &star
                     curr = g;
                     insertEdge(prev, curr, count);
                     prev = curr;
+
+                    // save vertex
+                    verticesOfRead.emplace_back(curr);
+                    // save vertex
+                    m_readPosVertex[tuple<string,int>(read,g)] = curr;
+                    // save vertex
+                    m_readVertex2Index[tuple<string,Vertex>(read,curr)] = index;
+                    // save vertex
+                    m_readIndex2Vertex[tuple<string,int>(read,index)] = curr;
+
+                    // index by pos and vertex
+                    m_readMatIdxByPos[g][curr].emplace_back(m_numRead);
+
+                    // save read MD
+                    m_readMd[read][g] = read[j];
+
                     continue;
                 }
 
@@ -169,6 +207,22 @@ void GenericDagGraph::updateDagGraphByRead(string &read, Cigar &cigar, int &star
                     curr = g;
                     insertEdge(prev, curr, count);
                     prev = curr;
+
+                    // save vertex
+                    verticesOfRead.emplace_back(curr);
+                    // save vertex
+                    m_readPosVertex[tuple<string,int>(read,g)] = curr;
+                    // save vertex
+                    m_readVertex2Index[tuple<string,Vertex>(read,curr)] = index;
+                    // save vertex
+                    m_readIndex2Vertex[tuple<string,int>(read,index)] = curr;
+
+                    // index by pos and vertex
+                    m_readMatIdxByPos[g][curr].emplace_back(m_numRead);
+
+                    // save read MD
+                    m_readMd[read][g] = read[j];
+
                     continue;
                 }
 
@@ -182,6 +236,25 @@ void GenericDagGraph::updateDagGraphByRead(string &read, Cigar &cigar, int &star
                     {
                         curr = y;
                         insertEdge(prev, curr, count);
+
+                        // save vertex
+                        verticesOfRead.emplace_back(curr);
+                        // save vertex
+                        m_readPosVertex[tuple<string,int>(read,g)] = curr;
+                        // save vertex
+                        m_readVertex2Index[tuple<string,Vertex>(read,curr)] = index;
+                        // save vertex
+                        m_readIndex2Vertex[tuple<string,int>(read,index)] = curr;
+
+                        // save read mismatch
+                        m_readMismatches[tuple<string,int>(read,g)] = curr;
+
+                        // index by pos and vertex
+                        m_readMisIdxByPos[g][curr].emplace_back(m_numRead);
+
+                        // save read MD
+                        m_readMd[read][g] = read[j];
+
                         break;
                     }
                 }
@@ -196,31 +269,89 @@ void GenericDagGraph::updateDagGraphByRead(string &read, Cigar &cigar, int &star
                     // genomic position
                     m_genomePosition[curr] = g;
 
+                    // count the mismatch
+                    if (m_mismatches.find(g)==m_mismatches.end())
+                        m_numMismatch++;
+
                     // mismatch
                     m_isMismatch[curr] = true;
 
+                    // not insert
+                    m_isInsert[curr] = false;
+
+                    // not on backbone
+                    m_isOnGenome[curr] = false;
+
+                    // not skip
+                    m_skip[curr] = false;
+
                     // genome sibling
                     m_genomeSiblings[g].emplace_back(curr);
+
+                    // save vertex
+                    verticesOfRead.emplace_back(curr);
+                    // save vertex
+                    m_readPosVertex[tuple<string,int>(read,g)] = curr;
+                    // save vertex
+                    m_readVertex2Index[tuple<string,Vertex>(read,curr)] = index;
+                    // save vertex
+                    m_readIndex2Vertex[tuple<string,int>(read,index)] = curr;
+
+                    // save read mismatch
+                    m_readMismatches[tuple<string,int>(read,g)] = curr;
+
+                    // index by pos and vertex
+                    m_readMisIdxByPos[g][curr] = vector<int>(1,m_numRead);
+
+                    // save read md
+                    m_readMd[read][g] = read[j];
                 }
 
                 // update previous vertex
                 prev = curr;
             }
+            continue;
         }
 
         // it is delete
         if (GenericBamAlignmentTools::isDelete(iter->Type))
         {
+            int g0 = g;
+
             g += iter->Length;
             curr = g;
-//            insertEdge(prev, curr);
-//            prev = curr;
+
+            // save read delete
+            for (int gg=g0; gg<g; gg++)
+            {
+                m_readDeletes.insert(tuple<string,int>(read,gg));
+            }
+
+            // index by pos
+            for (int gg=g0; gg<g; gg++)
+            {
+                if (m_readDelIdxByPos.find(gg) == m_readDelIdxByPos.end())
+                {
+                    m_readDelIdxByPos[gg] = vector<int>(1,m_numRead);
+                }else
+                {
+                    m_readDelIdxByPos[gg].emplace_back(m_numRead);
+                }
+            }
+
+            // save read MD
+            for (int gg=g0; gg<g; gg++)
+            {
+                m_readMd[read][gg] = "-";
+            }
+
+            continue;
         }
 
         // it is insert
         if (GenericBamAlignmentTools::isInsert(iter->Type))
         {
-            for (int i=0; i<iter->Length; i++, j++)
+            for (int i=0; i<iter->Length; i++, j++, index++)
             {
                 list<EdgeVertex>::iterator outEdgeIter = m_outEdges[prev].begin();
                 for (; outEdgeIter!=m_outEdges[prev].end(); ++outEdgeIter)
@@ -231,6 +362,21 @@ void GenericDagGraph::updateDagGraphByRead(string &read, Cigar &cigar, int &star
                         // it is not a new vertex
                         curr = y;
                         insertEdge(prev, curr, count);
+                        // save vertex
+                        verticesOfRead.emplace_back(curr);
+                        // save vertex
+                        m_readPosInsert[tuple<string,int,int>(read,g-1,i)] = curr;
+                        // save vertex
+                        m_readVertex2Index[tuple<string,Vertex>(read,curr)] = index;
+                        // save vertex
+                        m_readIndex2Vertex[tuple<string,int>(read,index)] = curr;
+
+                        // save read insert
+                        m_readInserts[tuple<string,int,int>(read,g-1,i)] = curr;
+
+                        // index by pos and vertex
+                        m_readInsIdxByPos[tuple<int,int>(g-1,i)][curr].emplace_back(m_numRead);
+
                         break;
                     }
                 }
@@ -238,26 +384,94 @@ void GenericDagGraph::updateDagGraphByRead(string &read, Cigar &cigar, int &star
                 if (outEdgeIter==m_outEdges[prev].end())
                 {
                     string t_label = read.substr(j,1);
-                    if (t_label!="N")
-                    {
-                        curr = m_numVertexs++;
-                        insertVertex(curr, t_label, false, prev);
-                        insertEdge(prev, curr, count);
-                    }
+                    curr = m_numVertexs++;
+                    insertVertex(curr, t_label, false, prev);
+                    insertEdge(prev, curr, count);
+                    // insert
+                    m_isInsert[curr] = true;
+                    // not mismatch
+                    m_isMismatch[curr] = false;
+                    // not on backbone
+                    m_isOnGenome[curr] = false;
+                    // the position on the backbone
+                    m_genomePosition[curr] = g-1;
+                    // not skip
+                    m_skip[curr] = false;
+                    // insert position
+                    m_insertPosition[curr] = tuple<int,int>(g-1,i);
+                    // save vertex
+                    verticesOfRead.emplace_back(curr);
+                    // save vertex
+                    m_readPosInsert[tuple<string,int,int>(read,g-1,i)] = curr;
+                    // save vertex
+                    m_readVertex2Index[tuple<string,Vertex>(read,curr)] = index;
+                    // save vertex
+                    m_readIndex2Vertex[tuple<string,int>(read,index)] = curr;
+
+                    // save read insert
+                    m_readInserts[tuple<string,int,int>(read,g-1,i)] = curr;
+
+                    // index by pos and vertex
+                    m_readInsIdxByPos[tuple<int,int>(g-1,i)][curr] = vector<int>(1,m_numRead);
+
                 }
+
                 // update previous vertex
                 prev = curr;
             }
+            continue;
         }
     }
 
-//    insertEdge(prev, m_end);
+    while (g!=m_end && m_labels[g]==m_labels[prev])
+    {
+        g++;
+    }
     insertEdge(prev, g, count);
+
+
+    // save read information
+    GenericGraphRead graphRead;
+    graphRead.name       = read;
+    graphRead.startPos   = start+1;
+    graphRead.vertexList = verticesOfRead;
+    graphRead.count      = count;
+    m_readPool[read]     = graphRead;
+    m_numRead           += 1;
+
+    // save the read
+    m_reads.emplace_back(read);
+    // the start position of the read on the backbone
+    m_readStartPos[read] = m_genomePosition[*verticesOfRead.begin()];
+    // the end position of the read on the backbone
+    m_readEndPos[read]   = m_genomePosition[*verticesOfRead.rbegin()];
+    // the number of read occurrence
+    m_readCount[read]    = count;
+    // the index of read
+    m_readIndex[read] = m_numRead-1;
+    // the vertices of read
+    m_readVertices[read] = verticesOfRead;
 
     // topological sorting
     if (sorting)
     {
         topologicalSorting();
+    }
+
+    // debug
+    if (m_readIndex[read]==-1)
+    {
+        string sigar;
+        GenericBamAlignmentTools::convertCigarToString(cigar, sigar);
+
+        cerr << read << endl;
+        cerr << sigar << endl;
+        for (auto v : verticesOfRead)
+        {
+            cerr << v << " ~ " << m_readVertex2Index[tuple<string,Vertex>(read,v)] << endl;
+        }
+        cerr << m_end << endl;
+        exit(0);
     }
 }
 
@@ -1395,9 +1609,10 @@ void GenericDagGraph::calculateSuccedeHomopolymer()
     }
 }
 
+typedef long double LDBL;
 struct SortPathByWeightDescent
 {
-    bool operator()(const tuple<string, double, double, list<Vertex>>& a, const tuple<string, double, double, list<Vertex>>& b)
+    bool operator()(const tuple<string, LDBL, LDBL, list<Vertex>>& a, const tuple<string, LDBL, LDBL, list<Vertex>>& b)
     {
         return (get<2>(a)>get<2>(b));
     }
@@ -1406,11 +1621,10 @@ struct SortPathByWeightDescent
 void GenericDagGraph::topRankPaths(int k, vector<string> &pathLabels, vector<list<Vertex>>& pathVertexs, vector<double> &pathWeights)
 {
     // make sure graph is sorted
-    if (m_topoSortVertexs.empty())
-        topologicalSorting();
+    topologicalSorting();
 
     // from begin to end
-    map<Vertex, vector<tuple<string, double, double, list<Vertex>>>> pathToVertex;
+    map<Vertex, vector<tuple<string, LDBL, LDBL, list<Vertex>>>> pathToVertex;
 
     for (vector<Vertex>::iterator iter=m_topoSortVertexs.begin(); iter!=m_topoSortVertexs.end(); ++iter)
     {
@@ -1422,14 +1636,14 @@ void GenericDagGraph::topRankPaths(int k, vector<string> &pathLabels, vector<lis
         // it is begin node
         if (v==m_begin)
         {
-            pathToVertex[v] = vector<tuple<string, double, double, list<Vertex>>>(1, tuple<string, double, double, list<Vertex>>("", 0., 0., list<Vertex>(1, m_begin)));
+            pathToVertex[v] = vector<tuple<string, LDBL, LDBL, list<Vertex>>>(1, tuple<string, LDBL, LDBL, list<Vertex>>("", 1., 1., list<Vertex>(1, m_begin)));
             continue;
         }
 
         // it is middle or end node
         if (v!=m_begin)
         {
-            vector<tuple<string, double, double, list<Vertex>>> pathBuffer;
+            vector<tuple<string, LDBL, LDBL, list<Vertex>>> pathBuffer;
             for (list<EdgeVertex>::iterator iter2=m_inEdges[v].begin(); iter2!=m_inEdges[v].end(); ++iter2)
             {
                 Vertex u = iter2->m_id;
@@ -1440,29 +1654,38 @@ void GenericDagGraph::topRankPaths(int k, vector<string> &pathLabels, vector<lis
                 for (int i=0; i<pathToVertex[u].size(); ++i)
                 {
                     string pl       = get<0>(pathToVertex[u][i]);
-                    double pw       = get<1>(pathToVertex[u][i]);   // sum of path weight
-                    double apw      = get<2>(pathToVertex[u][i]);   // geometric average of path weight
+                    LDBL pw         = get<1>(pathToVertex[u][i]);   // sum of path weight
+                    LDBL apw        = get<2>(pathToVertex[u][i]);   //
                     list<Vertex> pv = get<3>(pathToVertex[u][i]);
 
                     pv.emplace_back(v);
 
-                    pw += log(m_edgeProbWeight[tuple<Vertex,Vertex>(u,v)]);
-                    apw = pw/pv.size();
+                    LDBL ow = 0;
+                    for (auto uo : m_outEdges[u])
+                        ow += uo.m_count;
 
-//                    pw = pw*(pv.size()-1)+log(m_edgeProbWeight[tuple<Vertex,Vertex>(u,v)]);
-//                    pw /= pv.size();
-//                    pw *= m_edgeProbWeight[tuple<Vertex,Vertex>(u,v)];
-//                    apw = pw;
+                    LDBL iw = 0;
+                    for (auto io : m_inEdges[v])
+                        iw += io.m_count;
+
+                    LDBL ew = m_edgeWeight[tuple<Vertex,Vertex>(u,v)];
+                    pw += 2*log(ew)-log(ow)-log(iw);
+                    apw = pw/pv.size();
 
                     // push into vector
                     if (v!=m_end)
-                        pathBuffer.push_back(tuple<string, double, double, list<Vertex>>(pl+m_labels[v], pw, apw, pv));
+                        pathBuffer.push_back(tuple<string, LDBL, LDBL, list<Vertex>>(pl+m_labels[v], pw, apw, pv));
                     else
-                        pathBuffer.push_back(tuple<string, double, double, list<Vertex>>(pl, pw, apw, pv));
+                        pathBuffer.push_back(tuple<string, LDBL, LDBL, list<Vertex>>(pl, pw, apw, pv));
                 }
             }
             // sort path buffer
-            sort(pathBuffer.begin(), pathBuffer.end(), SortPathByWeightDescent());
+            if (k<=100){
+                sort(pathBuffer.begin(), pathBuffer.end(), SortPathByWeightDescent());
+            }else{
+                __gnu_parallel::sort(pathBuffer.begin(), pathBuffer.end(), SortPathByWeightDescent());
+            }
+
 
             // erase items more than k
             if (pathBuffer.size()>k)
@@ -1476,12 +1699,12 @@ void GenericDagGraph::topRankPaths(int k, vector<string> &pathLabels, vector<lis
     }
 
     // save results
-    for (vector<tuple<string,double,double,list<Vertex>>>::iterator iter=pathToVertex[m_end].begin();
+    for (vector<tuple<string,LDBL,LDBL,list<Vertex>>>::iterator iter=pathToVertex[m_end].begin();
          iter!=pathToVertex[m_end].end(); ++iter)
     {
         pathLabels.push_back(get<0>(*iter));
         if (&pathWeights!=0)
-            pathWeights.push_back(get<2>(*iter));
+            pathWeights.push_back(get<2>(*iter)*k);
         if (&pathVertexs!=0)
             pathVertexs.push_back(get<3>(*iter));
     }
@@ -1699,23 +1922,25 @@ void GenericDagGraph::edgePruning(int graphEdgeLevel, bool calEdgeWeight)
 {
 
     // make sure graph is sorted
-    if (m_topoSortVertexs.empty())
-        topologicalSorting();
+    topologicalSorting();
 
     vector<tuple<Vertex,Vertex>> edgeToRemove;
     // visit vertexs
-    for (vector<Vertex>::iterator iter=m_topoSortVertexs.begin(); iter!=m_topoSortVertexs.end(); ++iter)
+    for (auto iter=m_topoSortVertexs.rbegin(); iter!=m_topoSortVertexs.rend(); ++iter)
     {
         Vertex v = *iter;
 
         if (v==m_begin || v==m_end)
             continue;
 
+        if (m_skip[v])
+            continue;
+
         for (list<EdgeVertex>::iterator iter2=m_inEdges[v].begin(); iter2!=m_inEdges[v].end(); ++iter2)
         {
             Vertex u = iter2->m_id;
 
-            if (u+1==v)
+            if (m_isOnGenome[u] && m_isOnGenome[v] && u+1==v)
                 continue;
 
             // edge count below threshold
@@ -1756,9 +1981,9 @@ void GenericDagGraph::edgePruning(int graphEdgeLevel, bool calEdgeWeight)
     }
 
     // find isolated vertex
-    for (int i=0; i<m_topoSortVertexs.size(); ++i)
+    for (auto iter=m_topoSortVertexs.rbegin(); iter!=m_topoSortVertexs.rend(); iter++)
     {
-        Vertex v = m_topoSortVertexs[i];
+        Vertex v = *iter;
 
         if (v==m_begin || v==m_end)
             continue;
@@ -1775,6 +2000,121 @@ void GenericDagGraph::edgePruning(int graphEdgeLevel, bool calEdgeWeight)
         edgeProbWeight();
 }
 
+void GenericDagGraph::edgePruningMix(int graphEdgeLevel, double graphEdgeFrac, bool calEdgeWeight)
+{
+
+    // make sure graph is sorted
+    topologicalSorting();
+
+    // normalized by out-edge
+    edgeWeightNormByOut();
+
+    vector<tuple<Vertex,Vertex>> edgeToRemove;
+    // visit vertexs
+    for (auto iter=m_topoSortVertexs.rbegin(); iter!=m_topoSortVertexs.rend(); ++iter)
+    {
+        Vertex v = *iter;
+
+        if (v==m_begin)
+            continue;
+
+        if (m_skip[v])
+            continue;
+
+        for (list<EdgeVertex>::iterator iter2=m_inEdges[v].begin(); iter2!=m_inEdges[v].end(); ++iter2)
+        {
+            Vertex u = iter2->m_id;
+
+            if (m_isOnGenome[u] && m_isOnGenome[v] && u+1==v)
+                continue;
+
+            // edge count below threshold
+            if (iter2->m_count<=graphEdgeLevel ||
+                    m_edgeProbWeight[tuple<Vertex,Vertex>(u,v)]<=graphEdgeFrac)
+                edgeToRemove.push_back(tuple<Vertex,Vertex>(u,v));
+        }
+
+    }
+
+    // remove edge
+    for (int i=0; i<edgeToRemove.size(); ++i)
+    {
+        Vertex u = get<0>(edgeToRemove[i]);
+        Vertex v = get<1>(edgeToRemove[i]);
+
+        list<EdgeVertex>::iterator iter;
+        // erase out edge of u
+        iter=m_outEdges[u].begin();
+        for (; iter!=m_outEdges[u].end(); ++iter)
+        {
+            if (iter->m_id==v)
+            {
+                m_outEdges[u].erase(iter);
+                break;
+            }
+        }
+
+        // erase in edge of v
+        iter=m_inEdges[v].begin();
+        for (; iter!=m_inEdges[v].end(); ++iter)
+        {
+            if (iter->m_id==u)
+            {
+                m_inEdges[v].erase(iter);
+                break;
+            }
+        }
+    }
+
+    // find isolated vertex
+    for (auto iter=m_topoSortVertexs.begin(); iter!=m_topoSortVertexs.end(); iter++)
+    {
+        Vertex v = *iter;
+
+        if (v==m_begin || v==m_end)
+            continue;
+
+        if (m_outEdges[v].empty() || m_inEdges[v].empty())
+        {
+            // in-edges
+            for (auto eu : m_inEdges[v])
+            {
+                for (auto vptr=m_outEdges[eu.m_id].begin(); vptr!=m_outEdges[eu.m_id].end(); vptr++)
+                {
+                    if (vptr->m_id==v)
+                    {
+                        m_outEdges[eu.m_id].erase(vptr);
+                    }
+                }
+            }
+            // out-edges
+            for (auto evv : m_outEdges[v])
+            {
+                for (auto vptr=m_inEdges[evv.m_id].begin(); vptr!=m_inEdges[evv.m_id].end(); vptr++)
+                {
+                    if (vptr->m_id==v)
+                    {
+                        m_inEdges[evv.m_id].erase(vptr);
+                    }
+                }
+            }
+
+            m_skip[v] = true;
+        }
+    }
+
+    // sorting
+    topologicalSorting();
+
+    // re-calculate edge weight
+    if (calEdgeWeight)
+        edgeProbWeight();
+
+    // mark the differences
+    markDifference();
+}
+
+
 void GenericDagGraph::edgePruning2(int graphVertexLevel, int graphEdgeLevel, bool calEdgeWeight)
 {
     int threshMismatch = graphVertexLevel;
@@ -1786,11 +2126,14 @@ void GenericDagGraph::edgePruning2(int graphVertexLevel, int graphEdgeLevel, boo
 
     vector<tuple<Vertex,Vertex>> edgeToRemove;
     // visit vertexs
-    for (vector<Vertex>::iterator iter=m_topoSortVertexs.begin(); iter!=m_topoSortVertexs.end(); ++iter)
+    for (auto iter=m_topoSortVertexs.rbegin(); iter!=m_topoSortVertexs.rend(); ++iter)
     {
         Vertex v = *iter;
 
         if (v==m_begin || v==m_end)
+            continue;
+
+        if (m_skip[v])
             continue;
 
         if (m_isOnGenome[v])
@@ -1799,7 +2142,7 @@ void GenericDagGraph::edgePruning2(int graphVertexLevel, int graphEdgeLevel, boo
             {
                 Vertex u = iter2->m_id;
 
-                if (!m_isOnGenome[u])
+                if (m_isOnGenome[u])
                     continue;
 
                 // delete
@@ -1955,6 +2298,1130 @@ void GenericDagGraph::edgeProbWeight()
             Vertex v = iter2->m_id;
             double w = t_inEdgeWeight[u];
             m_edgeProbWeight[tuple<Vertex,Vertex>(u,v)] = iter2->m_count/w;
+            m_edgeWeight[tuple<Vertex,Vertex>(u,v)] = iter2->m_count;
         }
+    }
+}
+
+void GenericDagGraph::markDifference()
+{
+    // clear the previous marking
+    m_mismatches.clear();
+    m_inserts.clear();
+    m_insertSize.clear();
+    m_deletes.clear();
+
+    // make sure topological sort
+    topologicalSorting();
+
+    for (auto v : m_topoSortVertexs)
+    {
+        if (v==m_begin || v==m_end)
+            continue;
+
+        if (m_skip[v])
+            continue;
+
+        // mismatch and insert
+        if (m_isMismatch[v])
+        {
+            m_mismatches.emplace(m_genomePosition[v]);
+        }else if (m_isInsert[v])
+        {
+            auto ptr = m_inserts.find(m_genomePosition[v]);
+            if (ptr == m_inserts.end())
+            {
+                m_inserts.emplace(m_genomePosition[v]);
+                m_insertSize[m_genomePosition[v]] = 1;
+            }else
+            {
+                tuple<int,int> p = m_insertPosition[v];
+                if (get<1>(p)>=m_insertSize[m_genomePosition[v]])
+                    m_insertSize[m_genomePosition[v]] ++;
+            }
+        }
+
+        // delete
+        for (auto eu : m_inEdges[v])
+        {
+            auto u = eu.m_id;
+
+            if (m_skip[u])
+                continue;
+
+            if (m_genomePosition[u]+1<m_genomePosition[v])
+            {
+                for (int g=m_genomePosition[u]+1; g<m_genomePosition[v]; g++)
+                {
+                    m_deletes.emplace(g);
+                }
+            }
+        }
+    }
+}
+
+void GenericDagGraph::buildVertexReadArray()
+{
+    // topological sorting
+    topologicalSorting();
+
+    for (auto v : m_topoSortVertexs)
+    {
+        if (v==m_begin || v==m_end)
+            continue;
+
+        if (m_skip[v])
+            continue;
+
+        int gv = m_genomePosition[v];
+        m_vertexReadArray[v] = vector<string>(m_numRead);
+        for (int i=0; i<m_numRead; i++)
+        {
+            string read = m_reads[i];
+            if (m_readStartPos[read]>gv)
+            {
+                m_vertexReadArray[v][i]="^";
+            }else if (m_readEndPos[read]<gv)
+            {
+                m_vertexReadArray[v][i]="$";
+            }else
+            {
+                if (m_isInsert[v])
+                {
+                    tuple<int,int> igv = m_insertPosition[v];
+                    auto ptr = m_readPosInsert.find(tuple<string,int,int>(read,get<0>(igv),get<1>(igv)));
+                    if (ptr==m_readPosInsert.end())
+                    {
+                        m_vertexReadArray[v][i]="-";
+                    }else
+                    {
+                        m_vertexReadArray[v][i]=m_labels[ptr->second];
+                    }
+                }else
+                {
+                    auto ptr = m_readPosVertex.find(tuple<string,int>(read,gv));
+                    if (ptr==m_readPosVertex.end())
+                    {
+                        m_vertexReadArray[v][i]="-";
+                    }else
+                    {
+                        m_vertexReadArray[v][i]=m_labels[ptr->second];
+                    }
+                }
+            }
+        }
+    }
+}
+
+void GenericDagGraph::buildMarkov1Matrix(){
+    map<int,map<string,string>> data;
+    for (int p=m_begin+1; p<m_end; p++){
+        if (m_mismatches.count(p)==0)
+            continue;
+        for (auto r : m_reads){
+            if (m_readStartPos[r]>p) data[p][r] = "^";
+            else if (m_readEndPos[r]<p) data[p][r] = "$";
+            else data[p][r] = m_readMd[r][p];
+        }
+    }
+
+    int pu = -1;
+    for (int pv=m_begin+1; pv<m_end; pv++){
+        if (m_mismatches.count(pv)==0)
+            continue;
+        if (pu==-1){
+            pu = pv;
+            continue;
+        }
+        for (auto r : m_reads){
+            string a = data[pu][r];
+            string b = data[pv][r];
+            if (a=="^" || a=="$" || b=="^" || b=="$")
+                continue;
+            m_markov1[pu][a][b] = 0;
+        }
+        for (auto r : m_reads){
+            string a = data[pu][r];
+            string b = data[pv][r];
+            if (a=="^" || a=="$" || b=="^" || b=="$")
+                continue;
+            m_markov1[pu][a][b] += m_readCount[r];
+        }
+        pu = pv;
+    }
+
+    // normalization
+    for (auto p : m_markov1){
+        for (auto a : p.second){
+            double z = 0;
+            for (auto b : a.second){
+                z += b.second;
+            }
+            for (auto b : a.second){
+                m_markov1Prob[p.first][a.first][b.first] = b.second/z;
+            }
+        }
+    }
+}
+
+void GenericDagGraph::backwardRefineDagGraph()
+{
+    // topological sorting
+    topologicalSorting();
+
+    // convert in-edges to out-edges
+    map<Vertex, list<EdgeVertex>> outEdges = m_inEdges;
+    // convert out-edges to in-edges
+    map<Vertex, list<EdgeVertex>> inEdges  = m_outEdges;
+
+    // traverse the graph in backward direction
+    for (auto vptr = m_topoSortVertexs.rbegin(); vptr!=m_topoSortVertexs.rend(); vptr++)
+    {
+        // current vertex
+        Vertex v = *vptr;
+
+        if (m_skip[v])
+            continue;
+
+        // check merge or not
+        bool merge = false;
+        // collect the insert vertices
+        map<string,vector<Vertex>> idenVertices;
+        for (auto uu : outEdges[v])
+        {
+            // next vertex
+            Vertex u = uu.m_id;
+
+            if (m_isInsert[u])
+            {
+                auto pptr = idenVertices.find(m_labels[u]);
+                if (pptr==idenVertices.end())
+                {
+                    idenVertices[m_labels[u]] = vector<Vertex>(u);
+                }else
+                {
+                    idenVertices[m_labels[u]].emplace_back(u);
+                }
+            }
+        }
+        // collect the vertices to be merged
+        vector<vector<Vertex>> mergeVertices;
+        for (auto x: idenVertices)
+        {
+            if (x.second.size()>=2){
+                sort(x.second.begin(),x.second.end());
+                mergeVertices.emplace_back(x.second);
+            }
+        }
+
+        // aggregate the links of the vertices to the first vertex
+        for (auto x: mergeVertices)
+        {
+            Vertex x0 = x[0];
+            for (int i=1; i<x.size(); i++)
+            {
+                Vertex xi = x[i];
+                // move in-edges
+                for (auto e: m_inEdges[xi])
+                {
+                    insertEdge(e.m_id, x0, e.m_count);
+                }
+                // move out-edges
+                for (auto e: m_outEdges[xi])
+                {
+                    insertEdge(x0, e.m_id, e.m_count);
+                }
+
+                m_skip[xi] = true;
+            }
+        }
+    }
+}
+
+/*
+ *  Search the top-k path by the metrics of the alignment identity
+ *
+ *  The general idea is that compute the identities of all reads aligned to a path,
+ *  and then sort the identities in the descending order, then pick up the 25 quantile
+ *  as the score of the path.
+ */
+
+typedef struct _read2path
+{
+    public:
+        _read2path()
+            :m_align("")
+            ,m_start(0)
+            ,m_numMatch(0)
+            ,m_numMismatch(0)
+            ,m_numInsert(0)
+            ,m_numDelete(0)
+        {}
+        _read2path(string &name)
+            :m_name(name)
+            ,m_align("")
+            ,m_numMatch(0)
+            ,m_numMismatch(0)
+            ,m_numInsert(0)
+            ,m_numDelete(0)
+        {}
+        bool empty(){return (m_numMatch+m_numMismatch+m_numInsert+m_numDelete)==0;}
+    public:
+        string       m_name;
+        string       m_align;
+
+        Vertex       m_start;
+        int          m_numMatch;
+        int          m_numMismatch;
+        int          m_numInsert;
+        int          m_numDelete;
+
+        list<Vertex> m_vertices;
+}Read2Path;
+
+void GenericDagGraph::topRankPathsByIden(int k, double quantile, vector<string> &pathLabels, vector<list<Vertex> > &pathVertexs, vector<double> &pathWeights)
+{
+    // make sure the graph is topologically sorted
+    topologicalSorting();
+
+    // this record the information of the paths reaching the vertex
+    typedef tuple<string, list<Read2Path>, double, list<Vertex>> PathInfo;
+    map<Vertex, vector<PathInfo>> pathToVertex;
+
+    // lambda function for sorting
+    auto SortByIden = [](const PathInfo& a, const PathInfo &b)->bool{
+        return get<2>(a)>get<2>(b);
+    };
+
+    // lambda function for computing alignment identity
+    auto AlnIden = [](const int &mat, const int &mis, const int &ins, const int &del)->double{
+        if (mat+mis+ins+del==0)
+            return 0;
+        return mat/(mat+mis+ins+del+0.);
+    };
+
+    // lambda function for the quantile
+    auto Q = [quantile](vector<tuple<double,int>>& x)->double{
+        // sort x in descending order
+        sort(x.begin(), x.end(),[](const tuple<double,int> &a, const tuple<double,int> &b)->bool{return (get<0>(a)>get<0>(b));});
+        // compute the cumulative sum
+        vector<double> y(x.size(),0);
+        vector<int>    s(x.size(),0);
+        #pragma parallel for shared(y,s)
+        for (int i=0; i<x.size(); i++)
+        {
+            if (i==0)
+            {
+                y[i] = get<0>(x[i])*get<1>(x[i]);
+                s[i] = get<1>(x[i]);
+            }
+            else
+            {
+                y[i] = y[i-1] + get<0>(x[i])*get<1>(x[i]);
+                s[i] = s[i-1] + get<1>(x[i]);
+            }
+        }
+        // total score
+        double z = *y.rbegin();
+        // find the quantile
+        double q;
+        int i=0;
+        for (; i<y.size(); i++)
+        {
+            if (y[i]>=z*quantile)
+            {
+                break;
+            }
+        }
+        if (i==0)
+        {
+            q = get<0>(x[i]);
+//            q = y[i]/s[i];
+        }else
+        {
+            q = (get<0>(x[i])+get<0>(x[i-1]))/2.0;
+//            q = (y[i]+y[i-1])/(s[i]+s[i-1]);
+        }
+        return q;
+    };
+
+    // iterate from begin to end
+    for (auto v : m_topoSortVertexs)
+    {
+        if (m_skip[v])
+            continue;
+
+        // debug
+        cerr << v << "\t" << m_end << endl;
+
+        // if vertex is begin
+        if (v==m_begin)
+        {
+            list<Read2Path> readAlns;
+            for (auto r : m_reads)
+            {
+                readAlns.emplace_back(Read2Path(r));
+            }
+
+            pathToVertex[v] = vector<PathInfo>(1,PathInfo("",readAlns,0.,list<Vertex>(1,m_begin)));
+            continue;
+        }
+
+        // if vertex is end
+        if (v==m_end)
+        {
+            // collect the path
+            vector<PathInfo> buffer;
+            // iterate over the in-edges
+            for (auto eu : m_inEdges[v])
+            {
+                Vertex u = eu.m_id;
+                for (auto p : pathToVertex[u])
+                {
+                    get<3>(p).emplace_back(v);
+                    buffer.emplace_back(p);
+                }
+            }
+            // compute the indentities
+            for (auto &p : buffer)
+            {
+                vector<tuple<double,int>> readIden;
+                for (auto r : get<1>(p))
+                {
+                    double iden = AlnIden(r.m_numMatch, r.m_numMismatch, r.m_numInsert, r.m_numDelete);
+                    readIden.emplace_back(tuple<double,int>(iden,m_readCount[r.m_name]));
+                }
+                double q = Q(readIden);
+                get<2>(p) = q;
+            }
+            // sort path
+            sort(buffer.begin(), buffer.end(), SortByIden);
+            // save the top-k path
+            vector<PathInfo> localResults;
+            for (int i=0; i<buffer.size(); i++)
+            {
+                if (i>=k)
+                    break;
+
+                localResults.emplace_back(buffer[i]);
+            }
+            pathToVertex[v] = localResults;
+
+            continue;
+        }
+
+        // if vertex is the internal node
+        if (v!=m_begin && v!=m_end)
+        {
+            // temporary buffer
+            vector<PathInfo> buffer;
+
+            // iterate over the in-edges
+            for (auto eu : m_inEdges[v])
+            {
+                // the id of the precede vertex
+                Vertex u = eu.m_id;
+                // skip if it is masked
+                if (m_skip[u])
+                    continue;
+
+                // if current vertex is insert
+                if (m_isInsert[v])
+                {
+                    // the position of the insert on the backbone
+                    tuple<int,int> vp = m_insertPosition[v];
+                    // iterate over all path reaching u
+                    for (auto p : pathToVertex[u])
+                    {
+                        // iterate over all reads
+                        for (auto &r : get<1>(p))
+                        {
+                            // the last vertex of read before reaching v
+                            Vertex ru = *r.m_vertices.rbegin();
+
+                            if (ru != *m_readVertices[r.m_name].rbegin()){
+                                // if there is delete
+                                auto rv_ptr = m_readPosInsert.find(tuple<string,int,int>(r.m_name, get<0>(vp), get<1>(vp)));
+                                if (rv_ptr == m_readPosInsert.end())
+                                {
+                                    r.m_numDelete += 1;
+                                    r.m_align += "D";
+                                }else
+                                {
+
+                                    // current vertex on the read
+                                    Vertex rv = rv_ptr->second;
+
+                                    // there is insert
+                                    int iru = m_readVertex2Index[tuple<string,Vertex>(r.m_name,ru)];
+                                    int irv = m_readVertex2Index[tuple<string,Vertex>(r.m_name,rv)];
+                                    if (iru+1<irv)
+                                    {
+                                        int i0 = m_readVertex2Index[tuple<string,Vertex>(r.m_name,ru)]+1;
+                                        int i1 = m_readVertex2Index[tuple<string,Vertex>(r.m_name,rv)]-1;
+                                        for (int ii=i0; ii<=i1; ii++)
+                                        {
+                                            Vertex rx = m_readIndex2Vertex[tuple<string,int>(r.m_name,ii)];
+                                            r.m_numInsert += 1;
+                                            r.m_align += "I";
+                                            r.m_vertices.emplace_back(rx);
+                                        }
+                                    }
+
+                                    if (m_labels[rv]==m_labels[v])
+                                    {
+                                        r.m_numMatch += 1;
+                                        r.m_align += "M";
+                                    }else
+                                    {
+                                        r.m_numMismatch += 1;
+                                        r.m_align += "X";
+                                    }
+
+                                    // insert rv to the vertex list
+                                    r.m_vertices.emplace_back(rv);
+                                }
+                            }
+                        }
+                        get<0>(p) += m_labels[v];
+                        get<3>(p).emplace_back(v);
+                        buffer.emplace_back(p);
+                    }
+                }else
+                {
+                    // the position of v on the backbone
+                    int vp = m_genomePosition[v];
+                    // iterate over all path reaching u
+                    for (auto p : pathToVertex[u])
+                    {
+                        // iterate over all reads
+                        for (auto &r : get<1>(p))
+                        {
+                            // read starts before v
+                            if (!r.empty()){
+                                // the last vertex of read before reaching v
+                                Vertex ru = *r.m_vertices.rbegin();
+                                if (ru != *m_readVertices[r.m_name].rbegin())
+                                {
+                                    // it is delete
+                                    auto rv_ptr = m_readPosVertex.find(tuple<string,int>(r.m_name,vp));
+                                    if (rv_ptr==m_readPosVertex.end())
+                                    {
+                                        int iru = m_readVertex2Index[tuple<string,Vertex>(r.m_name,ru)];
+                                        int irv = iru+1;
+                                        Vertex rv = m_readIndex2Vertex[tuple<string,int>(r.m_name,irv)];
+                                        while (m_genomePosition[rv]<m_genomePosition[v] && m_readEndPos[r.m_name]!=m_genomePosition[rv])
+                                        {
+                                            rv = m_readIndex2Vertex[tuple<string,int>(r.m_name,++irv)];
+                                        }
+                                        irv = m_readVertex2Index[tuple<string,int>(r.m_name,rv)];
+                                        // there is insert
+                                        if (iru+1<irv || m_readEndPos[r.m_name]==rv)
+                                        {
+                                            int i0 = iru+1;
+                                            int i1 = irv-1;
+                                            if (m_readEndPos[r.m_name]==rv)
+                                                i1 = irv;
+                                            for (int ii=i0; ii<=i1; ii++)
+                                            {
+                                                Vertex rx = m_readIndex2Vertex[tuple<string,int>(r.m_name,ii)];
+                                                r.m_numInsert += 1;
+                                                r.m_align += "I";
+                                                r.m_vertices.emplace_back(rx);
+                                            }
+                                        }
+
+                                        r.m_numDelete += 1;
+                                        r.m_align += "D";
+                                    }else
+                                    {
+                                        // current vertex on the read
+                                        Vertex rv = rv_ptr->second;
+
+                                        // there is insert
+                                        int iru = m_readVertex2Index[tuple<string,Vertex>(r.m_name,ru)];
+                                        int irv = m_readVertex2Index[tuple<string,Vertex>(r.m_name,rv)];
+                                        if (iru+1<irv)
+                                        {
+                                            int i0 = m_readVertex2Index[tuple<string,Vertex>(r.m_name,ru)]+1;
+                                            int i1 = m_readVertex2Index[tuple<string,Vertex>(r.m_name,rv)]-1;
+                                            for (int ii=i0; ii<=i1; ii++)
+                                            {
+                                                Vertex rx = m_readIndex2Vertex[tuple<string,int>(r.m_name,ii)];
+                                                r.m_numInsert += 1;
+                                                r.m_align += "I";
+                                                r.m_vertices.emplace_back(rx);
+                                            }
+                                        }
+
+                                        if (m_labels[rv]==m_labels[v])
+                                        {
+                                            r.m_numMatch += 1;
+                                            r.m_align += "M";
+                                        }else
+                                        {
+                                            r.m_numMismatch += 1;
+                                            r.m_align += "X";
+                                        }
+
+                                        // insert rv to the vertex list
+                                        r.m_vertices.emplace_back(rv);
+                                    }
+                                }
+                            }else
+                            {
+                                Vertex rv = m_readPosVertex[tuple<string,int>(r.m_name,vp)];
+                                // read start at v
+                                if (m_readStartPos[r.m_name]==vp)
+                                {
+                                    if (m_labels[rv]==m_labels[v])
+                                    {
+                                        r.m_numMatch += 1;
+                                        r.m_align += "M";
+                                    }else
+                                    {
+                                        r.m_numMismatch += 1;
+                                        r.m_align += "X";
+                                    }
+                                    // start vertex
+                                    r.m_start = v;
+                                    // insert rv to the vertex list
+                                    r.m_vertices.emplace_back(rv);
+                                }
+                                // read start before path
+                                else if (m_readStartPos[r.m_name]<vp)
+                                {
+                                    // before vb
+                                    int i1 = m_readVertex2Index[tuple<string,Vertex>(r.m_name,rv)]-1;
+                                    for (int ii=0; ii<=i1; ii++)
+                                    {
+                                        Vertex rx = m_readIndex2Vertex[tuple<string,int>(r.m_name,ii)];
+                                        r.m_align += "S";
+                                        r.m_vertices.emplace_back(rx);
+                                    }
+                                    // v
+                                    if (m_labels[rv]==m_labels[v])
+                                    {
+                                        r.m_numMatch += 1;
+                                        r.m_align += "M";
+                                    }else
+                                    {
+                                        r.m_numMismatch += 1;
+                                        r.m_align += "X";
+                                    }
+                                    // start vertex
+                                    r.m_start = v;
+                                    // insert rv to the vertex list
+                                    r.m_vertices.emplace_back(rv);
+                                }
+                            }
+
+                        }
+                        get<0>(p) += m_labels[v];
+                        get<3>(p).emplace_back(v);
+                        buffer.emplace_back(p);
+                    }
+                }
+            }
+
+            // compute the quantile
+            for (auto &p : buffer)
+            {
+                vector<tuple<double,int>> readIden;
+                for (auto r : get<1>(p))
+                {
+                    double iden = AlnIden(r.m_numMatch, r.m_numMismatch, r.m_numInsert, r.m_numDelete);
+                    readIden.emplace_back(tuple<double,int>(iden,m_readCount[r.m_name]));
+                }
+                double q = Q(readIden);
+                get<2>(p) = q;
+            }
+            // sort path
+            sort(buffer.begin(), buffer.end(), SortByIden);
+            // save the top-k path
+            vector<PathInfo> localResults;
+            for (int i=0; i<buffer.size(); i++)
+            {
+                if (i>=k)
+                    break;
+
+                localResults.emplace_back(buffer[i]);
+            }
+            pathToVertex[v] = localResults;
+
+            continue;
+        }
+    }
+
+    int kk = 0;
+    for (auto p : pathToVertex[m_end])
+    {
+        if (kk>=k)
+            break;
+        pathLabels.emplace_back(get<0>(p));
+
+        if (&pathVertexs!=nullptr)
+        {
+            pathVertexs.emplace_back(get<3>(p));
+        }
+
+        if (&pathWeights!=nullptr)
+        {
+            pathWeights.emplace_back(get<2>(p));
+        }
+
+        kk ++;
+    }
+
+}
+
+void GenericDagGraph::topRankPathsByErrMdl(int k, int k2, string scoring, bool markovian, vector<string> &pathLabels, vector<list<Vertex> > &pathVertexs, vector<double> &pathWeights)
+{
+    double err = 0.01;
+    double le = log(err);
+    double lc = log(1-err);
+
+    map<Vertex,int> vertexIdx;
+    // make sure the graph is topologically sorted
+    topologicalSorting();
+
+    // the index of vertex
+    for (int i=0; i<m_topoSortVertexs.size(); i++)
+        vertexIdx[m_topoSortVertexs[i]] = i;
+
+    // build the matrix of vertex-read
+    buildVertexReadArray();
+
+    // build the first order markovian matrix
+    if (markovian)
+        buildMarkov1Matrix();
+
+    // data structure for allele count
+    // the number of matches and mismatches
+    typedef tuple<int,int> AlleleCount;
+
+    // data structure for read info
+    // AlleleCount, previous difference and markovian feature
+    typedef vector<tuple<AlleleCount,int,LDBL>> ReadInfo;
+
+    // data structure for path
+    // (label, read info, score, vertices, read scores)
+    typedef tuple<string,ReadInfo,double,list<Vertex>> GraphPath;
+
+    // data structure for vertex
+    map<Vertex, vector<GraphPath>> pathToVertex;
+
+    // sorting method for path
+    auto ByDescendOrder = [](const GraphPath &a, const GraphPath &b)->bool{
+        return get<2>(a)>get<2>(b);
+    };
+
+    // path scoring method
+    // likelihood scoring
+    auto ScorePath = [lc,le,this](GraphPath &a)->double{
+        double score = 0;
+        int i = 0;
+        for (auto x : get<1>(a))
+        {
+            int n = this->m_readCount[this->m_reads[i++]];
+            if (get<0>(get<0>(x))+get<1>(get<0>(x))>0)
+                score += n*exp(get<0>(get<0>(x))*lc + get<1>(get<0>(x))*le + get<2>(x));
+        }
+        return score;
+    };
+
+    // maximal assignment scoring
+    auto ScorePath2 = [lc, le, this, &ScorePath](vector<GraphPath> &a){
+        vector<vector<double>> readPathScore(this->m_numRead);
+        for (int i=0; i<this->m_numRead; i++)
+        {
+            for (auto p : a)
+            {
+                int n0 = get<0>(get<0>(get<1>(p)[i]));
+                int n1 = get<1>(get<0>(get<1>(p)[i]));
+                if (n0+n1>0)
+                    readPathScore[i].emplace_back(exp(n0*lc+n1*le+get<2>(get<1>(p)[i])));
+                else
+                    readPathScore[i].emplace_back(0);
+            }
+        }
+        vector<double> pathReadCount(a.size(), 0);
+        for (int i=0; i<this->m_numRead; i++)
+        {
+            LDBL maxs = 0;
+            int maxj = -1;
+            int n = this->m_readCount[this->m_reads[i]];
+            for (int j=0; j<a.size(); j++)
+            {
+                if (maxs < readPathScore[i][j])
+                {
+                    maxs = readPathScore[i][j];
+                    maxj = j;
+                }
+            }
+            if (maxj != -1) pathReadCount[maxj] += n;
+        }
+        for (int j=0; j<a.size(); j++)
+        {
+            get<2>(a[j]) = pathReadCount[j];
+        }
+    };
+
+    // average assignment scoring
+    auto ScorePath3 = [lc, le, this, &ScorePath](vector<GraphPath> &a){
+        vector<vector<double>> readPathScore(this->m_numRead);
+        for (int i=0; i<this->m_numRead; i++)
+        {
+            for (auto p : a)
+            {
+                int n0 = get<0>(get<0>(get<1>(p)[i]));
+                int n1 = get<1>(get<0>(get<1>(p)[i]));
+                if (n0+n1>0)
+                    readPathScore[i].emplace_back(exp(n0*lc+n1*le+get<2>(get<1>(p)[i])));
+                else
+                    readPathScore[i].emplace_back(0);
+            }
+        }
+        vector<double> pathReadCount(a.size(), 0);
+        for (int i=0; i<this->m_numRead; i++)
+        {
+            LDBL maxt = 0;
+            int n = this->m_readCount[this->m_reads[i]];
+            for (int j=0; j<a.size(); j++)
+            {
+                maxt += readPathScore[i][j];
+            }
+            for (int j=0; j<a.size(); j++)
+            {
+                pathReadCount[j] += n*readPathScore[i][j]/(maxt+1e-9);
+            }
+        }
+        for (int j=0; j<a.size(); j++)
+        {
+            get<2>(a[j]) = pathReadCount[j];
+        }
+    };
+
+    // unique graph path
+    auto UniquePath = [&ByDescendOrder](vector<GraphPath> &a)
+    {
+        vector<GraphPath> b(a.begin(), a.end());
+
+        a.clear();
+        a.shrink_to_fit();
+
+        set<string> pathSeqs;
+        for (auto p : b)
+        {
+            bool skip = false;
+            for (auto s : pathSeqs)
+            {
+                if (get<0>(p).find(s)!=string::npos)
+                {
+                    skip = true;
+                    break;
+                }
+                if (s.find(get<0>(p))!=string::npos)
+                {
+                    skip = true;
+                    break;
+                }
+            }
+            if (!skip)
+            {
+                a.emplace_back(p);
+                pathSeqs.insert(get<0>(p));
+            }
+        }
+    };
+
+    // top-k path
+    auto TopkPath = [&UniquePath,scoring](vector<GraphPath> &a, vector<GraphPath> &b, int k)
+    {
+        for (int i=0; i<b.size(); i++)
+        {
+            if (i>=k)
+                break;
+            a.emplace_back(b[i]);
+        }
+    };
+
+    // iterate from begin to end
+    for (auto v : m_topoSortVertexs)
+    {
+        // if vertex is begin
+        if (v==m_begin)
+        {
+            pathToVertex[v] = vector<GraphPath>(1, GraphPath("", ReadInfo(m_numRead,tuple<AlleleCount,int,LDBL>(AlleleCount(0,0),-1,0)), 0, list<Vertex>(1,m_begin)));
+            continue;
+        }
+
+//        // if vertex is end
+//        if (v==m_end)
+//        {
+//            vector<GraphPath> pathBuffer;
+//            // iterate over in-edges
+//            for (auto eu : m_inEdges[v])
+//            {
+//                // previous vertex
+//                auto u = eu.m_id;
+
+//                if (m_skip[u]) continue;
+
+//                // iterate over all paths of u
+//                for (auto &p : pathToVertex[u])
+//                {
+//                    get<3>(p).emplace_back(m_end);
+//                    pathBuffer.emplace_back(p);
+//                }
+//            }
+
+//            if (scoring=="assign")
+//                ScorePath2(pathBuffer);
+
+//            // sort the path
+//            sort(pathBuffer.begin(), pathBuffer.end(), ByDescendOrder);
+
+//            pathToVertex[v] = vector<GraphPath>();
+//            TopkPath(pathToVertex[v], pathBuffer, k);
+
+//            continue;
+//        }
+
+        // if vertex is the internal node
+        if (v!=m_begin)
+        {
+            auto vidx = vertexIdx[v];
+            int pv = m_genomePosition[v];
+
+            vector<GraphPath> vPathBuffer;
+            // iterate over the in-edges
+            for (auto eu : m_inEdges[v])
+            {
+                auto u = eu.m_id;
+                auto uidx = vertexIdx[u];
+                int pu = m_genomePosition[u];
+
+                // skip if it is masked
+                if (m_skip[u]) continue;
+
+                set<int> visited_pos;
+                set<tuple<int,int>> visited_ins;
+
+                if (m_mismatches.count(pu))
+                    visited_pos.insert(pu);
+                if (m_isInsert[u])
+                    visited_ins.insert(m_insertPosition[u]);
+
+                vector<GraphPath> uPathBuffer(pathToVertex[u].begin(), pathToVertex[u].end());
+                // there is a jump
+//                if (pu+1<pv || m_inserts.count(pu)){
+                    for (int xidx=uidx+1; xidx<vidx; xidx++)
+                    {
+                        Vertex x = m_topoSortVertexs[xidx];
+                        int px = m_genomePosition[x];
+
+                        if (px>=pv)
+                            continue;
+
+                        if (m_mismatches.count(px)){
+                            if (visited_pos.count(px))
+                                continue;
+                            visited_pos.insert(px);
+                        }
+                        if (m_isInsert[x])
+                        {
+                            tuple<int,int> ipx = m_insertPosition[x];
+                            if (visited_ins.count(ipx))
+                                continue;
+                            visited_ins.insert(ipx);
+                        }
+
+                        for (auto &p : uPathBuffer)
+                        {
+                            for (int r=0; r<m_numRead; r++)
+                            {
+                                if (m_vertexReadArray[x][r]=="^")
+                                    continue;
+                                if (m_vertexReadArray[x][r]=="$")
+                                    continue;
+
+                                if (m_vertexReadArray[x][r]!="-")
+                                    get<1>(get<0>(get<1>(p)[r])) += 1;
+                                else
+                                    get<0>(get<0>(get<1>(p)[r])) += 1;
+                            }
+
+                            // compute the markovian feature
+                            if (!m_isInsert[x] && m_mismatches.count(px) && markovian){
+                                for (int r=0; r<m_numRead; r++){
+                                    if (m_readStartPos[m_reads[r]]>px) continue;
+                                    if (m_readEndPos[m_reads[r]]<px) continue;
+                                    int t = get<1>(get<1>(p)[r]);
+                                    if (t==-1){
+                                        get<1>(get<1>(p)[r]) = px;
+                                    }else{
+                                        string a = m_readMd[m_reads[r]][t];
+                                        string b = m_readMd[m_reads[r]][px];
+                                        get<2>(get<1>(p)[r]) += log(m_markov1Prob[t][a][b]);
+                                        get<1>(get<1>(p)[r]) = px;
+                                    }
+                                }
+                            }
+                        }                        
+                    }
+//                }
+
+                vPathBuffer.insert(vPathBuffer.end(), uPathBuffer.begin(), uPathBuffer.end());
+            }
+
+            // update the alignment information
+            if ((m_mismatches.count(pv) || m_deletes.count(pv) || m_isInsert[v]) && v!=m_end)
+            {
+                for (auto &p : vPathBuffer)
+                {
+                    for (int r=0; r<m_numRead; r++)
+                    {
+                        if (m_vertexReadArray[v][r]=="^")
+                            continue;
+                        if (m_vertexReadArray[v][r]=="$")
+                            continue;
+
+                        if (m_vertexReadArray[v][r]==m_labels[v])
+                            get<0>(get<0>(get<1>(p)[r])) += 1;
+                        else
+                            get<1>(get<0>(get<1>(p)[r])) += 1;
+                    }
+
+                    if (!m_isInsert[v] && m_mismatches.count(pv) && markovian){
+                        for (int r=0; r<m_numRead; r++){
+                            if (m_readStartPos[m_reads[r]]>pv) continue;
+                            if (m_readEndPos[m_reads[r]]<pv) continue;
+                            int t = get<1>(get<1>(p)[r]);
+                            if (t==-1){
+                                get<1>(get<1>(p)[r]) = pv;
+                            }else{
+                                string a = m_readMd[m_reads[r]][t];
+                                string b = m_readMd[m_reads[r]][pv];
+                                get<2>(get<1>(p)[r]) += log(m_markov1Prob[t][a][b]);
+                                get<1>(get<1>(p)[r]) = pv;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // compute path weight and update sequence
+            for (auto &p : vPathBuffer)
+            {
+                if (v!=m_end)
+                    get<0>(p) += m_labels[v];
+
+                if ((m_inEdges[v].size()>1 || m_mismatches.count(pv) || m_deletes.count(pv) || m_isInsert[v] || v==m_end)
+                        && scoring=="likeli")
+                {
+                    double s = ScorePath(p);
+                    get<2>(p) = s;
+                }
+
+                get<3>(p).emplace_back(v);
+            }
+
+            if ((m_inEdges[v].size()>1 || m_mismatches.count(pv) || m_deletes.count(pv) || m_isInsert[v] || v==m_end)
+                    && scoring=="assign")
+                ScorePath3(vPathBuffer);
+
+            // sort the path
+            sort(vPathBuffer.begin(), vPathBuffer.end(), ByDescendOrder);
+            // top-k path
+            pathToVertex[v] = vector<GraphPath>();
+            if (v!=m_end)
+                TopkPath(pathToVertex[v], vPathBuffer, k2);
+            else
+                TopkPath(pathToVertex[v], vPathBuffer, k);
+
+            continue;
+        }
+    }
+
+    for (auto p : pathToVertex[m_end])
+    {
+        pathLabels.emplace_back(get<0>(p));
+
+        if (&pathVertexs!=nullptr)
+        {
+            pathVertexs.emplace_back(get<3>(p));
+        }
+
+        if (&pathWeights!=nullptr)
+        {
+            pathWeights.emplace_back(get<2>(p));
+        }
+    }
+}
+
+// the variants in a path
+// note: it will use VRM to collect read information in the future
+void GenericDagGraph::pathVariantCollect(list<Vertex> &pathVertices, map<int, GenericAllele> &pathVariants)
+{
+    Vertex u;
+    for (auto v : pathVertices){
+        if (v==m_begin) u = v;
+        if (v==m_end) continue;
+
+        // it is mismatch or insert
+        if (!m_isOnGenome[v]){
+            // it is mismatch
+            if (m_isMismatch[v]){
+                auto pos = m_genomePosition[v] - 1;
+                string ref = m_labels[pos+1];
+                string alt = m_labels[v];
+                // allele
+                GenericAllele allele;
+                allele.m_chrID       = 0;
+                allele.m_chrPosition = pos;
+                allele.m_allele      = alt;
+                allele.m_reference   = ref;
+                // save
+                pathVariants[pos]    = allele;
+            }
+            // it is insert
+            else if (m_isInsert[v]){
+                auto pos = m_genomePosition[v] - 1;
+                if (pathVariants.count(pos)){
+                    // update
+                    pathVariants[pos].m_allele += m_labels[v];
+                }else{
+                    string ref = m_labels[pos+1];
+                    string alt = m_labels[v];
+                    // allele
+                    GenericAllele allele;
+                    allele.m_chrID       = 0;
+                    allele.m_chrPosition = pos;
+                    allele.m_allele      = alt;
+                    allele.m_reference   = ref;
+                    // save
+                    pathVariants[pos]    = allele;
+                }
+            }
+        }else
+        // it is delete
+        if (m_genomePosition[u]+1<m_genomePosition[v]){
+            for (auto pos=m_genomePosition[u]+1; pos<m_genomePosition[v]; pos++){
+                string ref = m_labels[pos];
+                string alt = "-";
+                // allele
+                GenericAllele allele;
+                allele.m_chrID       = 0;
+                allele.m_chrPosition = pos-1;
+                allele.m_allele      = alt;
+                allele.m_reference   = ref;
+                // save
+                pathVariants[pos-1]  = allele;
+            }
+        }
+
+        // update
+        u = v;
     }
 }

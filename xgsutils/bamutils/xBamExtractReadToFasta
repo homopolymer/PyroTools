@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# check samtools installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash samtools &> /dev/null
+if [ $? -eq 1 ]
+then
+  >&2 echo "require samtools installed"
+  >&2 echo "abort"
+  exit 1
+fi
+
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamExtractReadToFasta [OPTIONS] <BAMFILE>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Extract sequencing reads in a specified region and save in a fasta file ignoring quality"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -r,--roi     region of interest [STR]"
+  >&2 echo "    -q,--mq      minimum mapping quality score (default:5) [INT]"
+  >&2 echo "    -f,--ff      skip reads with the specified flags [INT]"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+
+# print help message if no arguments provided
+if [ "$#" = 0 ]
+then
+  help
+fi
+
+# parse the command line
+PARSED_OPTIONS=$(getopt -n "$0" -o q:r:f:h --long mq:,roi:,ff:,help -- "$@")
+
+# Bad arguments, something has gone wrong with the getopt command
+if [ $? -ne 0 ]
+then
+  help
+fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+mq="-q 5"
+roi=""
+ff=""
+# Now goes through all the options with a case and using shift to analyse 1 argument at a time
+# $1 identifies the first argument, and when we use shift we discard the first argument, 
+# so $2 becomes $1 and goes again through the case
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -r | --roi )
+      roi="$2"
+      shift 2;;
+    -q | --mq )
+      mq="-q $2"
+      shift 2;;
+    -f | --ff )
+      ff="$ff -F $2"
+      shift 2;;
+    --)
+      shift
+      break;;
+  esac
+done
+
+bamFiles=""
+for bam in "$@"
+do
+  bamFiles="$bamFiles $bam"
+done
+
+>&2 echo "[$(date) xBamExtractReadToFasta] process $bamFiles with options $roi $mq $ff"
+
+# extract sequencing reads in region of interest and convert to fastq
+samtools view $mq $ff $bamFiles $roi | gawk ' \
+{ \
+    Xn=$1; \
+    if (and($2,0x1)==0x1 && and($2,0x40)==0x40){ \
+      Xn=Xn ".1"; \
+    } \
+    if (and($2,0x1)==0x1 && and($2,0x80)==0x80){ \
+      Xn=Xn ".2"; \
+    } \
+    print ">"Xn"\n"$10 \
+}'

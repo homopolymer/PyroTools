@@ -1,0 +1,1051 @@
+The system is: Darwin - 14.0.0 - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /opt/local/bin/gcc 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/Users/fengzeng/workspace/PyroTools/build/CMakeFiles/3.0.2/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /opt/local/bin/g++ 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/Users/fengzeng/workspace/PyroTools/build/CMakeFiles/3.0.2/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec449195010/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec449195010.dir/build.make CMakeFiles/cmTryCompileExec449195010.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec449195010.dir/testCCompiler.c.o
+/opt/local/bin/gcc    -o CMakeFiles/cmTryCompileExec449195010.dir/testCCompiler.c.o   -c /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTryCompileExec449195010
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec449195010.dir/link.txt --verbose=1
+/opt/local/bin/gcc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec449195010.dir/testCCompiler.c.o  -o cmTryCompileExec449195010  
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec3011199831/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec3011199831.dir/build.make CMakeFiles/cmTryCompileExec3011199831.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3011199831.dir/CMakeCCompilerABI.c.o
+/opt/local/bin/gcc    -o CMakeFiles/cmTryCompileExec3011199831.dir/CMakeCCompilerABI.c.o   -c /opt/local/share/cmake-3.0/Modules/CMakeCCompilerABI.c
+Linking C executable cmTryCompileExec3011199831
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3011199831.dir/link.txt --verbose=1
+/opt/local/bin/gcc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTryCompileExec3011199831.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec3011199831   
+Using built-in specs.
+COLLECT_GCC=/opt/local/bin/gcc
+COLLECT_LTO_WRAPPER=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/lto-wrapper
+Target: x86_64-apple-darwin14
+Configured with: /opt/local/var/macports/build/_opt_local_var_macports_sources_rsync.macports.org_release_tarballs_ports_lang_gcc49/gcc49/work/gcc-4.9.1/configure --prefix=/opt/local --build=x86_64-apple-darwin14 --enable-languages=c,c++,objc,obj-c++,lto,fortran,java --libdir=/opt/local/lib/gcc49 --includedir=/opt/local/include/gcc49 --infodir=/opt/local/share/info --mandir=/opt/local/share/man --datarootdir=/opt/local/share/gcc-4.9 --with-local-prefix=/opt/local --with-system-zlib --disable-nls --program-suffix=-mp-4.9 --with-gxx-include-dir=/opt/local/include/gcc49/c++/ --with-gmp=/opt/local --with-mpfr=/opt/local --with-mpc=/opt/local --with-cloog=/opt/local --enable-cloog-backend=isl --disable-cloog-version-check --enable-stage1-checking --disable-multilib --enable-lto --enable-libstdcxx-time --with-as=/opt/local/bin/as --with-ld=/opt/local/bin/ld --with-ar=/opt/local/bin/ar --with-bugurl=https://trac.macports.org/newticket --with-pkgversion='MacPorts gcc49 4.9.1_1'
+Thread model: posix
+gcc version 4.9.1 (MacPorts gcc49 4.9.1_1) 
+COMPILER_PATH=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/libexec/gcc/x86_64-apple-darwin14/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/
+LIBRARY_PATH=/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../../:/usr/lib/
+COLLECT_GCC_OPTIONS='-mmacosx-version-min=10.10.0' '-v' '-o' 'cmTryCompileExec3011199831' '-mtune=core2'
+ /opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/collect2 -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec3011199831 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec3011199831.dir/CMakeCCompilerABI.c.o -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v
+collect2 version 4.9.1
+/opt/local/bin/ld -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec3011199831 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec3011199831.dir/CMakeCCompilerABI.c.o -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v
+@(#)PROGRAM:ld  PROJECT:ld64-236.3
+configured to support archs: i386 x86_64 x86_64h armv6 armv7 armv7s armv7m arm64
+@(#)PROGRAM:ld  PROJECT:ld64-236.3
+configured to support archs: i386 x86_64 x86_64h armv6 armv7 armv7s armv7m arm64
+Library search paths:
+	/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1
+	/opt/local/lib/gcc49
+	/usr/lib
+	/usr/local/lib
+Framework search paths:
+	/Library/Frameworks/
+	/System/Library/Frameworks/
+ /opt/local/bin/nm -n CMakeFiles/cmTryCompileExec3011199831.dir/CMakeCCompilerABI.c.o
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTryCompileExec3011199831/fast"]
+  ignore line: [/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec3011199831.dir/build.make CMakeFiles/cmTryCompileExec3011199831.dir/build]
+  ignore line: [/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building C object CMakeFiles/cmTryCompileExec3011199831.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/opt/local/bin/gcc    -o CMakeFiles/cmTryCompileExec3011199831.dir/CMakeCCompilerABI.c.o   -c /opt/local/share/cmake-3.0/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTryCompileExec3011199831]
+  ignore line: [/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3011199831.dir/link.txt --verbose=1]
+  ignore line: [/opt/local/bin/gcc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTryCompileExec3011199831.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec3011199831   ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/opt/local/bin/gcc]
+  ignore line: [COLLECT_LTO_WRAPPER=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/lto-wrapper]
+  ignore line: [Target: x86_64-apple-darwin14]
+  ignore line: [Configured with: /opt/local/var/macports/build/_opt_local_var_macports_sources_rsync.macports.org_release_tarballs_ports_lang_gcc49/gcc49/work/gcc-4.9.1/configure --prefix=/opt/local --build=x86_64-apple-darwin14 --enable-languages=c,c++,objc,obj-c++,lto,fortran,java --libdir=/opt/local/lib/gcc49 --includedir=/opt/local/include/gcc49 --infodir=/opt/local/share/info --mandir=/opt/local/share/man --datarootdir=/opt/local/share/gcc-4.9 --with-local-prefix=/opt/local --with-system-zlib --disable-nls --program-suffix=-mp-4.9 --with-gxx-include-dir=/opt/local/include/gcc49/c++/ --with-gmp=/opt/local --with-mpfr=/opt/local --with-mpc=/opt/local --with-cloog=/opt/local --enable-cloog-backend=isl --disable-cloog-version-check --enable-stage1-checking --disable-multilib --enable-lto --enable-libstdcxx-time --with-as=/opt/local/bin/as --with-ld=/opt/local/bin/ld --with-ar=/opt/local/bin/ar --with-bugurl=https://trac.macports.org/newticket --with-pkgversion='MacPorts gcc49 4.9.1_1']
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 4.9.1 (MacPorts gcc49 4.9.1_1) ]
+  ignore line: [COMPILER_PATH=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/libexec/gcc/x86_64-apple-darwin14/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/]
+  ignore line: [LIBRARY_PATH=/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../../:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-mmacosx-version-min=10.10.0' '-v' '-o' 'cmTryCompileExec3011199831' '-mtune=core2']
+  link line: [ /opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/collect2 -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec3011199831 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec3011199831.dir/CMakeCCompilerABI.c.o -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v]
+    arg [/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/collect2] ==> ignore
+    arg [-dynamic] ==> ignore
+    arg [-arch] ==> ignore
+    arg [x86_64] ==> ignore
+    arg [-macosx_version_min] ==> ignore
+    arg [10.10.0] ==> ignore
+    arg [-weak_reference_mismatches] ==> ignore
+    arg [non-weak] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec3011199831] ==> ignore
+    arg [-L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1] ==> dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1]
+    arg [-L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../..] ==> dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../..]
+    arg [-search_paths_first] ==> ignore
+    arg [-headerpad_max_install_names] ==> ignore
+    arg [-v] ==> ignore
+    arg [CMakeFiles/cmTryCompileExec3011199831.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-no_compact_unwind] ==> ignore
+    arg [-lSystem] ==> lib [System]
+    arg [-lgcc_ext.10.5] ==> lib [gcc_ext.10.5]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lSystem] ==> lib [System]
+    arg [-v] ==> ignore
+  Library search paths: [;/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1;/opt/local/lib/gcc49;/usr/lib;/usr/local/lib]
+  Framework search paths: [;/Library/Frameworks/;/System/Library/Frameworks/]
+  remove lib [System]
+  remove lib [gcc_ext.10.5]
+  remove lib [gcc]
+  remove lib [System]
+  collapse library dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1] ==> [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1]
+  collapse library dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../..] ==> [/opt/local/lib/gcc49]
+  collapse library dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1] ==> [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1]
+  collapse library dir [/opt/local/lib/gcc49] ==> [/opt/local/lib/gcc49]
+  collapse library dir [/usr/lib] ==> [/usr/lib]
+  collapse library dir [/usr/local/lib] ==> [/usr/local/lib]
+  collapse framework dir [/Library/Frameworks/] ==> [/Library/Frameworks]
+  collapse framework dir [/System/Library/Frameworks/] ==> [/System/Library/Frameworks]
+  implicit libs: []
+  implicit dirs: [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1;/opt/local/lib/gcc49;/usr/lib;/usr/local/lib]
+  implicit fwks: [/Library/Frameworks;/System/Library/Frameworks]
+
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec3685416523/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec3685416523.dir/build.make CMakeFiles/cmTryCompileExec3685416523.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec3685416523.dir/testCXXCompiler.cxx.o
+/opt/local/bin/g++     -o CMakeFiles/cmTryCompileExec3685416523.dir/testCXXCompiler.cxx.o -c /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTryCompileExec3685416523
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3685416523.dir/link.txt --verbose=1
+/opt/local/bin/g++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec3685416523.dir/testCXXCompiler.cxx.o  -o cmTryCompileExec3685416523  
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec1273991092/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec1273991092.dir/build.make CMakeFiles/cmTryCompileExec1273991092.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec1273991092.dir/CMakeCXXCompilerABI.cpp.o
+/opt/local/bin/g++     -o CMakeFiles/cmTryCompileExec1273991092.dir/CMakeCXXCompilerABI.cpp.o -c /opt/local/share/cmake-3.0/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTryCompileExec1273991092
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1273991092.dir/link.txt --verbose=1
+/opt/local/bin/g++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTryCompileExec1273991092.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec1273991092   
+Using built-in specs.
+COLLECT_GCC=/opt/local/bin/g++
+COLLECT_LTO_WRAPPER=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/lto-wrapper
+Target: x86_64-apple-darwin14
+Configured with: /opt/local/var/macports/build/_opt_local_var_macports_sources_rsync.macports.org_release_tarballs_ports_lang_gcc49/gcc49/work/gcc-4.9.1/configure --prefix=/opt/local --build=x86_64-apple-darwin14 --enable-languages=c,c++,objc,obj-c++,lto,fortran,java --libdir=/opt/local/lib/gcc49 --includedir=/opt/local/include/gcc49 --infodir=/opt/local/share/info --mandir=/opt/local/share/man --datarootdir=/opt/local/share/gcc-4.9 --with-local-prefix=/opt/local --with-system-zlib --disable-nls --program-suffix=-mp-4.9 --with-gxx-include-dir=/opt/local/include/gcc49/c++/ --with-gmp=/opt/local --with-mpfr=/opt/local --with-mpc=/opt/local --with-cloog=/opt/local --enable-cloog-backend=isl --disable-cloog-version-check --enable-stage1-checking --disable-multilib --enable-lto --enable-libstdcxx-time --with-as=/opt/local/bin/as --with-ld=/opt/local/bin/ld --with-ar=/opt/local/bin/ar --with-bugurl=https://trac.macports.org/newticket --with-pkgversion='MacPorts gcc49 4.9.1_1'
+Thread model: posix
+gcc version 4.9.1 (MacPorts gcc49 4.9.1_1) 
+COMPILER_PATH=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/libexec/gcc/x86_64-apple-darwin14/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/
+LIBRARY_PATH=/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../../:/usr/lib/
+COLLECT_GCC_OPTIONS='-mmacosx-version-min=10.10.0' '-v' '-o' 'cmTryCompileExec1273991092' '-shared-libgcc' '-mtune=core2'
+ /opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/collect2 -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec1273991092 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec1273991092.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v
+collect2 version 4.9.1
+/opt/local/bin/ld -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec1273991092 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec1273991092.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v
+@(#)PROGRAM:ld  PROJECT:ld64-236.3
+configured to support archs: i386 x86_64 x86_64h armv6 armv7 armv7s armv7m arm64
+@(#)PROGRAM:ld  PROJECT:ld64-236.3
+configured to support archs: i386 x86_64 x86_64h armv6 armv7 armv7s armv7m arm64
+Library search paths:
+	/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1
+	/opt/local/lib/gcc49
+	/usr/lib
+	/usr/local/lib
+Framework search paths:
+	/Library/Frameworks/
+	/System/Library/Frameworks/
+ /opt/local/bin/nm -n CMakeFiles/cmTryCompileExec1273991092.dir/CMakeCXXCompilerABI.cpp.o
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTryCompileExec1273991092/fast"]
+  ignore line: [/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec1273991092.dir/build.make CMakeFiles/cmTryCompileExec1273991092.dir/build]
+  ignore line: [/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building CXX object CMakeFiles/cmTryCompileExec1273991092.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/opt/local/bin/g++     -o CMakeFiles/cmTryCompileExec1273991092.dir/CMakeCXXCompilerABI.cpp.o -c /opt/local/share/cmake-3.0/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTryCompileExec1273991092]
+  ignore line: [/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1273991092.dir/link.txt --verbose=1]
+  ignore line: [/opt/local/bin/g++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTryCompileExec1273991092.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec1273991092   ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/opt/local/bin/g++]
+  ignore line: [COLLECT_LTO_WRAPPER=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/lto-wrapper]
+  ignore line: [Target: x86_64-apple-darwin14]
+  ignore line: [Configured with: /opt/local/var/macports/build/_opt_local_var_macports_sources_rsync.macports.org_release_tarballs_ports_lang_gcc49/gcc49/work/gcc-4.9.1/configure --prefix=/opt/local --build=x86_64-apple-darwin14 --enable-languages=c,c++,objc,obj-c++,lto,fortran,java --libdir=/opt/local/lib/gcc49 --includedir=/opt/local/include/gcc49 --infodir=/opt/local/share/info --mandir=/opt/local/share/man --datarootdir=/opt/local/share/gcc-4.9 --with-local-prefix=/opt/local --with-system-zlib --disable-nls --program-suffix=-mp-4.9 --with-gxx-include-dir=/opt/local/include/gcc49/c++/ --with-gmp=/opt/local --with-mpfr=/opt/local --with-mpc=/opt/local --with-cloog=/opt/local --enable-cloog-backend=isl --disable-cloog-version-check --enable-stage1-checking --disable-multilib --enable-lto --enable-libstdcxx-time --with-as=/opt/local/bin/as --with-ld=/opt/local/bin/ld --with-ar=/opt/local/bin/ar --with-bugurl=https://trac.macports.org/newticket --with-pkgversion='MacPorts gcc49 4.9.1_1']
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 4.9.1 (MacPorts gcc49 4.9.1_1) ]
+  ignore line: [COMPILER_PATH=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/libexec/gcc/x86_64-apple-darwin14/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/]
+  ignore line: [LIBRARY_PATH=/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../../:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-mmacosx-version-min=10.10.0' '-v' '-o' 'cmTryCompileExec1273991092' '-shared-libgcc' '-mtune=core2']
+  link line: [ /opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/collect2 -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec1273991092 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec1273991092.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v]
+    arg [/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.1/collect2] ==> ignore
+    arg [-dynamic] ==> ignore
+    arg [-arch] ==> ignore
+    arg [x86_64] ==> ignore
+    arg [-macosx_version_min] ==> ignore
+    arg [10.10.0] ==> ignore
+    arg [-weak_reference_mismatches] ==> ignore
+    arg [non-weak] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec1273991092] ==> ignore
+    arg [-L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1] ==> dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1]
+    arg [-L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../..] ==> dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../..]
+    arg [-search_paths_first] ==> ignore
+    arg [-headerpad_max_install_names] ==> ignore
+    arg [-v] ==> ignore
+    arg [CMakeFiles/cmTryCompileExec1273991092.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-no_compact_unwind] ==> ignore
+    arg [-lSystem] ==> lib [System]
+    arg [-lgcc_ext.10.5] ==> lib [gcc_ext.10.5]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lSystem] ==> lib [System]
+    arg [-v] ==> ignore
+  Library search paths: [;/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1;/opt/local/lib/gcc49;/usr/lib;/usr/local/lib]
+  Framework search paths: [;/Library/Frameworks/;/System/Library/Frameworks/]
+  remove lib [System]
+  remove lib [gcc_ext.10.5]
+  remove lib [gcc]
+  remove lib [System]
+  collapse library dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1] ==> [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1]
+  collapse library dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1/../../..] ==> [/opt/local/lib/gcc49]
+  collapse library dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1] ==> [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1]
+  collapse library dir [/opt/local/lib/gcc49] ==> [/opt/local/lib/gcc49]
+  collapse library dir [/usr/lib] ==> [/usr/lib]
+  collapse library dir [/usr/local/lib] ==> [/usr/local/lib]
+  collapse framework dir [/Library/Frameworks/] ==> [/Library/Frameworks]
+  collapse framework dir [/System/Library/Frameworks/] ==> [/System/Library/Frameworks]
+  implicit libs: [stdc++]
+  implicit dirs: [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.1;/opt/local/lib/gcc49;/usr/lib;/usr/local/lib]
+  implicit fwks: [/Library/Frameworks;/System/Library/Frameworks]
+
+
+The system is: Darwin - 14.0.0 - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /opt/local/bin/gcc 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/Users/fengzeng/workspace/PyroTools/build/CMakeFiles/3.1.3/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /opt/local/bin/g++ 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/Users/fengzeng/workspace/PyroTools/build/CMakeFiles/3.1.3/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec534255148/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec534255148.dir/build.make CMakeFiles/cmTryCompileExec534255148.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec534255148.dir/testCCompiler.c.o
+/opt/local/bin/gcc    -o CMakeFiles/cmTryCompileExec534255148.dir/testCCompiler.c.o   -c /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTryCompileExec534255148
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec534255148.dir/link.txt --verbose=1
+/opt/local/bin/gcc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTryCompileExec534255148.dir/testCCompiler.c.o  -o cmTryCompileExec534255148  
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec1311735569/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec1311735569.dir/build.make CMakeFiles/cmTryCompileExec1311735569.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1311735569.dir/CMakeCCompilerABI.c.o
+/opt/local/bin/gcc    -o CMakeFiles/cmTryCompileExec1311735569.dir/CMakeCCompilerABI.c.o   -c /opt/local/share/cmake-3.1/Modules/CMakeCCompilerABI.c
+Linking C executable cmTryCompileExec1311735569
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1311735569.dir/link.txt --verbose=1
+/opt/local/bin/gcc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTryCompileExec1311735569.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec1311735569   
+Using built-in specs.
+COLLECT_GCC=/opt/local/bin/gcc
+COLLECT_LTO_WRAPPER=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/lto-wrapper
+Target: x86_64-apple-darwin14
+Configured with: /opt/local/var/macports/build/_opt_mports_dports_lang_gcc49/gcc49/work/gcc-4.9.2/configure --prefix=/opt/local --build=x86_64-apple-darwin14 --enable-languages=c,c++,objc,obj-c++,lto,fortran,java --libdir=/opt/local/lib/gcc49 --includedir=/opt/local/include/gcc49 --infodir=/opt/local/share/info --mandir=/opt/local/share/man --datarootdir=/opt/local/share/gcc-4.9 --with-local-prefix=/opt/local --with-system-zlib --disable-nls --program-suffix=-mp-4.9 --with-gxx-include-dir=/opt/local/include/gcc49/c++/ --with-gmp=/opt/local --with-mpfr=/opt/local --with-mpc=/opt/local --with-isl=/opt/local --disable-isl-version-check --with-cloog=/opt/local --disable-cloog-version-check --enable-stage1-checking --disable-multilib --enable-lto --enable-libstdcxx-time --with-as=/opt/local/bin/as --with-ld=/opt/local/bin/ld --with-ar=/opt/local/bin/ar --with-bugurl=https://trac.macports.org/newticket --with-pkgversion='MacPorts gcc49 4.9.2_1'
+Thread model: posix
+gcc version 4.9.2 (MacPorts gcc49 4.9.2_1) 
+COMPILER_PATH=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/libexec/gcc/x86_64-apple-darwin14/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/
+LIBRARY_PATH=/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../../:/usr/lib/
+COLLECT_GCC_OPTIONS='-mmacosx-version-min=10.10.0' '-v' '-o' 'cmTryCompileExec1311735569' '-mtune=core2'
+ /opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/collect2 -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec1311735569 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec1311735569.dir/CMakeCCompilerABI.c.o -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v
+collect2 version 4.9.2
+/opt/local/bin/ld -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec1311735569 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec1311735569.dir/CMakeCCompilerABI.c.o -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v
+@(#)PROGRAM:ld  PROJECT:ld64-236.3
+configured to support archs: i386 x86_64 x86_64h armv6 armv7 armv7s armv7m arm64
+@(#)PROGRAM:ld  PROJECT:ld64-236.3
+configured to support archs: i386 x86_64 x86_64h armv6 armv7 armv7s armv7m arm64
+Library search paths:
+	/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2
+	/opt/local/lib/gcc49
+	/usr/lib
+	/usr/local/lib
+Framework search paths:
+	/Library/Frameworks/
+	/System/Library/Frameworks/
+ /usr/bin/nm -n CMakeFiles/cmTryCompileExec1311735569.dir/CMakeCCompilerABI.c.o
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTryCompileExec1311735569/fast"]
+  ignore line: [/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec1311735569.dir/build.make CMakeFiles/cmTryCompileExec1311735569.dir/build]
+  ignore line: [/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building C object CMakeFiles/cmTryCompileExec1311735569.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/opt/local/bin/gcc    -o CMakeFiles/cmTryCompileExec1311735569.dir/CMakeCCompilerABI.c.o   -c /opt/local/share/cmake-3.1/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTryCompileExec1311735569]
+  ignore line: [/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1311735569.dir/link.txt --verbose=1]
+  ignore line: [/opt/local/bin/gcc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTryCompileExec1311735569.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec1311735569   ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/opt/local/bin/gcc]
+  ignore line: [COLLECT_LTO_WRAPPER=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/lto-wrapper]
+  ignore line: [Target: x86_64-apple-darwin14]
+  ignore line: [Configured with: /opt/local/var/macports/build/_opt_mports_dports_lang_gcc49/gcc49/work/gcc-4.9.2/configure --prefix=/opt/local --build=x86_64-apple-darwin14 --enable-languages=c,c++,objc,obj-c++,lto,fortran,java --libdir=/opt/local/lib/gcc49 --includedir=/opt/local/include/gcc49 --infodir=/opt/local/share/info --mandir=/opt/local/share/man --datarootdir=/opt/local/share/gcc-4.9 --with-local-prefix=/opt/local --with-system-zlib --disable-nls --program-suffix=-mp-4.9 --with-gxx-include-dir=/opt/local/include/gcc49/c++/ --with-gmp=/opt/local --with-mpfr=/opt/local --with-mpc=/opt/local --with-isl=/opt/local --disable-isl-version-check --with-cloog=/opt/local --disable-cloog-version-check --enable-stage1-checking --disable-multilib --enable-lto --enable-libstdcxx-time --with-as=/opt/local/bin/as --with-ld=/opt/local/bin/ld --with-ar=/opt/local/bin/ar --with-bugurl=https://trac.macports.org/newticket --with-pkgversion='MacPorts gcc49 4.9.2_1']
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 4.9.2 (MacPorts gcc49 4.9.2_1) ]
+  ignore line: [COMPILER_PATH=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/libexec/gcc/x86_64-apple-darwin14/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/]
+  ignore line: [LIBRARY_PATH=/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../../:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-mmacosx-version-min=10.10.0' '-v' '-o' 'cmTryCompileExec1311735569' '-mtune=core2']
+  link line: [ /opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/collect2 -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec1311735569 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec1311735569.dir/CMakeCCompilerABI.c.o -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v]
+    arg [/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/collect2] ==> ignore
+    arg [-dynamic] ==> ignore
+    arg [-arch] ==> ignore
+    arg [x86_64] ==> ignore
+    arg [-macosx_version_min] ==> ignore
+    arg [10.10.0] ==> ignore
+    arg [-weak_reference_mismatches] ==> ignore
+    arg [non-weak] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec1311735569] ==> ignore
+    arg [-L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2] ==> dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2]
+    arg [-L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../..] ==> dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../..]
+    arg [-search_paths_first] ==> ignore
+    arg [-headerpad_max_install_names] ==> ignore
+    arg [-v] ==> ignore
+    arg [CMakeFiles/cmTryCompileExec1311735569.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-no_compact_unwind] ==> ignore
+    arg [-lSystem] ==> lib [System]
+    arg [-lgcc_ext.10.5] ==> lib [gcc_ext.10.5]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lSystem] ==> lib [System]
+    arg [-v] ==> ignore
+  Library search paths: [;/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2;/opt/local/lib/gcc49;/usr/lib;/usr/local/lib]
+  Framework search paths: [;/Library/Frameworks/;/System/Library/Frameworks/]
+  remove lib [System]
+  remove lib [gcc_ext.10.5]
+  remove lib [gcc]
+  remove lib [System]
+  collapse library dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2] ==> [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2]
+  collapse library dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../..] ==> [/opt/local/lib/gcc49]
+  collapse library dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2] ==> [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2]
+  collapse library dir [/opt/local/lib/gcc49] ==> [/opt/local/lib/gcc49]
+  collapse library dir [/usr/lib] ==> [/usr/lib]
+  collapse library dir [/usr/local/lib] ==> [/usr/local/lib]
+  collapse framework dir [/Library/Frameworks/] ==> [/Library/Frameworks]
+  collapse framework dir [/System/Library/Frameworks/] ==> [/System/Library/Frameworks]
+  implicit libs: []
+  implicit dirs: [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2;/opt/local/lib/gcc49;/usr/lib;/usr/local/lib]
+  implicit fwks: [/Library/Frameworks;/System/Library/Frameworks]
+
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec1990299111/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec1990299111.dir/build.make CMakeFiles/cmTryCompileExec1990299111.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec1990299111.dir/testCXXCompiler.cxx.o
+/opt/local/bin/g++     -o CMakeFiles/cmTryCompileExec1990299111.dir/testCXXCompiler.cxx.o -c /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTryCompileExec1990299111
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1990299111.dir/link.txt --verbose=1
+/opt/local/bin/g++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTryCompileExec1990299111.dir/testCXXCompiler.cxx.o  -o cmTryCompileExec1990299111  
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec3277883079/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec3277883079.dir/build.make CMakeFiles/cmTryCompileExec3277883079.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec3277883079.dir/CMakeCXXCompilerABI.cpp.o
+/opt/local/bin/g++     -o CMakeFiles/cmTryCompileExec3277883079.dir/CMakeCXXCompilerABI.cpp.o -c /opt/local/share/cmake-3.1/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTryCompileExec3277883079
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3277883079.dir/link.txt --verbose=1
+/opt/local/bin/g++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTryCompileExec3277883079.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec3277883079   
+Using built-in specs.
+COLLECT_GCC=/opt/local/bin/g++
+COLLECT_LTO_WRAPPER=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/lto-wrapper
+Target: x86_64-apple-darwin14
+Configured with: /opt/local/var/macports/build/_opt_mports_dports_lang_gcc49/gcc49/work/gcc-4.9.2/configure --prefix=/opt/local --build=x86_64-apple-darwin14 --enable-languages=c,c++,objc,obj-c++,lto,fortran,java --libdir=/opt/local/lib/gcc49 --includedir=/opt/local/include/gcc49 --infodir=/opt/local/share/info --mandir=/opt/local/share/man --datarootdir=/opt/local/share/gcc-4.9 --with-local-prefix=/opt/local --with-system-zlib --disable-nls --program-suffix=-mp-4.9 --with-gxx-include-dir=/opt/local/include/gcc49/c++/ --with-gmp=/opt/local --with-mpfr=/opt/local --with-mpc=/opt/local --with-isl=/opt/local --disable-isl-version-check --with-cloog=/opt/local --disable-cloog-version-check --enable-stage1-checking --disable-multilib --enable-lto --enable-libstdcxx-time --with-as=/opt/local/bin/as --with-ld=/opt/local/bin/ld --with-ar=/opt/local/bin/ar --with-bugurl=https://trac.macports.org/newticket --with-pkgversion='MacPorts gcc49 4.9.2_1'
+Thread model: posix
+gcc version 4.9.2 (MacPorts gcc49 4.9.2_1) 
+COMPILER_PATH=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/libexec/gcc/x86_64-apple-darwin14/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/
+LIBRARY_PATH=/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../../:/usr/lib/
+COLLECT_GCC_OPTIONS='-mmacosx-version-min=10.10.0' '-v' '-o' 'cmTryCompileExec3277883079' '-shared-libgcc' '-mtune=core2'
+ /opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/collect2 -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec3277883079 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec3277883079.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v
+collect2 version 4.9.2
+/opt/local/bin/ld -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec3277883079 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec3277883079.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v
+@(#)PROGRAM:ld  PROJECT:ld64-236.3
+configured to support archs: i386 x86_64 x86_64h armv6 armv7 armv7s armv7m arm64
+@(#)PROGRAM:ld  PROJECT:ld64-236.3
+configured to support archs: i386 x86_64 x86_64h armv6 armv7 armv7s armv7m arm64
+Library search paths:
+	/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2
+	/opt/local/lib/gcc49
+	/usr/lib
+	/usr/local/lib
+Framework search paths:
+	/Library/Frameworks/
+	/System/Library/Frameworks/
+ /usr/bin/nm -n CMakeFiles/cmTryCompileExec3277883079.dir/CMakeCXXCompilerABI.cpp.o
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTryCompileExec3277883079/fast"]
+  ignore line: [/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec3277883079.dir/build.make CMakeFiles/cmTryCompileExec3277883079.dir/build]
+  ignore line: [/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building CXX object CMakeFiles/cmTryCompileExec3277883079.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/opt/local/bin/g++     -o CMakeFiles/cmTryCompileExec3277883079.dir/CMakeCXXCompilerABI.cpp.o -c /opt/local/share/cmake-3.1/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTryCompileExec3277883079]
+  ignore line: [/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3277883079.dir/link.txt --verbose=1]
+  ignore line: [/opt/local/bin/g++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTryCompileExec3277883079.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec3277883079   ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/opt/local/bin/g++]
+  ignore line: [COLLECT_LTO_WRAPPER=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/lto-wrapper]
+  ignore line: [Target: x86_64-apple-darwin14]
+  ignore line: [Configured with: /opt/local/var/macports/build/_opt_mports_dports_lang_gcc49/gcc49/work/gcc-4.9.2/configure --prefix=/opt/local --build=x86_64-apple-darwin14 --enable-languages=c,c++,objc,obj-c++,lto,fortran,java --libdir=/opt/local/lib/gcc49 --includedir=/opt/local/include/gcc49 --infodir=/opt/local/share/info --mandir=/opt/local/share/man --datarootdir=/opt/local/share/gcc-4.9 --with-local-prefix=/opt/local --with-system-zlib --disable-nls --program-suffix=-mp-4.9 --with-gxx-include-dir=/opt/local/include/gcc49/c++/ --with-gmp=/opt/local --with-mpfr=/opt/local --with-mpc=/opt/local --with-isl=/opt/local --disable-isl-version-check --with-cloog=/opt/local --disable-cloog-version-check --enable-stage1-checking --disable-multilib --enable-lto --enable-libstdcxx-time --with-as=/opt/local/bin/as --with-ld=/opt/local/bin/ld --with-ar=/opt/local/bin/ar --with-bugurl=https://trac.macports.org/newticket --with-pkgversion='MacPorts gcc49 4.9.2_1']
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 4.9.2 (MacPorts gcc49 4.9.2_1) ]
+  ignore line: [COMPILER_PATH=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/libexec/gcc/x86_64-apple-darwin14/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/]
+  ignore line: [LIBRARY_PATH=/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/:/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../../:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-mmacosx-version-min=10.10.0' '-v' '-o' 'cmTryCompileExec3277883079' '-shared-libgcc' '-mtune=core2']
+  link line: [ /opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/collect2 -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec3277883079 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2 -L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec3277883079.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v]
+    arg [/opt/local/libexec/gcc/x86_64-apple-darwin14/4.9.2/collect2] ==> ignore
+    arg [-dynamic] ==> ignore
+    arg [-arch] ==> ignore
+    arg [x86_64] ==> ignore
+    arg [-macosx_version_min] ==> ignore
+    arg [10.10.0] ==> ignore
+    arg [-weak_reference_mismatches] ==> ignore
+    arg [non-weak] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec3277883079] ==> ignore
+    arg [-L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2] ==> dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2]
+    arg [-L/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../..] ==> dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../..]
+    arg [-search_paths_first] ==> ignore
+    arg [-headerpad_max_install_names] ==> ignore
+    arg [-v] ==> ignore
+    arg [CMakeFiles/cmTryCompileExec3277883079.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-no_compact_unwind] ==> ignore
+    arg [-lSystem] ==> lib [System]
+    arg [-lgcc_ext.10.5] ==> lib [gcc_ext.10.5]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lSystem] ==> lib [System]
+    arg [-v] ==> ignore
+  Library search paths: [;/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2;/opt/local/lib/gcc49;/usr/lib;/usr/local/lib]
+  Framework search paths: [;/Library/Frameworks/;/System/Library/Frameworks/]
+  remove lib [System]
+  remove lib [gcc_ext.10.5]
+  remove lib [gcc]
+  remove lib [System]
+  collapse library dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2] ==> [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2]
+  collapse library dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2/../../..] ==> [/opt/local/lib/gcc49]
+  collapse library dir [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2] ==> [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2]
+  collapse library dir [/opt/local/lib/gcc49] ==> [/opt/local/lib/gcc49]
+  collapse library dir [/usr/lib] ==> [/usr/lib]
+  collapse library dir [/usr/local/lib] ==> [/usr/local/lib]
+  collapse framework dir [/Library/Frameworks/] ==> [/Library/Frameworks]
+  collapse framework dir [/System/Library/Frameworks/] ==> [/System/Library/Frameworks]
+  implicit libs: [stdc++]
+  implicit dirs: [/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.2;/opt/local/lib/gcc49;/usr/lib;/usr/local/lib]
+  implicit fwks: [/Library/Frameworks;/System/Library/Frameworks]
+
+
+The system is: Darwin - 14.0.0 - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /opt/local/bin/gcc 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/Users/fengzeng/workspace/PyroTools/build/CMakeFiles/3.2.1/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /opt/local/bin/g++ 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/Users/fengzeng/workspace/PyroTools/build/CMakeFiles/3.2.1/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec1630050925/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec1630050925.dir/build.make CMakeFiles/cmTryCompileExec1630050925.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1630050925.dir/testCCompiler.c.o
+/opt/local/bin/gcc    -o CMakeFiles/cmTryCompileExec1630050925.dir/testCCompiler.c.o   -c /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTryCompileExec1630050925
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1630050925.dir/link.txt --verbose=1
+/opt/local/bin/gcc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec1630050925.dir/testCCompiler.c.o  -o cmTryCompileExec1630050925  
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec420933896/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec420933896.dir/build.make CMakeFiles/cmTryCompileExec420933896.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec420933896.dir/CMakeCCompilerABI.c.o
+/opt/local/bin/gcc    -o CMakeFiles/cmTryCompileExec420933896.dir/CMakeCCompilerABI.c.o   -c /opt/local/share/cmake-3.2/Modules/CMakeCCompilerABI.c
+Linking C executable cmTryCompileExec420933896
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec420933896.dir/link.txt --verbose=1
+/opt/local/bin/gcc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTryCompileExec420933896.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec420933896   
+Using built-in specs.
+COLLECT_GCC=/opt/local/bin/gcc
+COLLECT_LTO_WRAPPER=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/lto-wrapper
+Target: x86_64-apple-darwin14
+Configured with: /opt/local/var/macports/build/_opt_mports_dports_lang_gcc48/gcc48/work/gcc-4.8.4/configure --prefix=/opt/local --build=x86_64-apple-darwin14 --enable-languages=c,c++,objc,obj-c++,lto,fortran,java --libdir=/opt/local/lib/gcc48 --includedir=/opt/local/include/gcc48 --infodir=/opt/local/share/info --mandir=/opt/local/share/man --datarootdir=/opt/local/share/gcc-4.8 --with-local-prefix=/opt/local --with-system-zlib --disable-nls --program-suffix=-mp-4.8 --with-gxx-include-dir=/opt/local/include/gcc48/c++/ --with-gmp=/opt/local --with-mpfr=/opt/local --with-mpc=/opt/local --with-isl=/opt/local --disable-isl-version-check --with-cloog=/opt/local --disable-cloog-version-check --enable-stage1-checking --disable-multilib --enable-lto --enable-libstdcxx-time --with-as=/opt/local/bin/as --with-ld=/opt/local/bin/ld --with-ar=/opt/local/bin/ar --with-bugurl=https://trac.macports.org/newticket --with-pkgversion='MacPorts gcc48 4.8.4_0'
+Thread model: posix
+gcc version 4.8.4 (MacPorts gcc48 4.8.4_0) 
+COMPILER_PATH=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/libexec/gcc/x86_64-apple-darwin14/:/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/
+LIBRARY_PATH=/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../../:/usr/lib/
+COLLECT_GCC_OPTIONS='-mmacosx-version-min=10.10.0' '-v' '-o' 'cmTryCompileExec420933896' '-mtune=core2'
+ /opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/collect2 -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec420933896 -L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4 -L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec420933896.dir/CMakeCCompilerABI.c.o -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v
+collect2 version 4.8.4
+/opt/local/bin/ld -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec420933896 -L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4 -L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec420933896.dir/CMakeCCompilerABI.c.o -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v
+@(#)PROGRAM:ld  PROJECT:ld64-236.3
+configured to support archs: i386 x86_64 x86_64h armv6 armv7 armv7s armv7m arm64
+@(#)PROGRAM:ld  PROJECT:ld64-236.3
+configured to support archs: i386 x86_64 x86_64h armv6 armv7 armv7s armv7m arm64
+Library search paths:
+	/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4
+	/opt/local/lib/gcc48
+	/usr/lib
+	/usr/local/lib
+Framework search paths:
+	/Library/Frameworks/
+	/System/Library/Frameworks/
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTryCompileExec420933896/fast"]
+  ignore line: [/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec420933896.dir/build.make CMakeFiles/cmTryCompileExec420933896.dir/build]
+  ignore line: [/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building C object CMakeFiles/cmTryCompileExec420933896.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/opt/local/bin/gcc    -o CMakeFiles/cmTryCompileExec420933896.dir/CMakeCCompilerABI.c.o   -c /opt/local/share/cmake-3.2/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTryCompileExec420933896]
+  ignore line: [/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec420933896.dir/link.txt --verbose=1]
+  ignore line: [/opt/local/bin/gcc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTryCompileExec420933896.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec420933896   ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/opt/local/bin/gcc]
+  ignore line: [COLLECT_LTO_WRAPPER=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/lto-wrapper]
+  ignore line: [Target: x86_64-apple-darwin14]
+  ignore line: [Configured with: /opt/local/var/macports/build/_opt_mports_dports_lang_gcc48/gcc48/work/gcc-4.8.4/configure --prefix=/opt/local --build=x86_64-apple-darwin14 --enable-languages=c,c++,objc,obj-c++,lto,fortran,java --libdir=/opt/local/lib/gcc48 --includedir=/opt/local/include/gcc48 --infodir=/opt/local/share/info --mandir=/opt/local/share/man --datarootdir=/opt/local/share/gcc-4.8 --with-local-prefix=/opt/local --with-system-zlib --disable-nls --program-suffix=-mp-4.8 --with-gxx-include-dir=/opt/local/include/gcc48/c++/ --with-gmp=/opt/local --with-mpfr=/opt/local --with-mpc=/opt/local --with-isl=/opt/local --disable-isl-version-check --with-cloog=/opt/local --disable-cloog-version-check --enable-stage1-checking --disable-multilib --enable-lto --enable-libstdcxx-time --with-as=/opt/local/bin/as --with-ld=/opt/local/bin/ld --with-ar=/opt/local/bin/ar --with-bugurl=https://trac.macports.org/newticket --with-pkgversion='MacPorts gcc48 4.8.4_0']
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 4.8.4 (MacPorts gcc48 4.8.4_0) ]
+  ignore line: [COMPILER_PATH=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/libexec/gcc/x86_64-apple-darwin14/:/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/]
+  ignore line: [LIBRARY_PATH=/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../../:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-mmacosx-version-min=10.10.0' '-v' '-o' 'cmTryCompileExec420933896' '-mtune=core2']
+  link line: [ /opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/collect2 -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec420933896 -L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4 -L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec420933896.dir/CMakeCCompilerABI.c.o -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v]
+    arg [/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/collect2] ==> ignore
+    arg [-dynamic] ==> ignore
+    arg [-arch] ==> ignore
+    arg [x86_64] ==> ignore
+    arg [-macosx_version_min] ==> ignore
+    arg [10.10.0] ==> ignore
+    arg [-weak_reference_mismatches] ==> ignore
+    arg [non-weak] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec420933896] ==> ignore
+    arg [-L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4] ==> dir [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4]
+    arg [-L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../..] ==> dir [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../..]
+    arg [-search_paths_first] ==> ignore
+    arg [-headerpad_max_install_names] ==> ignore
+    arg [-v] ==> ignore
+    arg [CMakeFiles/cmTryCompileExec420933896.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-no_compact_unwind] ==> ignore
+    arg [-lSystem] ==> lib [System]
+    arg [-lgcc_ext.10.5] ==> lib [gcc_ext.10.5]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lSystem] ==> lib [System]
+    arg [-v] ==> ignore
+  Library search paths: [;/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4;/opt/local/lib/gcc48;/usr/lib;/usr/local/lib]
+  Framework search paths: [;/Library/Frameworks/;/System/Library/Frameworks/]
+  remove lib [System]
+  remove lib [gcc_ext.10.5]
+  remove lib [gcc]
+  remove lib [System]
+  collapse library dir [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4] ==> [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4]
+  collapse library dir [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../..] ==> [/opt/local/lib/gcc48]
+  collapse library dir [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4] ==> [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4]
+  collapse library dir [/opt/local/lib/gcc48] ==> [/opt/local/lib/gcc48]
+  collapse library dir [/usr/lib] ==> [/usr/lib]
+  collapse library dir [/usr/local/lib] ==> [/usr/local/lib]
+  collapse framework dir [/Library/Frameworks/] ==> [/Library/Frameworks]
+  collapse framework dir [/System/Library/Frameworks/] ==> [/System/Library/Frameworks]
+  implicit libs: []
+  implicit dirs: [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4;/opt/local/lib/gcc48;/usr/lib;/usr/local/lib]
+  implicit fwks: [/Library/Frameworks;/System/Library/Frameworks]
+
+
+
+
+Detecting C [-std=c11] compiler features compiled with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec966840822/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec966840822.dir/build.make CMakeFiles/cmTryCompileExec966840822.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec966840822.dir/feature_tests.c.o
+/opt/local/bin/gcc   -std=c11 -o CMakeFiles/cmTryCompileExec966840822.dir/feature_tests.c.o   -c /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/feature_tests.c
+Linking C executable cmTryCompileExec966840822
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec966840822.dir/link.txt --verbose=1
+/opt/local/bin/gcc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec966840822.dir/feature_tests.c.o  -o cmTryCompileExec966840822  
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:1c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c99] compiler features compiled with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec1368220351/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec1368220351.dir/build.make CMakeFiles/cmTryCompileExec1368220351.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1368220351.dir/feature_tests.c.o
+/opt/local/bin/gcc   -std=c99 -o CMakeFiles/cmTryCompileExec1368220351.dir/feature_tests.c.o   -c /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/feature_tests.c
+Linking C executable cmTryCompileExec1368220351
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1368220351.dir/link.txt --verbose=1
+/opt/local/bin/gcc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec1368220351.dir/feature_tests.c.o  -o cmTryCompileExec1368220351  
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c90] compiler features compiled with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec4091429711/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec4091429711.dir/build.make CMakeFiles/cmTryCompileExec4091429711.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec4091429711.dir/feature_tests.c.o
+/opt/local/bin/gcc   -std=c90 -o CMakeFiles/cmTryCompileExec4091429711.dir/feature_tests.c.o   -c /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/feature_tests.c
+Linking C executable cmTryCompileExec4091429711
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec4091429711.dir/link.txt --verbose=1
+/opt/local/bin/gcc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec4091429711.dir/feature_tests.c.o  -o cmTryCompileExec4091429711  
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:0c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:0c_variadic_macros
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec682779368/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec682779368.dir/build.make CMakeFiles/cmTryCompileExec682779368.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec682779368.dir/testCXXCompiler.cxx.o
+/opt/local/bin/g++     -o CMakeFiles/cmTryCompileExec682779368.dir/testCXXCompiler.cxx.o -c /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTryCompileExec682779368
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec682779368.dir/link.txt --verbose=1
+/opt/local/bin/g++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec682779368.dir/testCXXCompiler.cxx.o  -o cmTryCompileExec682779368  
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec548307055/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec548307055.dir/build.make CMakeFiles/cmTryCompileExec548307055.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec548307055.dir/CMakeCXXCompilerABI.cpp.o
+/opt/local/bin/g++     -o CMakeFiles/cmTryCompileExec548307055.dir/CMakeCXXCompilerABI.cpp.o -c /opt/local/share/cmake-3.2/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTryCompileExec548307055
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec548307055.dir/link.txt --verbose=1
+/opt/local/bin/g++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTryCompileExec548307055.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec548307055   
+Using built-in specs.
+COLLECT_GCC=/opt/local/bin/g++
+COLLECT_LTO_WRAPPER=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/lto-wrapper
+Target: x86_64-apple-darwin14
+Configured with: /opt/local/var/macports/build/_opt_mports_dports_lang_gcc48/gcc48/work/gcc-4.8.4/configure --prefix=/opt/local --build=x86_64-apple-darwin14 --enable-languages=c,c++,objc,obj-c++,lto,fortran,java --libdir=/opt/local/lib/gcc48 --includedir=/opt/local/include/gcc48 --infodir=/opt/local/share/info --mandir=/opt/local/share/man --datarootdir=/opt/local/share/gcc-4.8 --with-local-prefix=/opt/local --with-system-zlib --disable-nls --program-suffix=-mp-4.8 --with-gxx-include-dir=/opt/local/include/gcc48/c++/ --with-gmp=/opt/local --with-mpfr=/opt/local --with-mpc=/opt/local --with-isl=/opt/local --disable-isl-version-check --with-cloog=/opt/local --disable-cloog-version-check --enable-stage1-checking --disable-multilib --enable-lto --enable-libstdcxx-time --with-as=/opt/local/bin/as --with-ld=/opt/local/bin/ld --with-ar=/opt/local/bin/ar --with-bugurl=https://trac.macports.org/newticket --with-pkgversion='MacPorts gcc48 4.8.4_0'
+Thread model: posix
+gcc version 4.8.4 (MacPorts gcc48 4.8.4_0) 
+COMPILER_PATH=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/libexec/gcc/x86_64-apple-darwin14/:/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/
+LIBRARY_PATH=/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../../:/usr/lib/
+COLLECT_GCC_OPTIONS='-mmacosx-version-min=10.10.0' '-v' '-o' 'cmTryCompileExec548307055' '-shared-libgcc' '-mtune=core2'
+ /opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/collect2 -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec548307055 -L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4 -L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec548307055.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v
+collect2 version 4.8.4
+/opt/local/bin/ld -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec548307055 -L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4 -L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec548307055.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v
+@(#)PROGRAM:ld  PROJECT:ld64-236.3
+configured to support archs: i386 x86_64 x86_64h armv6 armv7 armv7s armv7m arm64
+@(#)PROGRAM:ld  PROJECT:ld64-236.3
+configured to support archs: i386 x86_64 x86_64h armv6 armv7 armv7s armv7m arm64
+Library search paths:
+	/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4
+	/opt/local/lib/gcc48
+	/usr/lib
+	/usr/local/lib
+Framework search paths:
+	/Library/Frameworks/
+	/System/Library/Frameworks/
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTryCompileExec548307055/fast"]
+  ignore line: [/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec548307055.dir/build.make CMakeFiles/cmTryCompileExec548307055.dir/build]
+  ignore line: [/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building CXX object CMakeFiles/cmTryCompileExec548307055.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/opt/local/bin/g++     -o CMakeFiles/cmTryCompileExec548307055.dir/CMakeCXXCompilerABI.cpp.o -c /opt/local/share/cmake-3.2/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTryCompileExec548307055]
+  ignore line: [/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec548307055.dir/link.txt --verbose=1]
+  ignore line: [/opt/local/bin/g++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTryCompileExec548307055.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec548307055   ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/opt/local/bin/g++]
+  ignore line: [COLLECT_LTO_WRAPPER=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/lto-wrapper]
+  ignore line: [Target: x86_64-apple-darwin14]
+  ignore line: [Configured with: /opt/local/var/macports/build/_opt_mports_dports_lang_gcc48/gcc48/work/gcc-4.8.4/configure --prefix=/opt/local --build=x86_64-apple-darwin14 --enable-languages=c,c++,objc,obj-c++,lto,fortran,java --libdir=/opt/local/lib/gcc48 --includedir=/opt/local/include/gcc48 --infodir=/opt/local/share/info --mandir=/opt/local/share/man --datarootdir=/opt/local/share/gcc-4.8 --with-local-prefix=/opt/local --with-system-zlib --disable-nls --program-suffix=-mp-4.8 --with-gxx-include-dir=/opt/local/include/gcc48/c++/ --with-gmp=/opt/local --with-mpfr=/opt/local --with-mpc=/opt/local --with-isl=/opt/local --disable-isl-version-check --with-cloog=/opt/local --disable-cloog-version-check --enable-stage1-checking --disable-multilib --enable-lto --enable-libstdcxx-time --with-as=/opt/local/bin/as --with-ld=/opt/local/bin/ld --with-ar=/opt/local/bin/ar --with-bugurl=https://trac.macports.org/newticket --with-pkgversion='MacPorts gcc48 4.8.4_0']
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 4.8.4 (MacPorts gcc48 4.8.4_0) ]
+  ignore line: [COMPILER_PATH=/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/libexec/gcc/x86_64-apple-darwin14/:/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/]
+  ignore line: [LIBRARY_PATH=/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/:/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../../:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-mmacosx-version-min=10.10.0' '-v' '-o' 'cmTryCompileExec548307055' '-shared-libgcc' '-mtune=core2']
+  link line: [ /opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/collect2 -dynamic -arch x86_64 -macosx_version_min 10.10.0 -weak_reference_mismatches non-weak -o cmTryCompileExec548307055 -L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4 -L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../.. -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTryCompileExec548307055.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lSystem -v]
+    arg [/opt/local/libexec/gcc/x86_64-apple-darwin14/4.8.4/collect2] ==> ignore
+    arg [-dynamic] ==> ignore
+    arg [-arch] ==> ignore
+    arg [x86_64] ==> ignore
+    arg [-macosx_version_min] ==> ignore
+    arg [10.10.0] ==> ignore
+    arg [-weak_reference_mismatches] ==> ignore
+    arg [non-weak] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec548307055] ==> ignore
+    arg [-L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4] ==> dir [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4]
+    arg [-L/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../..] ==> dir [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../..]
+    arg [-search_paths_first] ==> ignore
+    arg [-headerpad_max_install_names] ==> ignore
+    arg [-v] ==> ignore
+    arg [CMakeFiles/cmTryCompileExec548307055.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-no_compact_unwind] ==> ignore
+    arg [-lSystem] ==> lib [System]
+    arg [-lgcc_ext.10.5] ==> lib [gcc_ext.10.5]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lSystem] ==> lib [System]
+    arg [-v] ==> ignore
+  Library search paths: [;/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4;/opt/local/lib/gcc48;/usr/lib;/usr/local/lib]
+  Framework search paths: [;/Library/Frameworks/;/System/Library/Frameworks/]
+  remove lib [System]
+  remove lib [gcc_ext.10.5]
+  remove lib [gcc]
+  remove lib [System]
+  collapse library dir [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4] ==> [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4]
+  collapse library dir [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4/../../..] ==> [/opt/local/lib/gcc48]
+  collapse library dir [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4] ==> [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4]
+  collapse library dir [/opt/local/lib/gcc48] ==> [/opt/local/lib/gcc48]
+  collapse library dir [/usr/lib] ==> [/usr/lib]
+  collapse library dir [/usr/local/lib] ==> [/usr/local/lib]
+  collapse framework dir [/Library/Frameworks/] ==> [/Library/Frameworks]
+  collapse framework dir [/System/Library/Frameworks/] ==> [/System/Library/Frameworks]
+  implicit libs: [stdc++]
+  implicit dirs: [/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.4;/opt/local/lib/gcc48;/usr/lib;/usr/local/lib]
+  implicit fwks: [/Library/Frameworks;/System/Library/Frameworks]
+
+
+
+
+Detecting CXX [-std=c++1y] compiler features compiled with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec4143560054/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec4143560054.dir/build.make CMakeFiles/cmTryCompileExec4143560054.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec4143560054.dir/feature_tests.cxx.o
+/opt/local/bin/g++    -std=c++1y -o CMakeFiles/cmTryCompileExec4143560054.dir/feature_tests.cxx.o -c /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTryCompileExec4143560054
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec4143560054.dir/link.txt --verbose=1
+/opt/local/bin/g++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec4143560054.dir/feature_tests.cxx.o  -o cmTryCompileExec4143560054  
+
+
+    Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:1cxx_alias_templates
+    Feature record: CXX_FEATURE:1cxx_alignas
+    Feature record: CXX_FEATURE:1cxx_alignof
+    Feature record: CXX_FEATURE:1cxx_attributes
+    Feature record: CXX_FEATURE:0cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:1cxx_auto_type
+    Feature record: CXX_FEATURE:0cxx_binary_literals
+    Feature record: CXX_FEATURE:1cxx_constexpr
+    Feature record: CXX_FEATURE:0cxx_contextual_conversions
+    Feature record: CXX_FEATURE:1cxx_decltype
+    Feature record: CXX_FEATURE:0cxx_decltype_auto
+    Feature record: CXX_FEATURE:1cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:1cxx_default_function_template_args
+    Feature record: CXX_FEATURE:1cxx_defaulted_functions
+    Feature record: CXX_FEATURE:1cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:1cxx_delegating_constructors
+    Feature record: CXX_FEATURE:1cxx_deleted_functions
+    Feature record: CXX_FEATURE:0cxx_digit_separators
+    Feature record: CXX_FEATURE:1cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:1cxx_explicit_conversions
+    Feature record: CXX_FEATURE:1cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:1cxx_extern_templates
+    Feature record: CXX_FEATURE:1cxx_final
+    Feature record: CXX_FEATURE:1cxx_func_identifier
+    Feature record: CXX_FEATURE:1cxx_generalized_initializers
+    Feature record: CXX_FEATURE:0cxx_generic_lambdas
+    Feature record: CXX_FEATURE:1cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:1cxx_inline_namespaces
+    Feature record: CXX_FEATURE:1cxx_lambdas
+    Feature record: CXX_FEATURE:0cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:1cxx_local_type_template_args
+    Feature record: CXX_FEATURE:1cxx_long_long_type
+    Feature record: CXX_FEATURE:1cxx_noexcept
+    Feature record: CXX_FEATURE:1cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:1cxx_nullptr
+    Feature record: CXX_FEATURE:1cxx_override
+    Feature record: CXX_FEATURE:1cxx_range_for
+    Feature record: CXX_FEATURE:1cxx_raw_string_literals
+    Feature record: CXX_FEATURE:1cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:0cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:0cxx_return_type_deduction
+    Feature record: CXX_FEATURE:1cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:1cxx_rvalue_references
+    Feature record: CXX_FEATURE:1cxx_sizeof_member
+    Feature record: CXX_FEATURE:1cxx_static_assert
+    Feature record: CXX_FEATURE:1cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:1cxx_thread_local
+    Feature record: CXX_FEATURE:1cxx_trailing_return_types
+    Feature record: CXX_FEATURE:1cxx_unicode_literals
+    Feature record: CXX_FEATURE:1cxx_uniform_initialization
+    Feature record: CXX_FEATURE:1cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:1cxx_user_literals
+    Feature record: CXX_FEATURE:0cxx_variable_templates
+    Feature record: CXX_FEATURE:1cxx_variadic_macros
+    Feature record: CXX_FEATURE:1cxx_variadic_templates
+
+
+Detecting CXX [-std=c++11] compiler features compiled with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec423349578/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec423349578.dir/build.make CMakeFiles/cmTryCompileExec423349578.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec423349578.dir/feature_tests.cxx.o
+/opt/local/bin/g++    -std=c++11 -o CMakeFiles/cmTryCompileExec423349578.dir/feature_tests.cxx.o -c /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTryCompileExec423349578
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec423349578.dir/link.txt --verbose=1
+/opt/local/bin/g++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec423349578.dir/feature_tests.cxx.o  -o cmTryCompileExec423349578  
+
+
+    Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:1cxx_alias_templates
+    Feature record: CXX_FEATURE:1cxx_alignas
+    Feature record: CXX_FEATURE:1cxx_alignof
+    Feature record: CXX_FEATURE:1cxx_attributes
+    Feature record: CXX_FEATURE:0cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:1cxx_auto_type
+    Feature record: CXX_FEATURE:0cxx_binary_literals
+    Feature record: CXX_FEATURE:1cxx_constexpr
+    Feature record: CXX_FEATURE:0cxx_contextual_conversions
+    Feature record: CXX_FEATURE:1cxx_decltype
+    Feature record: CXX_FEATURE:0cxx_decltype_auto
+    Feature record: CXX_FEATURE:1cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:1cxx_default_function_template_args
+    Feature record: CXX_FEATURE:1cxx_defaulted_functions
+    Feature record: CXX_FEATURE:1cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:1cxx_delegating_constructors
+    Feature record: CXX_FEATURE:1cxx_deleted_functions
+    Feature record: CXX_FEATURE:0cxx_digit_separators
+    Feature record: CXX_FEATURE:1cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:1cxx_explicit_conversions
+    Feature record: CXX_FEATURE:1cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:1cxx_extern_templates
+    Feature record: CXX_FEATURE:1cxx_final
+    Feature record: CXX_FEATURE:1cxx_func_identifier
+    Feature record: CXX_FEATURE:1cxx_generalized_initializers
+    Feature record: CXX_FEATURE:0cxx_generic_lambdas
+    Feature record: CXX_FEATURE:1cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:1cxx_inline_namespaces
+    Feature record: CXX_FEATURE:1cxx_lambdas
+    Feature record: CXX_FEATURE:0cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:1cxx_local_type_template_args
+    Feature record: CXX_FEATURE:1cxx_long_long_type
+    Feature record: CXX_FEATURE:1cxx_noexcept
+    Feature record: CXX_FEATURE:1cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:1cxx_nullptr
+    Feature record: CXX_FEATURE:1cxx_override
+    Feature record: CXX_FEATURE:1cxx_range_for
+    Feature record: CXX_FEATURE:1cxx_raw_string_literals
+    Feature record: CXX_FEATURE:1cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:0cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:0cxx_return_type_deduction
+    Feature record: CXX_FEATURE:1cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:1cxx_rvalue_references
+    Feature record: CXX_FEATURE:1cxx_sizeof_member
+    Feature record: CXX_FEATURE:1cxx_static_assert
+    Feature record: CXX_FEATURE:1cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:1cxx_thread_local
+    Feature record: CXX_FEATURE:1cxx_trailing_return_types
+    Feature record: CXX_FEATURE:1cxx_unicode_literals
+    Feature record: CXX_FEATURE:1cxx_uniform_initialization
+    Feature record: CXX_FEATURE:1cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:1cxx_user_literals
+    Feature record: CXX_FEATURE:0cxx_variable_templates
+    Feature record: CXX_FEATURE:1cxx_variadic_macros
+    Feature record: CXX_FEATURE:1cxx_variadic_templates
+
+
+Detecting CXX [-std=c++98] compiler features compiled with the following output:
+Change Dir: /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec4178274216/fast"
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTryCompileExec4178274216.dir/build.make CMakeFiles/cmTryCompileExec4178274216.dir/build
+/opt/local/bin/cmake -E cmake_progress_report /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec4178274216.dir/feature_tests.cxx.o
+/opt/local/bin/g++    -std=c++98 -o CMakeFiles/cmTryCompileExec4178274216.dir/feature_tests.cxx.o -c /Users/fengzeng/workspace/PyroTools/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTryCompileExec4178274216
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec4178274216.dir/link.txt --verbose=1
+/opt/local/bin/g++     -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTryCompileExec4178274216.dir/feature_tests.cxx.o  -o cmTryCompileExec4178274216  
+
+
+    Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:0cxx_alias_templates
+    Feature record: CXX_FEATURE:0cxx_alignas
+    Feature record: CXX_FEATURE:0cxx_alignof
+    Feature record: CXX_FEATURE:0cxx_attributes
+    Feature record: CXX_FEATURE:0cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:0cxx_auto_type
+    Feature record: CXX_FEATURE:0cxx_binary_literals
+    Feature record: CXX_FEATURE:0cxx_constexpr
+    Feature record: CXX_FEATURE:0cxx_contextual_conversions
+    Feature record: CXX_FEATURE:0cxx_decltype
+    Feature record: CXX_FEATURE:0cxx_decltype_auto
+    Feature record: CXX_FEATURE:0cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:0cxx_default_function_template_args
+    Feature record: CXX_FEATURE:0cxx_defaulted_functions
+    Feature record: CXX_FEATURE:0cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:0cxx_delegating_constructors
+    Feature record: CXX_FEATURE:0cxx_deleted_functions
+    Feature record: CXX_FEATURE:0cxx_digit_separators
+    Feature record: CXX_FEATURE:0cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:0cxx_explicit_conversions
+    Feature record: CXX_FEATURE:0cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:0cxx_extern_templates
+    Feature record: CXX_FEATURE:0cxx_final
+    Feature record: CXX_FEATURE:0cxx_func_identifier
+    Feature record: CXX_FEATURE:0cxx_generalized_initializers
+    Feature record: CXX_FEATURE:0cxx_generic_lambdas
+    Feature record: CXX_FEATURE:0cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:0cxx_inline_namespaces
+    Feature record: CXX_FEATURE:0cxx_lambdas
+    Feature record: CXX_FEATURE:0cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:0cxx_local_type_template_args
+    Feature record: CXX_FEATURE:0cxx_long_long_type
+    Feature record: CXX_FEATURE:0cxx_noexcept
+    Feature record: CXX_FEATURE:0cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:0cxx_nullptr
+    Feature record: CXX_FEATURE:0cxx_override
+    Feature record: CXX_FEATURE:0cxx_range_for
+    Feature record: CXX_FEATURE:0cxx_raw_string_literals
+    Feature record: CXX_FEATURE:0cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:0cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:0cxx_return_type_deduction
+    Feature record: CXX_FEATURE:0cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:0cxx_rvalue_references
+    Feature record: CXX_FEATURE:0cxx_sizeof_member
+    Feature record: CXX_FEATURE:0cxx_static_assert
+    Feature record: CXX_FEATURE:0cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:0cxx_thread_local
+    Feature record: CXX_FEATURE:0cxx_trailing_return_types
+    Feature record: CXX_FEATURE:0cxx_unicode_literals
+    Feature record: CXX_FEATURE:0cxx_uniform_initialization
+    Feature record: CXX_FEATURE:0cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:0cxx_user_literals
+    Feature record: CXX_FEATURE:0cxx_variable_templates
+    Feature record: CXX_FEATURE:0cxx_variadic_macros
+    Feature record: CXX_FEATURE:0cxx_variadic_templates

@@ -1,0 +1,166 @@
+#!/bin/bash
+
+# check emboss-water installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash water &> /dev/null
+if [ $? -eq 1 ]
+then
+  echo "require water (emboss package) installed"
+  echo "abort"
+  exit 1
+fi
+
+# check environment variable BIOINFO_TOOL_XGSUTILS is already set
+# http://stackoverflow.com/questions/11686208/check-if-environment-variable-is-already-set
+xgsutils_exist=`env | awk '/^BIOINFO_TOOL_XGSUTILS=/{print 1}'`
+if [ -z "$xgsutils_exist" ]
+then
+  BIOINFO_TOOL_XGSUTILS=/Users/fengzeng/tool/xgsutils
+fi
+
+# function look for substring position
+# http://stackoverflow.com/questions/5031764/position-of-a-string-within-a-string-using-linux-shell-script
+hgl(){
+  x="${1%%$2*}"
+  echo ${#x}
+}
+htl(){
+  x="${1##*$2}"
+  echo ${#x}
+}
+
+# help message
+help(){
+  echo "SYNOPSIS"
+  echo "    xEmbossWater [OPTIONS] <SeqA> <SeqB>"
+  echo ""
+  echo "DESCRIPTION"
+  echo "    Compute the local alignment between two sequences"
+  echo ""
+  echo "OPTIONS"
+  echo "    --gapopen      gap open penalty [10.0]"
+  echo "    --gapextend    gap extend penalty [0.5]"
+  echo "    --aformat      output format: pair, markx0, markx1,"
+  echo "                   markx2, markx3, markx10, match, sam,"
+  echo "                   bam, score, srspair [srspair]"
+  echo "    -h,--help      print help message"
+  exit 0
+}
+
+# print help message if no arguments provided
+if [ "$#" = 0 ]
+then
+  help
+fi
+
+# parse arguments
+gapopen="-gapopen 10"
+gapextend="-gapextend 0.5"
+aformat="-aformat srspair"
+
+# parse command line
+PARSED_OPTIONS=$(getopt -n "$0" -o h -l gapopen:,gapextend:,aformat:,help -- "$@")
+
+# Bad arguments, something has gone wrong with the getopt command
+if [ $? -ne 0 ]
+then
+  help
+fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    --gapopen )
+      gapopen="-gapopen $2"
+      shift 2;;
+    --gapextend )
+      gapextend="-gapextend $2"
+      shift 2;;
+    --aformat )
+      aformat="-aformat $2"
+      shift 2;;
+    --)
+      shift
+      break;;
+  esac
+done
+
+
+seqa=$1 && shift
+seqb=$1
+
+
+# water alignment
+if [[ ( "$aformat" == "-aformat sam" ) || ( "$aformat" == "-aformat bam" ) ]]
+then
+  water -datafile $BIOINFO_TOOL_XGSUTILS/alnutils/EDNAFULL $gapopen $gapextend -aformat sam -asequence $seqa -bsequence $seqb -outfile temp.water
+else
+  water -datafile $BIOINFO_TOOL_XGSUTILS/alnutils/EDNAFULL $gapopen $gapextend $aformat -asequence $seqa -bsequence $seqb -outfile temp.water 
+fi
+
+
+# refine sam/bam output
+if [[ ( "$aformat" == "-aformat sam" ) || ( "$aformat" == "-aformat bam" ) ]]
+then
+  OLDIFS=IFS
+  IFS=$'\n'
+  for line in `cat temp.water`
+  do
+    if [[ $line =~ ^@ ]];then echo "$line" >> temp.water2;continue;fi
+    rname=$(echo $line | awk '{print $1}')
+    rseq=$(echo $line | awk '{print $10}')
+    rcigar=$(echo $line | awk '{print $6}')
+    rlen=${#rseq}
+    rseq0=$(samtools faidx $seqb $rname | awk '!/^>/{a=a$1}END{print a}')
+    rlen0=$(samtools faidx $seqb $rname | $BIOINFO_TOOL_XGSUTILS/faxutils/xFastaSequenceLength - | awk '{print $2}')
+    hb=""
+    ht=""
+    bl=$(hgl $rseq0 $rseq)
+    tl=$(htl $rseq0 $rseq)
+    # hard clipping pattern
+    hcp="(([0-9]*)H)?[0-9]+[MDI].*(0-9)+[MDI](([0-9]*)H)?"
+    # align pattern
+    acp="(([0-9]+[MDI])+)"
+    # search for hard clipping
+    [[ $rcigar =~ $hcp ]]
+    if [ ! -z ${BASH_REMATCH[2]} ];then bl=$(( $bl + ${BASH_REMATCH[2]} ));fi
+    if [ ! -z ${BASH_REMATCH[4]} ];then tl=$(( $tl + ${BASH_REMATCH[4]} ));fi
+    # search for align pattern
+    [[ $rcigar =~ $acp ]]
+    rcigar=${BASH_REMATCH[1]}
+    if [[ $bl != 0 ]];then hb=$bl"S";rcigar=$hb$rcigar;fi
+    if [[ $tl != 0 ]];then ht=$tl"S";rcigar=$rcigar$ht;fi
+    echo "$line" | awk -v seq="$rseq0" -v cigar="$rcigar" '{$6=cigar;$10=seq;a=$1;l=length($10);b="";for(i=1;i<=l;i++){b=b"?";}$11=b;for(i=2;i<=NF;i++){a=a"\t"$i};print a}' >> temp.water2
+  done
+  IFS=OLDIFS
+fi
+
+if [[ ( "$aformat" == "-aformat sam" ) || ( "$aformat" == "-aformat bam" ) ]]
+then
+  mv temp.water2 temp.water
+fi
+
+
+if [[ ( "$aformat" == "-aformat sam" ) || ( "$aformat" == "-aformat sam" ) ]]
+then
+  refname=$(xgsutils xFastaSequenceLength $seqa | awk '{print $1}')
+  reflen=$(xgsutils xFastaSequenceLength $seqa | awk '{print $2}')
+  awk -v a="$refname" -v b="$reflen" 'NR==2{print "@SQ\tSN:"a"\tLN:"b}1' temp.water > temp.temp.water && mv temp.temp.water temp.water
+fi
+
+if [ "$aformat" = "-aformat bam" ]
+then
+  $BIOINFO_TOOL_XGSUTILS/bamutils/xBamFromSamToBam -f $seqa temp.water temp.water
+  mv temp.water.bam temp.water
+  mv temp.water.bam.bai temp.water.bai
+fi
+
+if [ -f $seqb.fai ];then rm $seqb.fai;fi
+
+cat temp.water
+rm temp.water*

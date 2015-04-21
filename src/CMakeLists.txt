@@ -8,7 +8,6 @@
 # ================================================ +
 # Link to BamTools library                         +
 # ================================================ +
-
 # set Bamtools include and library path
 include_directories(${PyroTools_SOURCE_DIR}/bamtools/include)
 link_directories(${PyroTools_SOURCE_DIR}/bamtools/lib)
@@ -16,10 +15,8 @@ link_directories(${PyroTools_SOURCE_DIR}/bamtools/lib)
 # ================================================ +
 # Link to NlOpt library                            +
 # ================================================ +
-
 # set Nlopt include and library path
-include_directories(${PyroTools_SOURCE_DIR}/nlopt/api)
-#link_directories(${PyroTools_SOURCE_DIR}/nlopt/.libs)
+include_directories(${PyroTools_SOURCE_DIR}/nlopt/include)
 link_directories(${PyroTools_SOURCE_DIR}/nlopt/lib)
 
 # ================================================ +
@@ -27,7 +24,7 @@ link_directories(${PyroTools_SOURCE_DIR}/nlopt/lib)
 # ================================================ +
 
 # set external link libraries
-set(LIBS m z pthread bamtools bamtools-utils nlopt)
+set(LIBS m z pthread bamtools bamtools-utils nlopt gomp)
 
 # source file
 aux_source_directory(. SRC_LIST)

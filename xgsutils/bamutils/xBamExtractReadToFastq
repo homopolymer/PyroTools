@@ -1,0 +1,102 @@
+#!/bin/bash
+
+# check samtools installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash samtools &> /dev/null
+if [ $? -eq 1 ]
+then
+  >&2 echo "require samtools installed"
+  >&2 echo "abort"
+  exit 1
+fi
+
+# runtime message
+runMsg(){
+  >&2 echo $1
+}
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamExtractReadToFastq [OPTIONS] <BAMFILE>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Extract sequencing reads in a specified region and save in a fastq file"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -r,--roi     region of interest [STR]"
+  >&2 echo "    -q,--mq      minimum mapping quality score (default:5) [INT]"
+  >&2 echo "    -f,--ff      skip reads with the specified flags [INT]"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+
+# print help message if no arguments provided
+if [ "$#" = 0 ]
+then
+  help
+fi
+
+# parse command arguments
+PARSED_OPTIONS=$(getopt -n "$0" -o r:q:f:h --long roi:,mq:,ff:,help -- "$@")
+
+# bad argument
+if [ $? -ne 0 ]
+then
+  help
+fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+
+# parse argument
+mq="-q 5"
+roi=""
+ff=""
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -r | --roi )
+      roi="$roi $2"
+      shift 2;;
+    -q | --mq )
+      mq="-q $2"
+      shift 2;;
+    -f | --ff )
+      ff="$ff -F $2"
+      shift 2;;
+    -- )
+      shift
+      break;;
+  esac
+done
+
+bamfile=$1
+
+# runtime message
+runMsg "[$(date) xBamExtractReadToFastq] process $bamfile with options $roi $mq $ff"
+
+# check BAM file valid
+if [ ! -f "$bamfile" ]
+then
+  >&2 echo "invalid bam file" 
+  >&2 echo "abort"
+  exit 1
+fi
+
+# extract sequencing reads in region of interest and convert to fastq
+samtools view $mq $ff $bamfile $roi | gawk ' \
+{ \
+  Xn=$1; \
+  if (and($2,0x1)==0x1 && and($2,0x40)==0x40){ \
+    Xn=Xn ".1"; \
+  } \
+  if (and($2,0x1)==0x1 && and($2,0x80)==0x80){ \
+    Xn=Xn ".2"; \
+  } \
+  print "@"Xn"\n"$10"\n+\n"$11 \
+}'

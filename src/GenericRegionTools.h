@@ -12,9 +12,13 @@
 #ifndef GENERICREGIONTOOLS_H
 #define GENERICREGIONTOOLS_H
 
+#include <tuple>
 #include <vector>
 #include <string>
 using namespace std;
+
+#include "api/BamAux.h"
+using namespace BamTools;
 
 namespace GenericSequenceTools
 {
@@ -26,10 +30,15 @@ public:
 
 public:
     // parse a region string
-    static void parse(string& Roi, int& chrID, int& chrLeftPosition, int& chrRightPosition);
+    static void parse(string& Roi, string& chrName, int& chrLeftPosition, int& chrRightPosition);
 
     // parse a region file
-    static void parse(string& RoiFile, vector<int>& chrIDs, vector<int>& chrLeftPositions, vector<int>& chrRightPositions);
+    static void parse(string& RoiFile, vector<string>& chrNames, vector<int>& chrLeftPositions, vector<int>& chrRightPositions);
+
+    // convert a set of region strings to genome positions
+    static int toScanWindow(RefVector& Genome, vector<string>& RoiSet, int WindowSize, vector<tuple<int,int,int>>& WindowSet);
+    static int toScanWindow(RefVector& Genome, vector<string>& RoiSet, vector<tuple<int,int,int>>& WindowSet);
+
 };
 
 }   // namespace

@@ -5,7 +5,22 @@ using namespace GenericSequenceTools;
 #include <vector>
 #include <numeric>
 #include <iostream>
+#include <ctime>
+#include <sstream>
+#include <string>
 using namespace std;
+
+#ifdef __linux
+    #include <unistd.h>
+#elif __APPLE__
+    #include <mach-o/dyld.h>
+#endif
+
+#include <stdio.h>
+#include <limits.h>
+#include <stdlib.h>
+#include <libgen.h>
+#include <sys/stat.h>
 
 
 void GenericSequenceTools::setVectorValue(VectorInteger &vec, int size, int value)
@@ -75,4 +90,52 @@ double GenericRegressor::linearfit(std::vector<double> &x, std::vector<double> &
     }
 
     return residues;
+}
+
+string GenericSequenceTools::GetExecPath()
+{
+    string path;
+    char result[PATH_MAX];
+    uint32_t size=sizeof(result);
+
+#ifdef __linux
+    ssize_t count = readlink( "/proc/self/exe", result, size );
+    path = string( result, (count > 0) ? count : 0 );
+#elif __APPLE__
+    _NSGetExecutablePath( result, &size );
+    path = string(result);
+#endif
+
+    return string(dirname((char*)path.c_str()));
+}
+
+bool GenericSequenceTools::FileExist(const string &filename)
+{
+    struct stat buffer;
+    return (stat (filename.c_str(), &buffer) == 0);
+}
+
+
+int GenericSequenceTools::RunCmdGetReturn(string &cmd, string &result)
+{
+    result = "";
+    FILE* pipe = popen(cmd.c_str(), "r");
+    if (!pipe) return -1;
+    char buffer[128];
+    while(!feof(pipe)) {
+        if(fgets(buffer, 128, pipe) != NULL)
+            result += buffer;
+    }
+    pclose(pipe);
+    return 0;
+}
+
+string GenericSequenceTools::CurrentTime()
+{
+    string value;
+    time_t result = time(NULL);
+    stringstream ss;
+    ss << asctime(localtime(&result));
+    getline(ss, value);
+    return value;
 }

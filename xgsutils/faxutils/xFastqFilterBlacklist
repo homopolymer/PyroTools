@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# verbose function
+Verbose(){
+  >&2 echo "[$(date) xFastqFilterBlacklist] $1"
+}
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xFastqFilterBlacklist <FASTQFILE> <BLACKLIST>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Filter out the reads in the blacklist"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# check the fastqutils
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash fastqutils &> /dev/null
+if [ $? -eq 1 ]
+then
+  >&2 echo "require fastqutils installed"
+  >&2 echo "abort"
+  exit 1
+fi
+
+
+# print help message if no arguments provided
+if [ $# = 0 ];then help;fi
+
+# parse the command line
+if [ $1 = "-h" ];then help;fi
+if [ $1 = "--help" ];then help;fi
+
+myrealpath='realpath -s'
+if [[ $OSTYPE =~ darwin* ]];then myrealpath='grealpath -s';fi
+
+fastqFile=$($myrealpath $1) && shift
+blacklist=$($myrealpath $1)
+
+# get the current working directory
+cwd=$(pwd)
+# make a temporary working directory
+twd="$cwd/temporary_$RANDOM"
+if [ -d $twd ];then rm -rf $twd;fi
+mkdir $twd && cd $twd
+
+# convert fastq to fasta
+fastqutils tofasta $fastqFile > temporary.fasta
+samtools faidx temporary.fasta
+# get the name list of all reads
+awk '{print $1}' temporary.fasta.fai | sort > all_reads.txt
+
+# delete the reads in the blacklist
+mycomm='comm'
+if [[ $OSTYPE =~ darwin* ]];then mycomm='gcomm';fi
+$mycomm -3 all_reads.txt $blacklist > whitelist.txt
+
+# print reads in the whitelist
+fastqutils filter -whitelist whitelist.txt $fastqFile
+
+# return to the previous working directory
+cd $cwd
+# remove the temporary directory
+rm -rf $twd

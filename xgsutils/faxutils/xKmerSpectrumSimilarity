@@ -1,0 +1,71 @@
+#!/bin/bash
+
+myrealpath='realpath -s'
+if [[ $OSTYPE =~ darwin* ]];then myrealpath='grealpath -s';fi
+
+# verbose function
+Verbose(){
+  >&2 echo "[$(date) xKmerSpectrumSimilarity] $1"
+}
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xKmerSpectrumSimilarity [OPTIONS] <FASTAFILE> [<FASTAFILE2>]"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Compute the identity of all pairs of sequences in the fasta file"
+  >&2 echo "    Compute the identity of between all sequences in file1 and file2"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -k,--ksize    specify the size of the kmer"
+  >&2 echo "    -o,--osize    specify the overlap size of two nearby kmers"
+  >&2 echo "    -c,--cores    specify the number of threads"
+  >&2 echo "    -h,--help     print help message"
+  exit 0
+}
+
+# print help message if no arguments provided
+if [ $# = 0 ];then help;fi
+
+# parse the command line
+PARSED_OPTIONS=$(getopt -n "$0" -o k:o:c:h --long ksize:,osize:,cores:help -- "$@")
+
+# Bad arguments, something has gone wrong with the getopt command
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+ksize=31
+osize=30
+cores=1
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -k | --ksize )
+      ksize=$2
+      shift 2;;
+    -o | --osize )
+      osize=$2
+      shift 2;;
+    -c | --cores )
+      cores=$2
+      shift 2;;
+    --)
+      shift
+      break;;
+  esac
+done
+
+if [ $# = 1 ]
+then
+  $BIOINFO_TOOL_XGSUTILS/faxutils/seq_kmer_sim -k $ksize -o $osize -c $cores $1
+fi
+
+if [ $# = 2 ]
+then
+  $BIOINFO_TOOL_XGSUTILS/faxutils/seq_kmer_sim -k $ksize -o $osize -c $cores $1 $2
+fi

@@ -1,0 +1,47 @@
+#!/bin/bash
+# reference: http://stackoverflow.com/questions/23992646/sequence-length-of-fasta-file
+
+# help message
+help(){
+  echo "Print the length of sequences in the FASTA file"
+  echo "Usage: xFastaSequenceLength <FASTA_FILE>"
+  echo "-h,--help    print help message"
+  exit
+}
+
+# print help message if no arguments provided
+if [ "$#" = 0 ];then help;fi
+
+# set command argument parser
+PARSED_OPTIONS=$(getopt -n "$0" -o h --long help -- "$@")
+
+# bad argument
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+# parse arguments
+while true;do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -- )
+      shift
+      break;;
+  esac
+done
+
+fastaFile=$1
+
+cat $fastaFile | awk '/^>/{ \
+if(seqlen){ print seqname"\t"seqlen } \
+if ($1==">"){seqname=$2} \
+else{seqname=substr($1,2,length($1))} \
+seqlen=0; \
+next; \
+} \
+{seqlen=seqlen+length($0)} \
+END{print seqname"\t"seqlen} \
+'

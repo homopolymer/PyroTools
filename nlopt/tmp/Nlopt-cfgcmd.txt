@@ -1,0 +1,1 @@
+cmd='/Users/fengzeng/workspace/PyroTools/nlopt/configure;--prefix=/Users/fengzeng/workspace/PyroTools/nlopt'

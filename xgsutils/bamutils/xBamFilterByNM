@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# help message
+help(){
+  >&2 echo "SYNPOSIS"
+  >&2 echo "    xBamFilterByNM [OPTION] <BAMFILE>"
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    It filter BAM according to NM field"
+  >&2 echo "OPTION"
+  >&2 echo "    -n,--nm      specify NM threshold [INT]"
+  >&2 echo "    -H,--Head    print out header also"
+  >&2 echo "    -h,--help    print help message"
+  exit 1
+}
+
+# print help message, if no arguments provided
+if [ $# = 0 ];then help;fi
+
+# set command argument parser
+PARSED_OPTIONS=$(getopt -n "$0" -o n:Hh --long nm:,Head,help -- "$@")
+
+# bad argument
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+NM=5
+HEAD=""
+# parse arguments
+while true;do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -n | --nm )
+      NM="$2"
+      shift 2;;
+    -H | --Head )
+      HEAD="-h"
+      shift;;
+    -- )
+      shift
+      break;;
+  esac
+done
+
+BAM=$1;shift
+
+samtools view -F4 $HEAD $BAM | awk -v n="$NM" '{if ($1~/^@/){print}else{for(i=12;i<=NF;i++){if($i~/^NM/){split($i,a,":");if(a[3]<=n){print}}}}}'

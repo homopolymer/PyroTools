@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 #include <limits>
+#include <sys/stat.h>
+
 namespace GenericSequenceTools{
 
     // the allowed letters in DNA sequence
@@ -99,6 +101,15 @@ class GenericRegressor
         static double linearfit(std::vector<double>& x, std::vector<double>& y, double& intercept, double& slop);
         static double linearslop(std::vector<double>& x, std::vector<double>& y);
 };
+
+
+std::string GetExecPath();
+
+bool FileExist(const std::string& filename);
+
+int RunCmdGetReturn(std::string& cmd, std::string& result);
+
+std::string CurrentTime();
 
 }   // namespace
 

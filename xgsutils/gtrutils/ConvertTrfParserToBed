@@ -1,0 +1,11 @@
+#!/bin/bash
+# Script to convert the TrfParser output to BED format.
+# Copyright (c) 2014 Feng Zeng - All Rights Reserved
+# Last revised 9/26/2014
+# 
+# Usage: Streaming: cat TrfParserOutput | ConvertTrfParserToBed chrom
+#
+
+awk -v chr=$1 '
+  NR>1 {print chr"\t"$1"\t"$2"\t"$6":"length($6)":"$4"\t"$5"\t+"}
+' 

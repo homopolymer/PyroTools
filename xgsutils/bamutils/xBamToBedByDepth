@@ -1,0 +1,108 @@
+#!/bin/bash
+
+# check samtools installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash samtools &> /dev/null
+if [ $? -eq 1 ]
+then
+  >&2 echo "require samtools installed"
+  >&2 echo "abort"
+  exit 1
+fi
+
+# check bedtools installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash bedtools &> /dev/null
+if [ $? -eq 1 ]
+then
+  >&2 echo "require bedtools installed"
+  >&2 echo "abort"
+  exit 1
+fi
+
+# runtime message
+runMsg(){
+  >&2 echo $1
+}
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamToBedByDepth [OPTIONS] <BAMFILE>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Convert a BAM file to BED file recorded by depth"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -g,--gt      skip sties of which the depth is not greater than the value (default:3) [INT]"
+  >&2 echo "    -q,--mq      skip reads with mapping quality less than the value (default:5) [INT]"
+  >&2 echo "    -r,--roi     region of interest [STR]"
+  >&2 echo "    -f,--ff      skip reads with the specified flags [INT]"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# print help message if the number of command arguments is zero
+if [ "$#" = "0" ];then help;fi
+
+# parse command argument
+# reference: http://linuxaria.com/howto/parse-options-in-your-bash-script-with-getopt
+# reference: http://stackoverflow.com/questions/2721946/cross-platform-getopt-for-a-shell-script
+# reference: http://stackoverflow.com/questions/402377/using-getopts-in-bash-shell-script-to-get-long-and-short-command-line-options
+PARSED_OPTIONS=$(getopt -n "$0" -o q:g:r:f:h --long mq:,gt:,roi:,ff:,help -- "$@")
+
+# Bad arguments, something has gone wrong with the getopt command
+if [ $? -ne 0 ]
+then
+  help
+fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+mq="-q 5"
+gt=3
+roi=""
+ff=""
+# Now goes through all the options with a case and using shift to analyse 1 argument at a time
+# $1 identifies the first argument, and when we use shift we discard the first argument, 
+# so $2 becomes $1 and goes again through the case
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -g | --gt )
+      gt="$2"
+      shift 2;;
+    -r | --roi )
+      roi="-r $2"
+      shift 2;;
+    -q | --mq )
+      mq="-q $2"
+      shift 2;;
+    -f | --ff )
+      ff="$ff --ff $2"
+      shift 2;;
+    --)
+      shift
+      break;;
+  esac
+done
+
+# check file existence
+if [ ! -f $1 ]
+then
+  echo "file $1 not existed"
+  echo "abort"
+  exit 1
+fi
+
+# runtime message
+runMsg "[$(date) xBamToBedByDepth] process $1 with $mq $roi -g $gt $ff"
+
+# compute depth and convert to bed
+tempBed=$(echo -e "temporary_$(date "+%Y%m%d_%H_%M_%S").bed")
+samtools mpileup $mq $roi $ff $1 2>/dev/null | awk -v t="$gt" '{if ($4>=t) {print $1"\t"$2"\t"($2+1)"\t"$4}}' > $tempBed
+bedtools merge -c 4 -o mean -i $tempBed -d 1
+rm $tempBed

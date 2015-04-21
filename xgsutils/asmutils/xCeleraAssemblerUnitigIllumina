@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# check fastqToCA installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash fastqToCA &> /dev/null
+if [ $? -eq 1 ]
+then
+  >&2 echo "require fastqToCA installed"
+  >&2 echo "abort"
+  exit 1
+fi
+
+# check runCA installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash runCA &> /dev/null
+if [ $? -eq 1 ]
+then
+  >&2 echo "require runCA installed"
+  >&2 echo "abort"
+  exit 1
+fi
+
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xCeleraAssemblerUnitigIllumina <FASTQ_DIRECTORY> <FASTQ_PREFIX> <ASSEMBLY_PREFIX> <INSERT_SIZE_MEDIAN> <INSERT_SIZE_STD>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Assemble Illumina sequencing reads to unitig"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# print help message if no arguments provided
+if [ $# = 0 ];then help;fi
+
+# parse arguments
+if [ \( "$1" = "-h" \) -o \( "$1" = "-help" \) -o \( "$1" = "--help" \) ]
+then
+  help
+fi
+
+if [ -f "$1/$2.fastq" ]
+then
+  UNPAIRED_READS="-reads $1/$2.fastq"
+fi
+
+if [ -f "$1/$2_1.fastq" ]
+then
+  PAIRED_READS="-mates $1/$2_1.fastq"
+fi
+
+if [ -f "$1/$2_2.fastq" ]
+then
+  PAIRED_READS="$PAIRED_READS,$1/$2_2.fastq"
+fi
+
+# mkdir temporary and work in the temporary directory
+mkdir temporary
+# run fastqToCA
+fastqToCA -libraryname na -insertsize $4 $5 -technology illumina $UNPAIRED_READS $PAIRED_READS > $3.frg
+# run runCA
+cd temporary;
+runCA -p $3 -d aso unitigger=utg ../$3.frg
+# dump to fasta
+cd ..
+asmOutputFasta -p $3 < temporary/aso/$3.asm
+# save assembly file
+cp temporary/aso/$3.asm ./
+
+# remove temporary directory
+rm -rf temporary
+#rm temp.frg
+ls -l | sed '1d' | awk '!/\.utg\./{print}' | awk '!/^d/&&!/\.frg/&&!/\.asm/{print $9}' | xargs rm

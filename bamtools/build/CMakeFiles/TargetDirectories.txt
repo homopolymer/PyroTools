@@ -1,0 +1,8 @@
+/Users/fengzeng/workspace/PyroTools/bamtools/build/src/api/CMakeFiles/APIHeaders.dir
+/Users/fengzeng/workspace/PyroTools/bamtools/build/src/api/CMakeFiles/AlgorithmsHeaders.dir
+/Users/fengzeng/workspace/PyroTools/bamtools/build/src/api/CMakeFiles/BamTools.dir
+/Users/fengzeng/workspace/PyroTools/bamtools/build/src/api/CMakeFiles/BamTools-static.dir
+/Users/fengzeng/workspace/PyroTools/bamtools/build/src/utils/CMakeFiles/BamTools-utils.dir
+/Users/fengzeng/workspace/PyroTools/bamtools/build/src/CMakeFiles/SharedHeaders.dir
+/Users/fengzeng/workspace/PyroTools/bamtools/build/src/utils/CMakeFiles/UtilsHeaders.dir
+/Users/fengzeng/workspace/PyroTools/bamtools/build/src/third_party/jsoncpp/CMakeFiles/jsoncpp.dir

@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# help message
+help()
+{
+    >&2 echo "SYNOPSIS"
+    >&2 echo "    xBamMultiHit <SAM>"
+    >&2 echo ""
+    >&2 echo "DESCRIPTION"
+    >&2 echo "    Keep the multiple hits of the same optimal scores"
+    >&2 echo ""
+    >&2 echo "OPTIONS"
+    >&2 echo "    -n,--nm      filter out the alignments having larger NM values"
+    >&2 echo "    -h,--help    print help message"
+    exit 0
+}
+
+# print help if no arguments provide
+if [ "$#" = 0 ];then help;fi
+
+PARSED_OPTIONS=$(getopt -n "$0" -o n:h --long nm:,help -- "$@")
+
+# bad argument
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+# parse arguments
+NM=100
+while true;do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -n | --nm )
+      NM=$2
+      shift 2;;
+    -- )
+      shift
+      break;;
+  esac
+done
+
+SAM=$1
+
+cat ${SAM} | awk -v n="${NM}" '/^@/{print $0}!/^@/{split($18,x,":");if(a!=$1){a=$1;b=x[3];}if(b==x[3] && x[3]<=n){print $0}}'

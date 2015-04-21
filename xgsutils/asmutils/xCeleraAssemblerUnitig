@@ -1,0 +1,86 @@
+#!/bin/bash
+
+# check fastqToCA installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash fastqToCA &> /dev/null
+if [ $? -eq 1 ]
+then
+  echo "require fastqToCA installed"
+  echo "abort"
+  exit 1
+fi
+
+# check runCA installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash runCA &> /dev/null
+if [ $? -eq 1 ]
+then
+  echo "require runCA installed"
+  echo "abort"
+  exit 1
+fi
+
+# runtime message
+runMsg(){
+  >&2 echo $1
+}
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xCeleraAssemblerUnitig <FASTQFILE> <PREFIX>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Assemble High Throughput Sequencing reads to unitig"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# print help message if no arguments
+if [ "$#" = "0" ]
+then
+  help
+fi
+
+# parse arguments
+if [ \( "$1" = "-h" \) -o \( "$1" = "-help" \) -o \( "$1" = "--help" \) ]
+then
+  help
+fi
+
+# runtime message
+runMsg "[$(date) xCeleraAssemblerUnitig]"
+
+# mkdir temporary and work in the temporary directory
+CWD=$(echo -e "temporary_$(date "+%Y%m%d_%H_%M_%S")")
+if [ -d $CWD ];then rm -rf $CWD;fi
+mkdir $CWD
+
+# celera assembler feature setting
+CA_FEATURES="-feature forceBOGunitigger 1"
+CA_FEATURES="$CA_FEATURES -feature doNotTrustHomopolymerRuns 1"
+CA_FEATURES="$CA_FEATURES -feature doTrim_initialFlowBased 0"
+CA_FEATURES="$CA_FEATURES -feature doTrim_initialMerBased 1"
+CA_FEATURES="$CA_FEATURES -feature doTrim_initialQualityBased 1"
+CA_FEATURES="$CA_FEATURES -feature doRemoveDuplicateReads 1"
+CA_FEATURES="$CA_FEATURES -feature doTrim_finalLargestCovered 1"
+CA_FEATURES="$CA_FEATURES -feature doRemoveSpurReads 1"
+CA_FEATURES="$CA_FEATURES -feature doRemoveChimericReads 1"
+
+# run fastqToCA
+fastqToCA -libraryname na -technology none $CA_FEATURES -reads $1 > $2.frg 2>/dev/null
+# run runCA
+cd $CWD
+runCA -p $2 -d aso unitigger=bog ../$2.frg 2>/dev/null
+# dump to fasta
+cd ..
+asmOutputFasta -p $2 < $CWD/aso/$2.asm 2>/dev/null
+# save assembly file
+cp $CWD/aso/$2.asm ./
+
+# remove temporary directory
+rm -rf $CWD 2>/dev/null
+#rm temp.frg
+#ls -l $2.* | sed '1d' | awk '!/\.utg\./{print}' | awk '!/^d/&&!/\.frg/&&!/\.asm/{print $9}' | xargs rm

@@ -1,0 +1,170 @@
+#!/bin/bash
+
+myrealpath='realpath -s'
+if [[ $OSTYPE =~ darwin* ]];then myrealpath='grealpath -s';fi
+
+# check environment variable BIOINFO_TOOL_XGSUTILS is already set
+# http://stackoverflow.com/questions/11686208/check-if-environment-variable-is-already-set
+xgsutils_exist=`env | awk '/^BIOINFO_TOOL_XGSUTILS=/{print 1}'`
+if [ -z "$xgsutils_exist" ]
+then
+  BIOINFO_TOOL_XGSUTILS=/Users/fengzeng/tool/xgsutils
+fi
+
+# check environment variable BIOINFO_TOOL_TRF is already set
+# http://stackoverflow.com/questions/11686208/check-if-environment-variable-is-already-set
+trf_exist=`env | awk '/^BIOINFO_TOOL_TRF=/{print 1}'`
+if [ -z "$trf_exist" ]
+then
+  >&2 echo "require Tandem Repeat Finder (tandem.bu.edu/trf/trf.html) and exported in BIOINFO_TOOL_TRF variable"
+  >&2 echo "abort"
+  exit 1
+fi
+
+# verbose function
+Verbose(){
+  >&2 echo "[$(date) xTrFinderMicroSatellite] $1"
+}
+
+# help message
+help(){
+  echo "Profile the microsatellites in the fasta file"
+  echo "Usage: xTrFinderMicroSatellite [OPTIONS] <FASTA_FILE>"
+  echo "  --match        matching weight [2]"
+  echo "  --mismatch     mismatching penalty [5]"
+  echo "  --delta        indel penalty [7]"
+  echo "  --pm           match probability [80]"
+  echo "  --pi           indel probability [10]"
+  echo "  --minscore     minimum alignment score to report [50]"
+  echo "  --maxperiod    maximum period size to report [200]"
+  echo "  --m            masked sequence file"
+  echo "  --f            flanking sequence"
+  echo "  --d            data file [default]"
+  echo "  --h            suppress html output"
+  echo "  --r            no redundancy elimination"
+  echo "  --ngs          more compact .dat output on multisequence files, returns 0 on success"
+  echo "  -u,--usage     print help message"
+
+  echo "Check TandemRepeatFinder for more option details"
+  exit 1
+}
+
+# print help message if no arguments provided
+if [ "$#" = 0 ];then help;fi
+
+# parse command arguments
+PARSED_OPTIONS=$(getopt -n "$0" -o u --long match:,mismatch:,delta:,pm:,pi:,minscore:,maxperior:,m,f,d,h,r,ngs,usage -- "$@")
+
+# bad argument
+if [ $? -ne 0 ];then help;fi
+
+# little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+# option variable values
+match=2
+mismatch=5
+delta=7
+pm=80
+pi=10
+minscore=50
+maxperiod=200
+options="-d"
+options2=""
+# argument parsing
+while true;do
+  case "$1" in
+    --match )
+      match=$2
+      shift 2;;
+    --mismatch )
+      mismatch=$2
+      shift 2;;
+    --delta )
+      delta=$2
+      shift 2;;
+    --pm )
+      pm=$2
+      shift 2;;
+    --pi )
+      pi=$2
+      shift 2;;
+    --minscore )
+      minscore=$2
+      shift 2;;
+    --maxperiod )
+      maxperiod=$2
+      shift 2;;
+    --m )
+      options2="-m $options2"
+      shift;;
+    --f )
+      options2="-f $options2"
+      shift;;
+    --d )
+      options2="-d $options2"
+      shift;;
+    --h )
+      options2="-h $options2"
+      shift;;
+    --r )
+      options2="-r $options2"
+      shift;;
+    --ngs )
+      options2="-ngs $options2"
+      shift;; 
+    -u | --usage )
+      help
+      shift;;
+    -- )
+      shift
+      break;;
+    * )
+      break;;
+  esac
+done
+  
+if [ ! -z "$options2" ];then options=$(echo $options2); fi
+
+fastaFile=$($myrealpath $1)
+# check the existence of the fasta file
+if [ ! -f $fastaFile ];then Verbose "file $fastaFile not existed... abort"; exit;fi
+
+# make a temporary directory and use it as the current work directory
+CWD=$(echo -e "temporary_$(date "+%Y%m%d_%H_%M_%S")")
+if [ -d $CWD ];then rm -rf $CWD;fi
+mkdir $CWD && cd $CWD
+
+# create a soft link to the fasta file, then index the file
+ln -s $fastaFile myfasta.fasta
+samtools faidx myfasta.fasta 2>/dev/null
+
+Verbose "find the micro-satellites"
+
+# iterate over all sequences
+while read sequence;do
+  seqName=$(echo $sequence | awk '{print $1}')
+
+  # extract the subsequence
+  samtools faidx $fastaFile $seqName > myfasta.$seqName.fasta 2>/dev/null
+
+  # run TandemRepeatFinder
+  $BIOINFO_TOOL_TRF/TrFinder myfasta.$seqName.fasta $match $mismatch $delta $pm $pi $minscore $maxperiod $options >>/dev/null 2>&1
+
+  # run trfParser
+  perl $BIOINFO_TOOL_XGSUTILS/gtrutils/trfparser_v1.pl *.dat 0 2>/dev/null
+
+  num=$(wc -l myfasta.$seqName.fasta.$match.$mismatch.$delta.$pm.$pi.$minscore.$maxperiod.final.parse 2>/dev/null)
+  if [ -z "$num" ];then continue;fi
+  if (( $(echo $num | awk '{print $1}') == 1 ));then continue; fi
+
+  # convert trfParser output to BED file
+  (cat myfasta.$seqName.fasta.*.final.parse | awk -v chr="$seqName" 'NR>1{print chr"\t"$1"\t"$2"\t"$6":"length($6)":"$4"\t"$5"\t+"}') | cat >> mytr.bed
+done < myfasta.fasta.fai
+
+# extract microsatellites
+cat mytr.bed | $BIOINFO_TOOL_XGSUTILS/gtrutils/ExtractTrfOutputSatellites -t microsate
+
+Verbose "finished"
+
+cd .. && rm -rf $CWD

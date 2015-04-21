@@ -1,0 +1,15 @@
+#!/bin/bash
+# Script to convert the Phobos GFF output to BED format.
+# Copyright (c) 2014 Feng Zeng - All Rights Reserved
+# Last revised 9/27/2014
+# 
+# Usage: Streaming: cat PhobosGffOutput | ConvertPhobosGffToBed chrom
+#
+
+awk -v chr=$1 '
+  /^[^#]/ {
+    Unit=substr($18,1,length($18)-1)
+    print chr"\t"$4"\t"$5"\t"Unit":"$12":"$14"\t"$16"\t""+"
+  }
+' 
+

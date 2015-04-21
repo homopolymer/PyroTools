@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+   <FileVersion major="1" minor="6" />
+   <Project>
+      <Option title="PyroTools" />
+      <Option makefile_is_custom="1" />
+      <Option compiler="gcc" />
+      <Option virtualFolders="CMake Files\;CMake Files\src\;" />
+      <Build>
+      <Target title="all">
+         <Option working_dir="/Users/fengzeng/workspace/PyroTools/build" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 all" />
+            <CompileFile command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="install/strip">
+         <Option working_dir="/Users/fengzeng/workspace/PyroTools/build" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 install/strip" />
+            <CompileFile command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_cache">
+         <Option working_dir="/Users/fengzeng/workspace/PyroTools/build" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 edit_cache" />
+            <CompileFile command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="rebuild_cache">
+         <Option working_dir="/Users/fengzeng/workspace/PyroTools/build" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 rebuild_cache" />
+            <CompileFile command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="install">
+         <Option working_dir="/Users/fengzeng/workspace/PyroTools/build" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 install" />
+            <CompileFile command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="list_install_components">
+         <Option working_dir="/Users/fengzeng/workspace/PyroTools/build" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 list_install_components" />
+            <CompileFile command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="install/local">
+         <Option working_dir="/Users/fengzeng/workspace/PyroTools/build" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 install/local" />
+            <CompileFile command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="PyroTools_cmd">
+         <Option output="/Users/fengzeng/workspace/PyroTools/bin/PyroTools" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/Users/fengzeng/workspace/PyroTools/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/Users/fengzeng/workspace/PyroTools/bamtools/include" />
+            <Add directory="/Users/fengzeng/workspace/PyroTools/nlopt/include" />
+            <Add directory="/Users/fengzeng/workspace/PyroTools/src" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/src/Makefile&quot;  VERBOSE=1 PyroTools_cmd" />
+            <CompileFile command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/src/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/src/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="PyroTools_cmd/fast">
+         <Option output="/Users/fengzeng/workspace/PyroTools/bin/PyroTools" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/Users/fengzeng/workspace/PyroTools/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/Users/fengzeng/workspace/PyroTools/bamtools/include" />
+            <Add directory="/Users/fengzeng/workspace/PyroTools/nlopt/include" />
+            <Add directory="/Users/fengzeng/workspace/PyroTools/src" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/src/Makefile&quot;  VERBOSE=1 PyroTools_cmd/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/src/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/Users/fengzeng/workspace/PyroTools/build/src/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      </Build>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/ConsensusGraphTool.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/CropBamTool.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/DarkAlignmentsTool.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/DataStatisticsTool.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericAlignment.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericBamAlignmentTools.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericDataStatistics.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericFastaTools.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericGraphTools.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericIndividualSnpCall.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericProbabilisticAlignment.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericReadBins.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericRegionTools.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericSequenceGlobal.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericSequenceTools.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericVariant.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericVariantCall.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericVcfTools.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/IndividualSnpCall.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/LocalStrainCall.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/MapErrorCleanTool.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/ProbabilisticAlignmentTool.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/SimpleVariantCallTool.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/StrainBinning.cpp">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/DarkAlignmentsTool.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericAlignment.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericBamAlignmentTools.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericDataStatistics.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericFastaTools.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericGraphTools.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericIndividualSnpCall.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericProbabilisticAlignment.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericReadBins.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericRegionTools.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericSequenceGlobal.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericVariant.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericVariantCall.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/GenericVcfTools.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/SimpleVariantCallTool.h">
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\" />
+      </Unit>
+      <Unit filename="/Users/fengzeng/workspace/PyroTools/src/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\src\" />
+      </Unit>
+   </Project>
+</CodeBlocks_project_file>

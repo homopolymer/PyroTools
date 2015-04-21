@@ -11,6 +11,7 @@ using namespace BamTools;
 using namespace std;
 
 #include "GenericSequenceGlobal.h"
+#include "GenericTool.h"
 
 
 
@@ -229,12 +230,23 @@ class GenericBamAlignmentTools
 
 
         // retrieve local alignment in the given alignment, given the start position and size
-        static void getLocalAlignment(BamAlignment& alignObj, int position, int size,
+        static int getLocalAlignment(BamAlignment& alignObj, int position, int size,
                                       string& localRead, string& localGenome,
                                       Cigar& cigar=*static_cast<Cigar*>(0),
                                       BamMD& md=*static_cast<BamMD*>(0),
                                       int& numMismatch=*static_cast<int*>(0),
                                       int& numInDel=*static_cast<int*>(0));
+
+        // retrieve local alignment in the given alignment, given the start position and size
+        static int getLocalAlignment(BamAlignment& alignObj, int position, int size,
+                                      string& localRead, string &localReadQual,
+                                      string& localGenome);
+
+        // retrieve local alignment in the given alignment, given the start position and size,
+        // and also clip away the indel at both the head and tail ends
+        static void getLocalAlignmentWithEndClip(BamAlignment &alignObj, int position, int size,
+                                                 string &localRead, string &localGenome,
+                                                 int &startPos, int &endPos);
 
         // change a part of an alignment, given the start position and size, given new alignment
         static void changeLocalAlignment(BamAlignment& alignObj, int position, int size,
@@ -243,6 +255,9 @@ class GenericBamAlignmentTools
 
         // ----------------------------------------------
         // Alignment Information
+
+        // name of the alignment
+        static string getBamAlignmentName(BamAlignment& alignObj);
 
         // ID of the alignment
         static string getBamAlignmentID(BamAlignment& alignObj);
@@ -278,13 +293,20 @@ class GenericBamAlignmentTools
                                            vector<string>&         insertedSequences,
                                            vector<vector<double>>& insertedSequenceQualities);
 
-        // the length of aligned sequence in read
+        // the length of aligned sequence in the alignment
         static int getBamAlignmentReadLength(BamAlignment& alignObj);
 
-        // the length of maximal gap in read
+        // the length of maximal gap in the alignment
         static int maxGapLength(BamAlignment& alignObj);
         static int maxGapLength(string& alignRead, string& alignGenome);
         static int maxGapLength(Cigar& cigar);
+
+        // the number of gap in the alignment
+        static int numGap(string& alignRead, string& alignGenome);
+        // the number of insertion in the alignment
+        static int numInsert(string& alignRead, string& alignGenome);
+        // the number of deletion in the alignment
+        static int numDelete(string& alignRead, string& alignGenome);
 
         // the number of mismatch in the alignment
         static int numMismatch(string& alignRead, string& alignGenome);
@@ -292,6 +314,12 @@ class GenericBamAlignmentTools
 
         // check it is good alignment
         static bool goodAlignment(BamAlignment& alignObj, bool keepDuplicate=false);
+        static bool isDuplicateAlignment(BamAlignment& alignObj);
+        static bool isUnmappedAlignment(BamAlignment& alignObj);
+        static bool isSecondaryAlignment(BamAlignment& alignObj);
+        static bool isSupplementaryAlignment(BamAlignment& alignObj);
+        static bool isQcFailedAlignment(BamAlignment& alignObj);
+        static bool isFilteredByFlag(BamAlignment& alignObj, int flag);
 
         // check read length
         static bool validReadLength(BamAlignment& alignObj, double minReadLength=100);
@@ -313,10 +341,14 @@ class GenericBamAlignmentTools
         static bool isGap(char op);
         static bool isNotGap(char op);
 
+        // convert cigar to string
+        static void convertCigarToString(Cigar& cigar, string& cigarStr);
+
     // print
     public:
         static void printBamAlignmentCigar(BamAlignment& alignObj);
         static void printBamAlignmentMD(BamAlignment& alignObj);
+        static void printBamAlignment(RefVector& genomeDict, BamAlignment& alignObj);
 
     // internal functions
     private:
@@ -329,6 +361,68 @@ class GenericBamAlignmentTools
                                        vector<RunInDelShift>& blockRuns);
 };
 
+class CropBamTool : public GenericAbstractTool
+{
+public:
+    CropBamTool();
+
+public:
+    int Help();
+    int Run(int argc, char *argv[]);
+
+public:
+    int parseCommandLine(int argc, char *argv[]);
+    int CropBam();
+
+public:
+    vector<string> bamFiles;
+    vector<string> regionStrings;
+
+    int mapQualThres;
+    int readLenThres;
+    int segmentLenThres;
+    int alnFlagMarker;
+    float alnIdenThres;
+    string outFormat;
+    bool keepClip;
+    bool useUnique;
+    int thresFreq;
+    string outFreq;
+    int numThreads;
+    int verbose;
+
+};
+
+class MapErrorCleanTool : public GenericAbstractTool
+{
+public:
+    MapErrorCleanTool();
+
+public:
+    int Help();
+    int Run(int argc, char *argv[]);
+
+public:
+    int parseCommandLind(int argc, char *argv[]);
+
+public:
+    int mapErrorClean();
+
+public:
+    string genomeFile;
+    vector<string> bamFiles;
+    vector<string> regionStrings;
+
+    int compressMode;
+    int step;
+    int alnFlagMarker;
+    int mapQualThres;
+    int readLenThres;
+    string bt2dict;
+
+    int numThreads;
+    int verbose;
+};
 }   // namespace
 
 #endif // GENERICBAMALIGNMENTTOOLS_H

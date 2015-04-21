@@ -4,7 +4,9 @@
 #include <vector>
 #include <list>
 #include <string>
+#include <sstream>
 #include <tuple>
+#include <map>
 using namespace std;
 
 namespace GenericSequenceTools
@@ -21,6 +23,12 @@ class GenericAllele
 {
     public:
         GenericAllele() {}
+        GenericAllele(int chrId, int chrPos, string ref, string alt)
+            : m_chrID(chrId)
+            , m_chrPosition(chrPos)
+            , m_allele(alt)
+            , m_reference(ref)
+        {}
 
     public:
         // allele info
@@ -32,8 +40,8 @@ class GenericAllele
         // data info
         int    m_alleleDepth;
         double m_alleleMapAvgQual;
-        int    m_alleleStrandPos;
-        int    m_alleleStrandNeg;
+        int    m_alleleStrandPos;   // positive strand
+        int    m_alleleStrandNeg;   // negative strand
 
         // global info
         int    m_globalDepth;
@@ -42,7 +50,19 @@ class GenericAllele
         int    m_globalStrandNeg;
 
         // sequencing data
-        list<tuple<char,int,int>> m_bamData;
+        // base-pair resolution information
+        // 1:allele
+        // 2:base quality
+        // 3:map quality
+        // 4:strand
+        list<tuple<char,int,int,int>> m_bamData;
+
+        static string key(int chrId, int chrPos, char ref, char alt)
+        {
+            stringstream ss;
+            ss << chrId << ":" << chrPos << "_" << ref << ">" << alt;
+            return ss.str();
+        }
 };
 
 typedef GenericAllele         Allele;
@@ -64,7 +84,24 @@ class GenericVariant
         long double m_quality;
         string      m_reference;
 
-        vector<int> m_haploidType;
+        // for allele indexing
+        int m_index;
+        map<string,int> m_alleleIndex;
+        void AlleleInsert(Allele &allele);
+        int AlleleIndex(string &allele);
+
+        vector<int> m_haploidType;  // for diploidy
+
+        // sample information
+        typedef vector<int> PhasedAlleles;    // order sensitive
+        map<string,PhasedAlleles> m_samples;
+
+        // the key value of the variant
+        string key(){
+            stringstream ss;
+            ss << m_chrID << ":" << m_chrPosition;
+            return ss.str();
+        }
 };
 
 }   // namespace

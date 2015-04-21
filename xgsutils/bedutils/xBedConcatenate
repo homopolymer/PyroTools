@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBedConcatenate <FILE1> <FILE2> [<FILE3>...]"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Concatenate multiple BED files into a file."
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# print help message if no arguments provided
+if [ $# = 0 ];then help;fi
+
+# parse arguments
+if [ \( "$1" = "-h" \) -o \( "$1" = "-help" \) -o \( "$1" = "--help" \) ]
+then
+  help
+fi
+
+# concatenation
+BEDFILES=("$@")
+(awk '/^[#]/{print}' $1; for i in ${BEDFILES[*]}; do awk '/^[^#]/{print}' ${i}; done) | cat

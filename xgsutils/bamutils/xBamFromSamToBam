@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# check samtools installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash samtools &> /dev/null
+if [ $? -eq 1 ]
+then
+  >&2 echo "require samtools installed"
+  >&2 echo "abort"
+  exit 1
+fi
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamFromSamToBam [OPTIONS] <SAMFILE> <BAMPREFIX>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Convert from SAM to BAM"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -f,--fasta    genome seqeuence"
+  >&2 echo "    -h,--help     print help message"
+  exit 0
+}
+
+# print help message if no arguments provided
+if [ "$#" = 0 ];then help;fi
+
+# set command argument parser
+PARSED_OPTIONS=$(getopt -n "$0" -o r:q:f:h --long roi:,mq:,ff:,help -- "$@")
+
+# bad argument
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+# parse arguments
+GENOME=""
+
+# parse arguments
+while true;do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -f | --fasta )
+      GENOME="$2"
+      shift 2;;
+    -- )
+      shift
+      break;;
+  esac
+done
+
+SAMFILE=$1 && shift
+BAMPREFIX=$1
+
+# check genome exist
+if [ ! -f $GENOME ]
+then
+  >&2 echo "invalid genome file"
+  >&2 echo "abort"
+  exit 1
+fi
+if [ ! -f $GENOME.fai ];then samtools faidx $GENOME;fi
+
+# check samfile exist
+if [ ! -f $SAMFILE ]
+then
+  echo "invalid sam file"
+  echo "abort"
+  exit 1
+fi
+
+>&2 echo "[$(date) xBamFromSamToBam]"
+
+# convertion
+samtools view -bht $GENOME $SAMFILE > xgstemp.bam 
+samtools sort xgstemp.bam $BAMPREFIX 2>/dev/null
+samtools index $BAMPREFIX.bam 2>/dev/null
+rm xgstemp.bam

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# check environment variable BIOINFO_TOOL_PICARD is already set
+# http://stackoverflow.com/questions/11686208/check-if-environment-variable-is-already-set
+picard_exist=`env | awk '/^BIOINFO_TOOL_PICARD=/{print 1}'`
+if [ -z "$picard_exist" ]
+then
+  echo "please make sure picard(https://github.com/broadinstitute/picard) downloaded and export the executable path in BIOINFO_TOOL_PICARD"
+  echo "abort"
+  exit 1
+fi
+
+#help message
+help(){
+  echo "Collect insert size metrics of paired-end reads"
+  echo "Usage: xBamInsertSizeMetrics <BAMFILE> <METRICSFILE>"
+  echo "-h,--help    print help message"
+  exit 1
+}
+
+# parse arguments
+if [ \( "$1" = "-h" \) -o \( "$1" = "-help" \) -o \( "$1" = "--help" \) ]
+then
+  help
+fi
+
+# run program
+java -Xmx2g -jar $BIOINFO_TOOL_PICARD/CollectInsertSizeMetrics.jar INPUT=$1 OUTPUT=$2 HISTOGRAM_FILE=$2.hist

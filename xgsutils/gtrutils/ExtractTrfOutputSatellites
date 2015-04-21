@@ -1,0 +1,95 @@
+#!/bin/bash
+# Script to extract microsatellite, minisatellite, and satellites from the TrfParser BED output.
+# Copyright (c) 2014 Feng Zeng - All Rights Reserved
+# Last revised 9/28/2014
+# 
+# Usage: Streaming: cat TrfParserBedOutput | ExtractTrfOutputSatellites RepeatType
+#
+
+# usage message
+usage() {
+  echo "Usage: cat TrfParserBedOutput | ExtractTrfOutputSatellites RepeatType"
+  echo "-t <STR>    valid values:microsate, minisate, sate"
+  echo "-h,--help   print usage information"
+  exit 1
+}
+
+# help message
+help() {
+  echo "Extract satellites of interesting from the BED file of TandemRepeatFinder output."
+  usage
+}
+
+# output setting
+MICROSATE=false
+MINISATE=false
+SATE=false
+
+# option parsing
+if [ "$#" -ne 0 ] 
+then
+  if [ \( "$1" = "-h" \) -o \( "$1" = "-help" \) -o \( "$1" = "--help" \) ]
+  then
+    help
+  fi
+  if [ "$1" = "-t" ]
+  then
+    if [ "$#" = 1 ]
+    then
+      echo "option value not provided"
+      echo "abort"
+      usage
+    fi
+    if [ "$2" = "microsate" ]
+    then
+      MICROSATE=true  
+    fi
+    if [ "$2" = "minisate" ]
+    then
+      MINISATE=true
+    fi
+    if [ "$2" = "sate" ]
+    then
+      SATE=true
+    fi
+  else
+    echo "invalid option: $2"
+    echo "abort"
+    exit 1
+  fi  
+else
+  echo "option not provided"
+  echo "abort"
+  usage
+fi
+
+# lower bound and upper bound
+lb=0
+ub=0
+if [ "$MICROSATE" = true ]
+then
+  lb=1
+  ub=10
+fi
+if [ "$MINISATE" = true ]
+then
+  lb=11
+  ub=100
+fi
+if [ "$SATE" = true ]
+then
+  lb=101
+  ub=1000000
+fi
+
+# awk processing
+awk -v L=$lb -v U=$ub '
+  /^[^#]/ {
+    split($4,a,":")
+    x=a[2]
+    if (x>=L && x<=U){
+      print $0
+    }
+  } 
+' 
+

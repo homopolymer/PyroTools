@@ -1,0 +1,6 @@
+bamutils    a toolkit of bam manipulation
+bedutils    a toolkit of bed manipulation
+asmutils    a toolkit of sequence assembler manipulation
+simutils    a toolkit of variant simulation
+gtrutils    a toolkit of tandem repeat detection
+gsautils    a toolkit of global strain assembly for microbiome and virome

@@ -1,0 +1,234 @@
+#!/bin/bash
+
+#myreadlink='readlink'
+if [[ $OSTYPE =~ darwin* ]];then myreadlink='greadlink';fi
+if [[ $OSTYPE =~ linux* ]];then myreadlink='readlink';fi
+
+# check environment variable BIOINFO_TOOL_XGSUTILS is already set
+# http://stackoverflow.com/questions/11686208/check-if-environment-variable-is-already-set
+xgsutils_exist=`env | awk '/^BIOINFO_TOOL_XGSUTILS=/{print 1}'`
+if [ -z "$xgsutils_exist" ]
+then
+  BIOINFO_TOOL_XGSUTILS=/Users/fengzeng/tool/xgsutils
+fi
+
+
+# function to process subregion
+function subBmeEliminate() {
+  local roiName=$1
+  local roiBeg=$2
+  local roiEnd=$3
+  local mq=$4
+  local ff=$5
+  local dict=$6
+  local gf=$7
+  local bf=$8
+  local of=$9
+  
+  local roi="$roiName:$roiBeg-$roiEnd"
+
+  >&2 echo "[$(date) xBamMapErrorRead] process subregion $roi"
+
+  # extract reads
+  $BIOINFO_TOOL_XGSUTILS/bamutils/xBamExtractReadToFastq -f $ff -r $roi -q $mq $bf >tempReads.fastq
+  # run assembler
+  $BIOINFO_TOOL_XGSUTILS/asmutils/xCeleraAssemblerUnitig tempReads.fastq tempLocalAssembly
+  # map contigs to genome
+  >&2 echo "[$(date) xBamMapErrorRead] map contigs to $gf"
+  bowtie2 --quiet -f -x $dict -U tempLocalAssembly.utg.fasta -S tempLocalAssembly.sam 2>/dev/null
+  # convert sam to bam
+  $BIOINFO_TOOL_XGSUTILS/bamutils/xBamFromSamToBam -f $gf tempLocalAssembly.sam tempLocalAssembly
+  # count the number of unmapped contigs 
+  $BIOINFO_TOOL_XGSUTILS/bamutils/xBamToBedByRead -q 0 tempLocalAssembly.bam | awk -v chr="$roiName" '{if($1!=chr || $1=="*"){print $4}}' >tempBadContigs
+  local n=$(wc -l tempBadContigs | awk '{print $1}')
+  if [ "$n" -gt 0 ]
+  then
+    # make bowtie2 dictionary
+    bowtie2-build -q tempLocalAssembly.utg.fasta tempLocalAssembly.utg.fasta 2>/dev/null
+    # map reads to contigs
+    bowtie2 --quiet -x tempLocalAssembly.utg.fasta -U tempReads.fastq -S tempReads.sam 2>/dev/null
+    # faidx the contigs
+    samtools faidx tempLocalAssembly.utg.fasta 2>/dev/null
+    # convert sam to bam 
+    $BIOINFO_TOOL_XGSUTILS/bamutils/xBamFromSamToBam -f tempLocalAssembly.utg.fasta tempReads.sam tempReads
+    # loop over bad congits
+    while read badContig
+    do 
+      # extract reads
+      $BIOINFO_TOOL_XGSUTILS/bamutils/xBamToBedByRead -r $badContig tempReads.bam | awk '{print $4}' >>$of
+    done <tempBadContigs
+  fi
+}
+
+# function to parse region string
+function parseRegion {
+  if [ ! -z "$1" ]
+  then
+    CHR_REGION=$(echo $1 | grep ":")
+    if [ ! -z "$CHR_REGION" ]
+    then
+      regionChrName=$(echo $1 | perl -nle 'm/^(.*):/;print $1')
+      regionChrBeg=$(echo $1 | perl -nle 'm/:([0-9]+)-/;print $1')
+      regionChrEnd=$(echo $1 | perl -nle 'm/-([0-9]+)/; print $1')
+      echo -e "$regionChrName\t$regionChrBeg\t$regionChrEnd"
+    else
+      echo $1
+    fi 
+  fi
+}
+
+
+# runtime message
+runMsg(){
+ >&2 echo $1
+}
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamMapErrorRead [OPTIONS] <GENOME_FASTA_FILE> <BAM_FILE> <OUTPUT_FILE>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    List the erroneously mapped reads in the BAM file"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -r,--roi     region of interest"
+  >&2 echo "    -q,--mq      skip reads with mapping quality less than the value"
+  >&2 echo "    -f,--ff      skip reads with the specified flags"
+  >&2 echo "    --step       divide the region into small segments of size step"
+  >&2 echo "    --bt2dict    the Bowtie2 dictionary of genome"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+
+# print help message if no arguments provided
+if [ "$#" = 0 ];then help;fi
+
+# set command argument parser
+PARSED_OPTIONS=$(getopt -n "$0" -o q:r:f:h --long mq:,roi:,ff:,step:,bt2dict:,help -- "$@")
+
+# bad argument
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+ 
+roi=""
+mq=0
+ff=0
+step=1000
+bt2dict=""
+# parse arguments
+while true;do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -r | --roi )
+      roi="$2"
+      shift 2;;
+    -q | --mq )
+      mq="$2"
+      shift 2;;
+    -f | --ff )
+      ff=$(( $ff | $2 ))
+      shift 2;;
+    --step )
+      step=$2
+      shift 2;;
+    --bt2dict )
+      bt2dict="$2"
+      shift 2;;
+    -- )
+      shift
+      break;;
+  esac
+done
+
+genomeFile=$($myreadlink -f $1)
+shift
+bamFile=$($myreadlink -f $1)
+shift
+outFile=$($myreadlink -f $1)
+
+# check the existence of the GENOME file
+if [ ! -f "$genomeFile" ];then echo -e "file $genomeFile not existed\nabort";exit;fi
+# check the existence of the BAM file
+if [ ! -f "$bamFile" ];then echo -e "file $bamFile not existed\nabort";exit;fi
+
+# runtime message
+runMsg "[$(date) xBamMapErrorRead] process $bamFile with $roi and $bt2dict"
+
+# region information
+roiBeg=""
+roiEnd=""
+roiName=""
+if [ ! -z "$roi" ]
+then
+  roiName=$(parseRegion $roi | awk '{print $1}')
+  roiBeg=$(parseRegion $roi | awk '{print $2}')
+  roiEnd=$(parseRegion $roi | awk '{print $3}')
+fi
+
+# make a temporary directory and use it as the current work directory
+CWD=$(echo -e "temporary_$(date "+%Y%m%d_%H_%M_%S")")
+if [ -d $CWD ];then rm -rf $CWD;fi
+mkdir $CWD && cd $CWD
+
+# loop over regions 
+if [ ! -z "$roi" ]
+then
+  chrLen=$(awk -v chr="$roiName" '{if($1==chr){print $2}}' "$genomeFile.fai")
+  X=($(seq -f %f $roiBeg $step $roiEnd))
+  for x0 in "${X[@]}"
+  do
+    x0=$(printf "%.0f" $x0)
+    x1=$(( x0 + $step ))
+    if (( "$x0" >= "$roiEnd" ));then continue;fi
+    if (( "$x1" > "$roiEnd" ));then x1=$roiEnd;fi
+    if (( "$x1" > "$chrLen" ));then x1=$chrLen;fi
+    subRoiLen=$(( $x1 - $x0 ))
+    if (( "$subRoiLen" < 100 )); then continue;fi
+    subRoi=$(echo "$roiName:$x0-$x1")
+    $BIOINFO_TOOL_XGSUTILS/bamutils/xBamToBedByDepth -r $subRoi -f $ff -q $mq -g 5 $bamFile >tempRoiDepth.bed
+    echo -e "$roiName\t$x0\t$x1" | bedtools intersect -a stdin -b tempRoiDepth.bed >tempRoi.bed
+    while read subRoi
+    do
+      chrName=$(echo $subRoi | awk '{print $1}')
+      chrBeg=$(echo $subRoi | awk '{print $2}')
+      chrEnd=$(echo $subRoi | awk '{print $3}')
+      subBmeEliminate $chrName $chrBeg $chrEnd $mq $ff $bt2dict $genomeFile $bamFile $outFile
+    done < tempRoi.bed
+  done
+else
+  echo "error"
+  while read chrInfo
+  do
+    chrName=$(awk '{print $1}' $chrInfo)
+    chrLen=$(awk '{print $2}' $chrInfo)
+    X=($(seq -f %f 1 $step $chrLen))
+    for x0 in "${X[@]}"
+    do
+      x0=$(printf "%.0f" $x0)
+      x1=$(( x0 + $step ))
+      if (( "$x1" > "$chrLen" ));then x1=$chrLen;fi
+      subRoiLen=$(( $x1 - $x0 ))
+      if (( "$subRoiLen" < 100 ));then continue;fi
+      subRoi=$(echo "$roiName:$x0-$x1")
+      $BIOINFO_TOOL_XGSUTILS/bamutils/xBamToBedByDepth -r $subRoi -f $ff -q $mq -g 5 $bamFile >tempRoiDepth.bed
+      echo -e "$roiName\t$x0\t$x1" | bedtools intersect -a stdin -b tempRoiDepth.bed >tempRoi.bed
+      while read subRoi
+      do
+        chrName=$(echo $subRoi | awk '{print $1}')
+        chrBeg=$(echo $subRoi | awk '{print $2}')
+        chrEnd=$(echo $subRoi | awk '{print $3}')
+        subBmeEliminate $chrName $chrBeg $chrEnd $mq $ff $bt2dict $genomeFile $bamFile $outFile
+      done < tempRoi.bed
+    done
+  done <"$genomeFile.fai"
+fi
+
+# remove temporary directory
+cd ..
+rm -rf $CWD

@@ -1,0 +1,357 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cstdlib>
+#include <regex>
+#include <map>
+#include <set>
+#include <vector>
+#include <iomanip>
+#include <cmath>
+#include <iterator>
+#include <algorithm>
+#include <limits>
+using namespace std;
+
+#include <zlib.h>
+#include <getopt.h>
+
+#include "../c++/kseq.h"
+#include "../c++/utils.h"
+using namespace XgsUtils;
+
+// help message
+int help(){
+    cerr << "SYNOPSIS" << endl;
+    cerr << "    haplo_search [OPTIONS] <sam> [freq]" << endl;
+    cerr << "" << endl;
+    cerr << "DESCRIPTION" << endl;
+    cerr << "    Search a subset of haplotypes which optimally explain the data" << endl;
+    cerr << "" << endl;
+    cerr << "OPTIONS" << endl;
+    cerr << "    -f    the sequence of haplotypes" << endl;
+    cerr << "    -e    specify the error rate (default:0.01) [FLT]" << endl;
+    cerr << "    -l    specify the lambda value (default:1.0) [FLT]" << endl;
+    cerr << "    -v    print the runtime message" << endl;
+    cerr << "    -h    print help message" << endl;
+    return 0;
+}
+
+// parse the command line
+int parseCommandLine(int argc, char *argv[], string &sam, string &fas, string &freq, int &cores, double &err, double &lambda, bool &verbose){
+    fas = "";
+    freq = "";
+    cores = 1;
+    err = 0.01;
+    lambda = 1.0;
+    verbose = false;
+    
+    int c;
+    while((c=getopt(argc,argv,"f:c:e:l:vh"))!=-1){
+        switch(c){
+            case 'v':
+                verbose=true;
+                break;
+            case 'f':
+                fas = optarg;
+                break;
+            case 'c':
+                cores = stoi(optarg);
+                break;
+            case 'e':
+                err = stod(optarg);
+                break;
+            case 'l':
+                lambda = stod(optarg);
+                break;
+            case 'h':
+                help();
+                exit(0);
+                break;
+            default:
+                abort();
+        }
+    }
+  
+    sam = argv[optind++];
+
+    if (optind<argc)
+        freq = argv[optind];
+
+    return 0;
+}
+
+KSEQ_INIT(gzFile,gzread)
+
+int main(int argc, char *argv[]){
+    // print help if no argument provided
+    if (argc == 1){
+        help();
+        exit(0);
+    }
+
+    bool verbose;
+    int cores;
+    double err,lambda,lc,le;
+    string sam, fas, freq;
+    parseCommandLine(argc, argv, sam, fas, freq, cores, err, lambda, verbose);
+
+    lc = log(1-err);
+    le = log(err);
+
+    ifstream input;
+    string line;
+
+    // parse the frequency file
+    int num_read = 0;
+    map<string,int> readFreq;
+    if (!freq.empty()){
+        input.open(freq);
+        while (getline(input,line)){
+            if (line.empty())
+                continue;
+            stringstream ss(line);
+            string n;
+            int c;
+            ss >> n >> c;
+            readFreq[n] = c;
+            num_read += c;
+        }
+        input.close();
+    }
+
+    if (verbose)
+        VerboseUtils::Verbose("haplo_search","compute haplotype-read likelihood");
+
+    // parse the sam file
+    input.open(sam);
+
+    int num_haplo = 0;
+    vector<string> haplos;
+    map<string,map<string,double>> matrix;
+    
+    typedef long double LDBL;
+    map<string,map<string,LDBL>> haplo_read_like;
+
+    set<string> reads;
+    map<string,int> read_lens;
+    map<string,set<string>> read_hits;
+
+    int cnt = 0;
+
+    regex sqex("^@SQ\\s+SN:([\\w[:punct:]]+)");
+    regex rcex("^@");
+    regex nmex("NM:i:([0-9]+)");
+    smatch matches;
+    ssub_match ssm;
+    while(getline(input,line)){
+        if (regex_search(line, matches, sqex)){
+            ssm = matches[1];
+            haplos.emplace_back(ssm.str());
+            num_haplo++;
+        }else if (!regex_search(line,rcex)){
+
+            if (verbose)
+                cerr << "\r" << cnt++;
+
+            stringstream ss(line);
+
+            string query,target;
+            string cigar;
+            string dummy1,dummy2,dummy3;
+            string seq;
+            int flag, mapq, pos;
+            int nm, len;
+            ss >> query >> flag >> target >> mapq >> pos >> cigar >> dummy1 >> dummy2 >> dummy3 >>seq;
+            
+            if (target=="*")
+                continue;
+
+            if (read_lens.count(query)==0){
+                read_lens[query] = seq.length();
+            }
+
+            reads.insert(query);
+            if (regex_search(line, matches, nmex)){
+                ssm = matches[1];
+                nm = stoi(ssm.str());
+            }
+
+            // parse cigar
+            len = 0;
+            nm = 0;
+            size_t prev=0, curr;
+            while ((curr=cigar.find_first_of("HSM=XDI",prev))!=string::npos){
+                if (curr>prev && (cigar[curr]=='M' || cigar[curr]=='=' || cigar[curr]=='X' || cigar[curr]=='D' || cigar[curr]=='I' || cigar[curr]=='H' || cigar[curr]=='S')){
+                    len += stoi(cigar.substr(prev,curr-prev));
+                    if (cigar[curr]=='X' || cigar[curr]=='D' || cigar[curr]=='I' || cigar[curr]=='H' || cigar[curr]=='S'){
+                        nm += stoi(cigar.substr(prev,curr-prev));
+                    }
+                }
+                prev = curr+1;
+            }
+    
+            haplo_read_like[target][query] = exp((len-nm)*lc+nm*le);
+
+            // count read hit 
+            if (read_hits.count(query)==0){
+                set<string> ts;
+                ts.insert(target);
+                read_hits[query] = ts;
+            }
+            else
+                read_hits[query].insert(target);
+        }
+    }
+    input.close();
+
+    // fill dummy value if no alignment
+    for (auto h : haplos){
+        for (auto r : reads){
+            if (haplo_read_like[h].count(r)==0){
+                haplo_read_like[h][r]=exp(read_lens[r]*le);
+            }
+        }
+    }
+
+    if (verbose)
+        cerr << endl;
+
+//    // model selection
+//    int num_mdl = num_haplo;
+//    vector<double> mdl_bic;
+//    for (int i=0; i<num_mdl; i++){ // model searching
+//        double z = i+1.0;
+//        double llk_mdl = 0.0; 
+//        for (auto r : reads){
+//            if (read_hits[r].size()<num_haplo)
+//                continue;
+//            double lkr = 0.0;
+//            for (int j=0; j<=i; j++){
+//                lkr += haplo_read_like[haplos[j]][r];
+//            }
+//            lkr /= z;
+//            llk_mdl += readFreq[r]*log(lkr);
+//        }
+//        // model complexity penalty
+//        llk_mdl -= lambda*(i+1)*log(num_read)/2.0;
+//        mdl_bic.emplace_back(llk_mdl);
+//    }
+
+    // debug
+    ofstream out;
+    out.open("temp_reads_haplo.txt");
+    out << "#read\t";
+    for (auto h : haplos)
+        out << h << "\t";
+    out << endl;
+    for (auto r : reads){
+        out << r << "\t";
+        for (auto h : haplos){
+            out << haplo_read_like[h][r] << "\t";
+        }
+        out << endl;
+    }
+    out.close();
+
+    // new model selection
+    int max_mdl_kmplx = num_haplo;
+    set<int> mdl_opt_subset;
+    long double mdl_opt_score = numeric_limits<long double>::lowest();
+    int mdl_opt_kmplx = 0;
+    // model space
+    for (int mdl_kmplx=1; mdl_kmplx<=max_mdl_kmplx; mdl_kmplx++){
+        vector<long double> mdl_llk;
+        long double local_mdl_opt_score = numeric_limits<long double>::lowest();
+        int local_mdl_opt_haplo = 0;
+        // haplotype space
+        for (int h=0; h<num_haplo; h++){
+            if (mdl_opt_subset.count(h)>0){
+                mdl_llk.emplace_back(numeric_limits<long double>::lowest());
+                continue;
+            }
+   
+            long double mdl_data_llk = 0;
+            // read space
+            for (auto r : reads){
+                //if (read_hits[r].size()<num_haplo)
+                //    continue;
+                long double data_llk = 0;
+                for (auto hh : mdl_opt_subset){
+                    data_llk += haplo_read_like[haplos[hh]][r];
+                }
+                data_llk += haplo_read_like[haplos[h]][r];
+                data_llk /= mdl_kmplx;
+                if (data_llk==0) mdl_data_llk += readFreq[r]*read_lens[r]*le;
+                else mdl_data_llk += readFreq[r]*log(data_llk);
+            }
+            mdl_data_llk -= lambda*mdl_kmplx*log(num_read)/2.0;
+            mdl_llk.emplace_back(mdl_data_llk);
+            // searching local optimal
+            if (local_mdl_opt_score < mdl_data_llk){
+                local_mdl_opt_score = mdl_data_llk;
+                local_mdl_opt_haplo = h;
+            }
+        }
+        
+        // searching global optimal
+        if (mdl_opt_score < local_mdl_opt_score){
+            mdl_opt_score = local_mdl_opt_score;
+            mdl_opt_kmplx = mdl_kmplx;
+            mdl_opt_subset.emplace(local_mdl_opt_haplo);
+        }else{
+            break;
+        }
+    }
+
+
+    // load fas sequences
+    map<string,string> haplo_seqs;
+    if (!fas.empty()){
+        gzFile fp;
+        kseq_t *seq;
+        int l;
+        
+        fp = gzopen(fas.c_str(),"r");
+        seq = kseq_init(fp);
+        while((l=kseq_read(seq))>=0){
+            haplo_seqs[seq->name.s] = seq->seq.s;
+        }
+        kseq_destroy(seq);
+        gzclose(fp);
+    }   
+
+    // read classification
+    num_read = 0;
+    vector<double> haplo_hits(num_haplo,0);
+    for (auto r : reads){
+        //if (read_hits[r].size()<num_haplo)
+        //        continue;
+        double z = 0;
+        for (auto j : mdl_opt_subset){
+            z += haplo_read_like[haplos[j]][r];
+        }
+        for (auto j : mdl_opt_subset){
+            haplo_hits[j] += readFreq[r] * haplo_read_like[haplos[j]][r]/z;
+        }
+        num_read += readFreq[r];
+    }
+    for (auto &x : haplo_hits){
+        if (num_read>0) x /= num_read;
+        else x = 1.0;
+    }
+
+    // output result
+    if (fas.empty()){
+        for (auto i : mdl_opt_subset){
+            cout << haplos[i] << "\t" << haplo_hits[i] << endl;
+        }
+    }else{
+        for (auto i : mdl_opt_subset){
+            cout << ">" << haplos[i] << "\t" << haplo_hits[i] << endl;
+            cout << haplo_seqs[haplos[i]] << endl;
+        }
+    }
+
+    return 0;  
+}

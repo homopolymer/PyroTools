@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# help message
+help(){
+  echo "Count the number of sequences in the fasta file"
+  echo "Usage: xFastaSequenceCount <FASTAFILE>"
+  echo "-h,--help    print help message"
+  exit 1
+}
+
+# print help message if no arguments provided
+if [ "$#" = 0 ];then help;fi
+
+# parse argument
+if [ \( "$1" = "-h" \) -o \( "$1" = "-help" \) -o \( "$1" = "--help" \) ]
+then
+  help
+fi
+
+grep "^>" $1 2>/dev/null | wc -l

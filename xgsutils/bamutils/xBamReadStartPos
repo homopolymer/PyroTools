@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+runMsg(){
+  >&2 echo $1
+}
+
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamReadStartPos [OPTIONS] <BAM>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -q,--mq      skip read with the mapping quality less than the value (default:5) [INT]"
+  >&2 echo "    -f,--ff      skip read with the specified flag (default:4) [INT]"
+  >&2 echo "    -r,--roi     specify the region of intere [STR]"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# print help message if no argument provided
+if [ $# = 0 ];then help;fi
+
+# parse the command line
+PARSED_OPTIONS=$(getopt -n "$0" -o q:r:f:h --long mq:,roi:,ff:,help -- "$@")
+
+# Bad arguments, something has gone wrong with the getopt command
+if [ $? -ne 0 ]
+then
+  help
+fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+mq="-q 5"
+roi=""
+ff=""
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -r | --roi )
+      roi="$2"
+      shift 2;;
+    -q | --mq )
+      mq="-q $2"
+      shift 2;;
+    -f | --ff )
+      ff="$ff -F $2"
+      shift 2;;
+    --)
+      shift
+      break;;
+  esac
+done
+
+if [ -z $ff ];then ff="-F 4";fi
+
+# check file existence
+if [ ! -f $1 ]
+then
+  echo "file $1 not existed"
+  echo "abort"
+  exit 1
+fi
+
+BAMFILE=$1;
+
+samtools view $mq $ff $BAMFILE $roi | awk '{print $3"\t"$4"\t"($4+1)}' | awk '!x[$0]++'

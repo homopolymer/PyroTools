@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# verbose function
+Verbose(){
+    >&2 echo "[$(date) xFilterContigByReadCount] $1"
+}
+
+# help message
+help(){
+    >&2 echo "SYNOPSIS"
+    >&2 echo "    xFilterContigByReadCount [OPTIONS] <FASTA> <READCOUNT>"
+    >&2 echo ""
+    >&2 echo "DESCRIPTION"
+    >&2 echo "    Remove the contigs with the read hit not greater than the value"
+    >&2 echo ""
+    >&2 echo "OPTIONS"
+    >&2 echo "    -t,--thres    specify the threshold value (default:0) [INT]"
+    >&2 echo "    -h,--help     print help message"
+    exit 0
+}
+
+# print help message if no arguments provided
+if [ $# = 0 ];then help;fi
+
+# parse the command line
+PARSED_OPTIONS=$(getopt -n "$0" -o t:h -l thres:,help -- "$@")
+
+# Bad arguments, something has gone wrong with the getopt command
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+thres=0
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -t | --thres )
+      thres=$2
+      shift 2;;
+    --)
+      shift
+      break;;
+  esac
+done
+
+myrealpath='realpath -s'
+if [[ $OSTYPE =~ darwin* ]];then myrealpath='grealpath -s';fi
+
+fastaFile=$($myrealpath $1) && shift
+rcFile=$($myrealpath $1)
+
+# set the filter list
+outFasta=$(cat $rcFile | awk -v t="$thres" '{if($2>t){a=$1" "a}}END{print a}')
+
+# get the qualified fastas
+samtools faidx $fastaFile $outFasta

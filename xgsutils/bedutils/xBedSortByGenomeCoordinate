@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# print message
+msg(){
+  >&2 echo $1
+}
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBedSortByGenomeCoordinate [OPTIONS] <BEDFILE>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Sort BED records by genome coordinate order."
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -c,--core    specify the number of threads"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# print help message if no arguments provided
+if [ $# = 0 ];then help;fi
+
+# parse the command line
+PARSED_OPTIONS=$(getopt -n "$0" -o c:h --long core:,help -- "$@")
+
+# Bad arguments, something has gone wrong with the getopt command
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+core=""
+# Now goes through all the options with a case and using shift to analyse 1 argument at a time
+# $1 identifies the first argument, and when we use shift we discard the first argument, 
+# so $2 becomes $1 and goes again through the case
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -c | --core )
+      core=$2
+      shift 2;;
+    --)
+      shift
+      break;;
+  esac
+done
+
+msg "[$(date) xBedSortByGenomeCoordinate] process $1"
+
+# sorting
+if [ -z "$core" ]
+then
+  sort -k1,1 -k2,2n $1
+else
+  sort --parallel=$core -k1,1 -k2,2n $1
+fi

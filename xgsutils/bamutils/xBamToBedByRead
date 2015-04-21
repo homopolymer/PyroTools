@@ -1,0 +1,157 @@
+#!/bin/bash
+
+# check samtools installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash samtools &> /dev/null
+if [ $? -eq 1 ]
+then
+  >&2 echo "require samtools installed"
+  >&2 echo "abort"
+  exit 1
+fi
+
+# check bedtools installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash bedtools &> /dev/null
+if [ $? -eq 1 ]
+then
+  >&2 echo "require bedtools installed"
+  >&2 echo "abort"
+  exit 1
+fi
+
+# runtime message
+runMsg(){
+  >&2 echo $1
+}
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamToBedByRead [OPTIONS] <BAMFILE>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Convert a BAM file to BED file recorded by read"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -q,--mq      skip reads with mapping quality less than the value (default:5) [INT]"
+  >&2 echo "    -r,--roi     specify region of interest [STR]"
+  >&2 echo "    -f,--ff      skip reads with the specified flags [INT]"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# print help message if the number of command arguments is zero
+if [ "$#" = "0" ];then help;fi
+
+# parse command argument
+# reference: http://linuxaria.com/howto/parse-options-in-your-bash-script-with-getopt
+# reference: http://stackoverflow.com/questions/2721946/cross-platform-getopt-for-a-shell-script
+# reference: http://stackoverflow.com/questions/402377/using-getopts-in-bash-shell-script-to-get-long-and-short-command-line-options
+PARSED_OPTIONS=$(getopt -n "$0" -o q:r:f:h --long mq:,roi:,ff:,help -- "$@")
+
+# Bad arguments, something has gone wrong with the getopt command
+if [ $? -ne 0 ]
+then
+  help
+fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+mq="-q 5"
+roi=""
+ff=""
+# Now goes through all the options with a case and using shift to analyse 1 argument at a time
+# $1 identifies the first argument, and when we use shift we discard the first argument, 
+# so $2 becomes $1 and goes again through the case
+while true; do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -r | --roi )
+      roi="$2"
+      shift 2;;
+    -q | --mq )
+      mq="-q $2"
+      shift 2;;
+    -f | --ff )
+      ff="$ff -F $2"
+      shift 2;;
+    --)
+      shift
+      break;;
+  esac
+done
+
+# check file existence
+if [ ! -f $1 ]
+then
+  echo "file $1 not existed"
+  echo "abort"
+  exit 1
+fi
+
+# runtime message
+runMsg "[$(date) xBamToBedByRead] process $1 with options $roi $mq $ff"
+
+# compute depth and convert to bed
+samtools view $mq $ff $1 $roi 2>/dev/null | awk '{l=length($6); 
+split($6,chars,"")
+hs=0
+ts=0
+z=""
+m=0
+y=""
+n=0
+x=""
+u=0
+v=""
+nm=0
+iden=0
+for (i=1;i<=l;i++){ \
+  if (chars[i]!="H" && chars[i]!="S" && chars[i]!="D" && chars[i]!="I" && chars[i]!="M") { \
+    x=x chars[i]; \
+    y=y chars[i]; \
+    z=z chars[i]; \
+    v=v chars[i]; \
+  } \
+  else{ \
+    if (chars[i]=="D" || chars[i]=="M") { \
+      n=n+x+0.0; \
+      x=""; \
+    } \
+    else { x=""; } \
+    if (chars[i]=="D" || chars[i]=="I" || chars[i]=="M") { \
+      m=m+y+0.0; \
+      y=""; \
+    } \
+    else { y=""; } \
+    if (chars[i]=="H" || chars[i]=="S" || chars[i]=="I" || chars[i]=="M") { \
+      u=u+v+0.0; \
+      v=""; \
+    } \
+    else { v=""; } \
+    if (chars[i]=="H" || chars[i]=="S") { \
+      if (m==0) { \
+        hs=z+0.0; \
+        z=""; \
+      } \
+      if (m>0) { \
+        ts=z+0.0; \
+        z=""; \
+      } \
+    } \
+    else { z=""; } \
+  }  \
+} 
+for (i=1; i<=NF; i++){ \
+  if ($i ~ /^NM/){ \
+    split($i,nms,":"); \
+    nm=nms[3]; \
+  } \
+}
+iden=((m-nm)/(m+0.0000001))
+printf "%s\t%d\t%d\t%s\t%d\t%s\t%.3f\t%d\t%d\t%d\t%s\t%s\n", $3,$4,($4+n+0.0),$1,$5,$6,iden,u,hs,ts,$10,$11 
+}'

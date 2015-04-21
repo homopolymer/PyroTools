@@ -1,0 +1,94 @@
+#!/bin/bash
+
+myrealpath='realpath -s'
+if [[ $OSTYPE =~ darwin* ]];then myrealpath='grealpath -s';fi
+
+# verbose function
+Verbose(){
+  >&2 echo "[$(date) xPairwiseIdentity] $1"
+}
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xPairwiseIdentity <FASTAFILE> [<FASTAFILE2>]"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Compute the identity of all pairs of sequences in the fasta file"
+  >&2 echo "    Compute the identity of between all sequences in file1 and file2"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+faindex(){
+  samtools faidx $1
+  while read item
+  do
+    name=$(echo $item | awk '{print $1}')
+    samtools faidx $1 $name > $name.fasta
+  done <$1.fai
+}
+
+# print help message if no arguments provided
+if [ $# = 0 ];then help;fi
+
+# parse the command line
+if [ "$1" = "-h" ];then help;fi
+if [ "$1" = "--help" ];then help;fi
+
+fastaFile1=$($myrealpath $1) && shift
+fastaFile2=""
+if [[ $# > 0 ]];then fastaFile2=$($myrealpath $1);fi  
+
+# get the current working directory
+cwd=$(pwd)
+
+# make the temporary working directory
+twd="$cwd/temporary_$RANDOM"
+if [ -d $twd ];then rm -rf $twd;fi
+mkdir $twd && cd $twd
+
+# copy the fasta files in the temporary directory
+cp $fastaFile1 ./tf1.fasta
+if [ -z "$fastaFile2" ]
+then 
+  cp $fastaFile1 ./tf2.fasta
+else 
+  cp $fastaFile2 ./tf2.fasta
+fi
+
+faindex tf1.fasta
+faindex tf2.fasta
+
+# index the fasta file
+samtools faidx tf1.fasta
+samtools faidx tf2.fasta
+
+# loop over reads in fasta file1
+while read item1
+do
+  name1=$(echo "$item1" | awk '{print $1}')
+  while read item2
+  do
+    name2=$(echo "$item2" | awk '{print $1}')
+    key=$(printf "%s_%s" $name2 $name1)
+    grep $key aligned.txt &>/dev/null
+    if [ $? = 0 ];then continue;fi
+    if [ "$name1" = "$name2" ];then continue;fi
+    alnResult=$($BIOINFO_TOOL_XGSUTILS/alnutils/xEmbossWater $name1.fasta $name2.fasta 2>/dev/null)
+    idenPattern="Identity:[[:space:]]+[0-9]+[[:punct:]][0-9]+[[:space:]]+[[:punct:]]([0-9.]+)%[[:punct:]]"
+    [[ $alnResult =~ $idenPattern ]]
+    idenValue=$(echo "scale=10;${BASH_REMATCH[1]}/100" | bc | xargs printf "%.5f")
+    #simPattern="Similarity:[[:space:]]+[0-9]+[[:punct:]][0-9]+[[:space:]]+[[:punct:]]([0-9.]+)%[[:punct:]]"
+    #[[ $alnResult =~ $simPattern ]]
+    #simValue=$(echo "scale=10;${BASH_REMATCH[1]}/100" | bc | xargs printf "%.5f")
+    echo -e "$name1\t$name2\t$idenValue"
+    key=$(printf "%s_%s" $name1 $name2)
+    echo $key >> aligned.txt
+  done <tf2.fasta.fai
+done <tf1.fasta.fai
+
+cd $cwd
+rm -rf $twd

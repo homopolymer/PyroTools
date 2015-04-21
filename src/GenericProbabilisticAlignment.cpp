@@ -123,6 +123,10 @@ double loglik(const vector<double>& w, vector<double>& grad, void* aux_data)
     VectorDouble NeighborContextFeatureExpectations(settings->ProbAligner->NumberNeighborContextFeatures, 0);
     VectorDouble EmissionFeatureExpectations(settings->ProbAligner->NumberEmissionFeatures, 0);
 
+
+    int numGapInData = 0;
+    int numDataWithGap = 0;
+
     long double logProbSum = 0;
 
     // debug
@@ -145,11 +149,16 @@ double loglik(const vector<double>& w, vector<double>& grad, void* aux_data)
         VectorDouble rcfc, rcfe;
         VectorDouble efc, efe;
 
+        // compute the alignment
         long double score = settings->ProbAligner->ViterbiComputation(
                         (*settings->readSeqs)[i], (*settings->genomeSeqs)[i], settings->band,
                         alignRead, alignGenome, viterbiScore, forwardScore,
                         pfc, rhfc, ghfc, lcfc, efc,
                         pfe, rhfe, ghfe, lcfe, efe);
+
+        // compute the number of gap in the alignment
+        numGapInData += GenericBamAlignmentTools::numGap(alignRead, alignGenome);
+        numDataWithGap += 1;
 
         if (score<=0)
         {
@@ -280,6 +289,8 @@ double loglik(const vector<double>& w, vector<double>& grad, void* aux_data)
 
     // regularize
     logProbSum -= 0.5*lambda*norm2(w);
+    // penalize on the number of gap
+    logProbSum -= numGapInData/double(numDataWithGap);
 
     // print message
     {
