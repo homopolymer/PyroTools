@@ -3,7 +3,7 @@ PyroTools
 
 ## Introduction
 
-**PyroTools** is a toolkit including methods developed for the analysis of human genome sequencing and metagenomic sequencing.
+**PyroTools** is a toolkit including methods developed for the analysis of human genome sequencing data and metagenomic sequencing data.
 
 ##Methods 
 
@@ -15,7 +15,7 @@ PyroTools
 
 - StrainCall 
 
-  A method for reconstructing local strain sequences from metagenomic sequencing data.  It is ultra-fast, and accurate in both the estimation of compositional abundances and the reconstruction of strain sequences.
+  A method for reconstructing local strain sequences from metagenomic sequencing data.  It is ultra-fast, and accurate in both the estimation of compositional abundances and the reconstruction of strain sequences. It works for both shotgun and amplicon sequencing data.
 
   [2] Zeng F, Chen T. (2015) StrainCall: a fast method for reconstructing strain sequences from metagenomic sequencing data. Submitted.
 
@@ -44,6 +44,17 @@ PyroTools
 	> cd PyroTools
 	> mkdir build
 	> cd build && cmake .. && make 
+	
+	
+### Dependencies
+Require the following packages:
+
+- [Samtools](samtools.sourceforge.net)
+- [Bamtools](https://github.com/pezmaster31/bamtools)
+- [seqtk](https://github.com/lh3/seqtk)
+- [Bedtools](bedtools.readthedocs.org)
+- [NGSUtils](ngsutils.org)
+- [SSW Library](https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library) 
 
 
 
