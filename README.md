@@ -42,8 +42,7 @@ PyroTools
 ## Clone and compile
 	> git clone https://github.com/homopolymer/PyroTools.git
 	> cd PyroTools
-	> mkdir build
-	> cd build && cmake .. && make 
+	> ./run_install.sh 
 	
 	
 ### Dependencies
