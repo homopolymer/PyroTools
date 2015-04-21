@@ -54,6 +54,7 @@ Require the following packages:
 - [Bedtools](bedtools.readthedocs.org)
 - [NGSUtils](ngsutils.org)
 - [SSW Library](https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library) 
+- [Bowtie2](bowtie-bio.sourceforge.net/bowtie2)
 
 
 
