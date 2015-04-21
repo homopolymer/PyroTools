@@ -21,19 +21,19 @@
   
   A program to estimate the parameters of the alignment scoring function, and to correct the misalignments.
   
-  [3] Zeng F., Jiang R., Ji G., Chen T. ProbAlign: a re-alignment method for long sequencing reads. [_biorXiv.org_](http://biorxiv.org/content/early/2014/09/02/008698), 2014.
+  [3] Zeng F, Jiang R, Ji G, Chen T. (2014) ProbAlign: a re-alignment method for long sequencing reads. [_biorXiv.org_](http://biorxiv.org/content/early/2014/09/02/008698).
   
 - **SnpCall/PyroHMMsnp**
  
   A program to call SNPs in the sequencing data of an individual.
 
-  [4] Zeng F., Jiang R., Chen T. PyroHMMsnp: a SNP caller for 454 and Ion Torrent sequencing data. _Nucleic Acids Research_, 2013.
+  [4] Zeng F, Jiang R, Chen T. (2013) PyroHMMsnp: a SNP caller for 454 and Ion Torrent sequencing data. _Nucleic Acids Research_.
 
 - **IndelCall/PyroHMMvar**
 
   A program to call insertions and deletions in the sequencing data of an individual.
 
-  [5] Zeng F., Jiang R., Chen T. PyroHMMvar: a sensitive and accurate method to detect short Indels and SNPs for Ion Torrent and 454 data. _Bioinformatics_, 2013.
+  [5] Zeng F, Jiang R, Chen T. (2013) PyroHMMvar: a sensitive and accurate method to detect short Indels and SNPs for Ion Torrent and 454 data. _Bioinformatics_.
 
 
 
