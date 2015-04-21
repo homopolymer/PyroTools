@@ -5,31 +5,31 @@
 
 ##Methods 
 
-- StrainBinning
+- **StrainBinning**
 
   A method for binning long reads or assembled contigs into the strain-level groups, and resolving the coassembly of multiple strains.  Our preliminary results show that it could assemble the complete or most complete individual genomes of closely related strains from metagenomic sequencing data, when using the isolated data binned by StrainBinning.  Comparatively, existing assemblers commonly assemble sequencing data of closely related strains into short and chimeric contigs.
   
   [1] Zeng F, Chen T. (2015) Strain-level binning of long reads for metagenomics.  Unpublished. 
 
-- StrainCall 
+- **StrainCall** 
 
   A method for reconstructing local strain sequences from metagenomic sequencing data.  It is ultra-fast, and accurate in both the estimation of compositional abundances and the reconstruction of strain sequences. It works for both shotgun and amplicon sequencing data.
 
   [2] Zeng F, Chen T. (2015) StrainCall: a fast method for reconstructing strain sequences from metagenomic sequencing data. Submitted.
 
-- ProbAlign 
+- **ProbAlign** 
   
   A program to estimate the parameters of the alignment scoring function, and to correct the misalignments.
   
   [3] Zeng F., Jiang R., Ji G., Chen T. ProbAlign: a re-alignment method for long sequencing reads. [_biorXiv.org_](http://biorxiv.org/content/early/2014/09/02/008698), 2014.
   
-- SnpCall/PyroHMMsnp
+- **SnpCall/PyroHMMsnp**
  
   A program to call SNPs in the sequencing data of an individual.
 
   [4] Zeng F., Jiang R., Chen T. PyroHMMsnp: a SNP caller for 454 and Ion Torrent sequencing data. _Nucleic Acids Research_, 2013.
 
-- IndelCall/PyroHMMvar
+- **IndelCall/PyroHMMvar**
 
   A program to call insertions and deletions in the sequencing data of an individual.
 
