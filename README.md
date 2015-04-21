@@ -42,6 +42,7 @@ PyroTools
 ## Clone and compile
 	> git clone https://github.com/homopolymer/PyroTools.git
 	> cd PyroTools
+	> chmod 775 run_install.sh
 	> ./run_install.sh 
 	
 	
