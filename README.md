@@ -1,5 +1,3 @@
-PyroTools
-===============
 
 ## Introduction
 
