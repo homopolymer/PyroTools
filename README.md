@@ -49,7 +49,7 @@ Require the following packages:
 
 - [Samtools](samtools.sourceforge.net)
 - [Bamtools](https://github.com/pezmaster31/bamtools)
-- [seqtk](https://github.com/lh3/seqtk)
+- [Seqtk](https://github.com/lh3/seqtk)
 - [Bedtools](bedtools.readthedocs.org)
 - [NGSUtils](ngsutils.org)
 - [SSW Library](https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library) 
