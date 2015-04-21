@@ -23,7 +23,7 @@ static const string CNSGRAPH    = "GraphConsensus";
 static const string SIMPLEVC    = "SimpleVarCall";
 static const string CROPBAM     = "CropBam";
 static const string MAPERRCLN   = "MapErrorClean";
-static const string LOCALSC     = "LocalStrainCall";
+static const string LOCALSC     = "StrainCall";
 static const string STRAINBIN   = "StrainBinning";
 
 // PyroTools help/version constants
@@ -109,11 +109,9 @@ int Help(int argc, char* argv[]){
     cerr << "    IndelCall          detect the indels by by using the haplotype-based method" << endl;
     cerr << "" << endl;
     cerr << "--Strain calling programs" << endl;
-    cerr << "    StrainCall         reconstruct the strains in the viral/microbial sequencing data," << endl;
-    cerr << "                       and inclusively output the SNPs and/or Indels in the strains" << endl;
     cerr << "    StrainBinning      aggregate long reads or assembled contigs/scaffolds into strain-" << endl;
     cerr << "                       specific bin" << endl;
-    cerr << "    LocalStrainCall    reconstruct the strains in a local region by using the viral/microbial" << endl;
+    cerr << "    StrainCall         reconstruct the strains in a local region by using the viral/microbial" << endl;
     cerr << "                       sequencing data, and inclusively output the SNPs and/or Indels in the strains," << endl;
     cerr << "                       the size of the local region is recommended not larger than 500bp" << endl;
     cerr << "--Bias correction programs" << endl;

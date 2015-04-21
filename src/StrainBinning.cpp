@@ -88,7 +88,7 @@ int StrainBinning::Help(){
     cerr << "    -s,--space         the space between two local reconstructing localtions (default:1000) [INT]" << endl;
     cerr << "    -x,--diff-num      minimal number of differences in a location (default:5) [INT]" << endl;
     cerr << "    -r,--roi           specify the region of interest for StrainBinning [STR]" << endl;
-    cerr << "--options for LocalStrainCall" << endl;
+    cerr << "--options for StrainCall" << endl;
     cerr << "    -k,--top-k         the number of reporting paths of GraphConsensus (default:10) [INT]" << endl;
     cerr << "    -e,--edge-prune    graph edge pruning based on the read hit counts (default:100) [INT]" << endl;
     cerr << "    -n,--uniq-hit      minimal duplicates of the unique read (default:2) [INT]" << endl;
@@ -140,7 +140,7 @@ int StrainBinning::commandOptionParser(int argc, char *argv[]){
             {"space",      required_argument, 0, 's'}, // 3
             {"diff-num",   required_argument, 0, 'x'}, // 4
             {"roi",        required_argument, 0, 'r'}, // 5
-            // options for LocalStrainCall
+            // options for StrainCall
             {"top-k",      required_argument, 0, 'k'}, // 6
             {"edge-prune", required_argument, 0, 'e'}, // 7
             {"len",        required_argument, 0, 'l'}, // 8
@@ -494,7 +494,7 @@ int StrainBinning::Binning()
         ssCMD.str("");
         system(CMD.c_str());
 
-        // 1.2 define locations to perform LocalStrainCall
+        // 1.2 define locations to perform StrainCall
         // make windows on the genome
         ssCMD << "bedtools makewindows "
               << "-g " << GenomeFile << ".fai "
@@ -534,7 +534,7 @@ int StrainBinning::Binning()
             LSC_windows.emplace_back(make_tuple(g_id,g_p0,g_p1));
         }
 
-        // invoke LocalStrainCall in the window
+        // invoke StrainCall in the window
         map<int,int> windows_strain_count;
         map<int,int> windows_strain_freq;
         map<int,string> windows_prefix1;
@@ -553,7 +553,7 @@ int StrainBinning::Binning()
 
             if (MS_verbose>=1) SB_Verbose("processing "+g_id+":"+to_string(g_p0)+"-"+to_string(g_p1));
 
-            ssCMD << PYROTOOLS << " LocalStrainCall "
+            ssCMD << PYROTOOLS << " StrainCall "
                   << "-k " << LSC_topk << " -K " << (LSC_topk+30>100?LSC_topk+30:100) << " "
                   << "-e " << LSC_edgePruneLevel << " "
                   << "-n " << LSC_minUniqHit << " "
@@ -603,7 +603,7 @@ int StrainBinning::Binning()
 
             if (MS_verbose>=1) SB_Verbose("processing "+g_id+":"+to_string(g_p0+shift)+"-"+to_string(g_p1+shift));
 
-            ssCMD << PYROTOOLS << " LocalStrainCall "
+            ssCMD << PYROTOOLS << " StrainCall "
                   << "-k " << LSC_topk << " -K " << (LSC_topk+30) << " "
                   << "-e " << LSC_edgePruneLevel << " "
                   << "-n " << LSC_minUniqHit << " "

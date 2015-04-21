@@ -34,9 +34,9 @@ LocalStrainCallTool::LocalStrainCallTool()
     :HasGenomeFile(false)
     ,HasBamAlnFile(false)
     ,HasRegion(false)
-    ,topk(10)
+    ,topk(30)
     ,topK(50)
-    ,edgePruneLevel(100)
+    ,edgePruneLevel(2)
     ,minUniqHit(2)
     ,minReadLength(100)
     ,useDiffRead(false)
@@ -244,17 +244,17 @@ int LocalStrainCallTool::commandOptionParser(int argc, char *argv[]){
 
 int LocalStrainCallTool::Help(){
     cerr << "SYNOPSIS" << endl;
-    cerr << "    PyroTools LocalStrainCall [OPTIONS] <GENOME> <BAM> <REGION>" << endl;
+    cerr << "    PyroTools StrainCall [OPTIONS] <GENOME> <BAM> <REGION>" << endl;
     cerr << "" << endl;
     cerr << "DESCRIPTION" << endl;
     cerr << "    It is to reconstruct the strains in a local region, and detect the SNPs and/or Indels in the strains." << endl;
     cerr << "" << endl;
     cerr << "OPTIONS" << endl;
     cerr << "--options for graph searching" << endl;
-    cerr << "    -k,--top-k         the number of reporting paths of GraphConsensus (default:10) [INT]" << endl;
+    cerr << "    -k,--top-k         the number of reporting paths of GraphConsensus (default:30) [INT]" << endl;
     cerr << "    -K,--top-K         the number of enumerating paths internally used by GraphConsensus (default:50) [INT]" << endl;
     cerr << "--options for graph construction" << endl;
-    cerr << "    -e,--edge-prune    graph edge pruning based on the read hit counts (default:100) [INT]" << endl;
+    cerr << "    -e,--edge-prune    graph edge pruning based on the read hit counts (default:2) [INT]" << endl;
     cerr << "    -n,--uniq-hit      minimal duplicates of the unique read (default:2) [INT]" << endl;
     cerr << "    -l,--len           minimal read length (default:100) [INT]" << endl;
     cerr << "    -q,--mq            minimal map quality (default:15) [INT]" << endl;
