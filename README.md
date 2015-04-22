@@ -7,13 +7,13 @@
 
 - **StrainBinning**
 
-  A method for binning long reads or assembled contigs into the strain-level groups, and resolving the coassembly of multiple strains.  Our preliminary results show that it could assemble the complete or most complete individual genomes of closely related strains from metagenomic sequencing data, when using the isolated data binned by StrainBinning.  Comparatively, existing assemblers commonly assemble sequencing data of closely related strains into short and chimeric contigs.
+  A method for binning long reads or assembled contigs into the strain-level groups, and resolving the coassembly of multiple strains.  Our preliminary results show that it could assemble the complete or most complete individual genomes of closely related strains from metagenomic sequencing data, when using the isolated data binned by StrainBinning.  Comparatively, existing assemblers commonly assemble sequencing data of closely related strains into short and chimeric contigs.  StrainBinning internally uses StrainCall.
   
   [1] Zeng F, Chen T. (2015) Strain-level binning of long reads for metagenomics.  Unpublished. 
 
 - **StrainCall** 
 
-  A method for reconstructing local strain sequences from metagenomic sequencing data.  It is ultra-fast, and accurate in both the estimation of compositional abundances and the reconstruction of strain sequences. It works for both shotgun and amplicon sequencing data.
+  A method for reconstructing local strain sequences from metagenomic sequencing data.  It is ultra-fast, and accurate in both the estimation of compositional abundances and the reconstruction of strain sequences. It works for both shotgun and amplicon sequencing data.  StrainCall accurately explores the intraspecies diversity in a local region, and provides a foundation for purifying metagenomics data that mixs up multiple strains and allowing the isolation of long reads/assembled contigs into the strain-level groups.  It eventually facilitates the complete assembly of individual strains, as what we have done in StrainBinning.
 
   [2] Zeng F, Chen T. (2015) StrainCall: a fast method for reconstructing strain sequences from metagenomic sequencing data. Submitted.
 
