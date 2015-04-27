@@ -47,6 +47,7 @@
 ### Dependencies
 Require the following packages:
 
+- GCC49
 - [Samtools](samtools.sourceforge.net)
 - [Bamtools](https://github.com/pezmaster31/bamtools)
 - [Seqtk](https://github.com/lh3/seqtk)
