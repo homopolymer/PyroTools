@@ -10,6 +10,7 @@
 #include <tuple>
 using namespace std;
 
+#include <limits.h>
 #include <zlib.h>
 #include <omp.h>
 #include <getopt.h>
