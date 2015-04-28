@@ -102,7 +102,7 @@ then
   cd xgsutils/alnutils
     g++ -std=c++11 -lz -fopenmp -o nucmer_aligner nucmer_aligner.cpp
     g++ -std=c++11 -lz -fopenmp -o ssw_aligner ssw_aligner.cpp ssw.c ssw_cpp.cpp
-    cd cssw/src/ && make && cd ../../
+    cd cssw/src/ && make clean && make && cd ../../
   cd ../asmutils
     g++ -std=c++11 -lz -o filter_contig_by_count filter_contig_by_count.cpp
   cd ../faxutils/
