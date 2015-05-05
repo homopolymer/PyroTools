@@ -1,5 +1,9 @@
 #!/bin/bash
-BIOINFO_TOOL_XGSUTILS=/Users/fengzeng/tool/xgsutils
+my_realpath=realpath
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  my_realpath=grealpath
+fi
+BIOINFO_TOOL_XGSUTILS=$($my_realpath $0 | xargs dirname)"/../"
 xgsutils_averageDepth="$BIOINFO_TOOL_XGSUTILS/bamutils/xBamAverageDepth"
 
 # help message
