@@ -1,0 +1,64 @@
+#!/bin/bash
+BIOINFO_TOOL_XGSUTILS=$(realpath $0 | xargs dirname)"/../"
+xgsutils_averageDepth="$BIOINFO_TOOL_XGSUTILS/bamutils/xBamAverageDepth"
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamCoverageEachChr [OPTIONS] <GENOME_FASTA> <BAM_FILE>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Compute the genomic coverage for each chromosome"
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -q,--mq        skip reads with mapping quality less than the value [INT]"
+  >&2 echo "    -f,--ff        skip reads with the specified flags [INT]"
+  >&2 echo "    -h,--help      print help message"
+  exit 0
+}
+
+# print help message if no arguments provided
+if [ $# = 0 ];then help;fi
+
+PARSED_OPTIONS=$(getopt -n "$0" -o r:q:f:h --long roi:,mq:,ff:,help -- "$@")
+
+# bad argument
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+mq=""
+ff=""
+# parse arguments
+while true;do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -q | --mq )
+      mq="-q $2"
+      shift 2;;
+    -f | --ff )
+      ff="--ff $2 $ff"
+      shift 2;;
+    -- )
+      shift
+      break;;
+  esac
+done
+
+genomeFile=$1 && shift
+bamFile=$1
+
+# number of chromosomes
+numChr=$(wc -l "$genomeFile.fai" | awk '{print $1}')
+# loop over chromosomes
+for i in $(seq 1 $numChr)
+do
+  chrName=$(awk -v n=$i 'NR==n{print $1}' "$genomeFile.fai")
+  chrLen=$(awk -v n=$i 'NR==n{print $2}' "$genomeFile.fai")
+  chrCov=$(samtools mpileup -r "${chrName}" $ff $mq $bamFile 2>/dev/null | wc -l)
+  chrCovR=$(echo "scale=6;${chrCov}/${chrLen}" | bc)
+  echo -e "$chrName\t$chrCovR"
+done
