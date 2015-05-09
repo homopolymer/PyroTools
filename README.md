@@ -52,6 +52,7 @@ Require the following packages:
 - [Bamtools](https://github.com/pezmaster31/bamtools)
 - [Seqtk](https://github.com/lh3/seqtk)
 - [Bedtools](bedtools.readthedocs.org)
+- [Vcftools](vcftools.sourceforge.net)
 - [NGSUtils](ngsutils.org)
 - [SSW Library](https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library) 
 - [Bowtie2](bowtie-bio.sourceforge.net/bowtie2)
