@@ -321,7 +321,7 @@ int LocalStrainCallTool::LocalStrainInference(){
     ssCMD.str("");
     ssCMD << PYROTOOLS << " " << "CropBam" << " ";
     ssCMD << "--format" << " " << "fasta" << " ";
-    ssCMD << "--roi" << " " << RegionOfInterest << " ";
+    ssCMD << "--roi" << " \"" << RegionOfInterest << "\" ";
     ssCMD << "--mq" << " " << minMapQuality << " ";
     ssCMD << "--len" << " " << minReadLength << " ";
     ssCMD << "--slen" << " " << 30 << " ";
@@ -353,7 +353,7 @@ int LocalStrainCallTool::LocalStrainInference(){
     ssCMD << "--vcf" << " " << "temp_local_strains.vcf" << " ";
     if (!skipIndel) ssCMD << "--indel" << " ";
     ssCMD << "--out-format" << " " << "fasta" << " ";
-    ssCMD << GenomeFile << " " << BamAlnFile << " " << RegionOfInterest << " ";
+    ssCMD << GenomeFile << " " << BamAlnFile << " \"" << RegionOfInterest << "\" ";
     ssCMD << ">" << " " << "temp_local_strains.fas" << " ";
     CMD = ssCMD.str();
     ssCMD.clear();
@@ -364,7 +364,7 @@ int LocalStrainCallTool::LocalStrainInference(){
     // use genome in inference
     if (useGenome)
     {
-        ssCMD << "samtools faidx " << GenomeFile << " " << RegionOfInterest << " > temp_reference.fas";
+        ssCMD << "samtools faidx " << GenomeFile << " \"" << RegionOfInterest << "\" > temp_reference.fas";
         CMD = ssCMD.str();
         ssCMD.clear();
         ssCMD.str("");
