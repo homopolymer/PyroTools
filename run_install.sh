@@ -69,6 +69,12 @@ while true; do
   esac
 done
 
+# check whether the binary file exists
+if [ -e "bin/PyroTools" ]
+then
+  rm bin/PyroTools
+fi
+
 # build bamtools
 if [ "$BUILD_BAMTOOLS" = true ]
 then
