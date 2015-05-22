@@ -15,7 +15,7 @@
   
   A figure of our preliminary result that StrainBinning gives the accurate estimation of mixture component number along with perfect assemblies for 5 HIV-1 strains.
   
-  ![Smaller icon]()
+  ![Smaller icon](https://github.com/homopolymer/PyroTools/blob/master/wiki/hiv_contig_cut.png)
 
 - **StrainCall** 
 
