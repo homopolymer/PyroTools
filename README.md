@@ -3,6 +3,8 @@
 
 **PyroTools** is a toolkit including methods developed for the analysis of human genome sequencing data and metagenomic sequencing data.
 
+**Contact**: zengfeng [AT] xmu [DOT] edu [DOT] cn
+
 ##Methods 
 
 - **StrainBinning**
@@ -10,6 +12,10 @@
   A method for binning long reads or assembled contigs into the strain-level groups, and resolving the issue of strain heterogeneity in the coassembly of multiple strains.  Our preliminary results show that it could assemble the complete or most complete individual genomes of closely related strains from metagenomic sequencing data, when using the isolated data binned by StrainBinning.  Comparatively, existing assemblers commonly assemble sequencing data of closely related strains into short and chimeric contigs.  StrainBinning internally uses StrainCall.
   
   [1] Zeng F, Chen T. (2015) Strain-level binning of long reads for metagenomics.  Unpublished. 
+  
+  A figure of our preliminary result that StrainBinning gives the accurate estimation of mixture component number along with perfect assemblies for 5 HIV-1 strains.
+  
+  ![Smaller icon]()
 
 - **StrainCall** 
 
