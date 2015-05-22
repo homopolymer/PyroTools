@@ -13,7 +13,7 @@
   
   [1] Zeng F, Chen T. (2015) Strain-level binning of long reads for metagenomics.  Unpublished. 
   
-  A figure of our preliminary result that StrainBinning gives the accurate estimation of mixture component number along with perfect assemblies for 5 HIV-1 strains.
+  A figure of our preliminary result that StrainBinning gives the accurate estimation of mixture component number along with perfect assemblies for 5 HIV-1 strains. In a circos plot, left side are reference genomes, right side are contigs.
   
   ![Smaller icon](https://github.com/homopolymer/PyroTools/blob/master/wiki/hiv_contig_cut.png)
 
