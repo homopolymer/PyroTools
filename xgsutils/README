@@ -4,3 +4,4 @@ asmutils    a toolkit of sequence assembler manipulation
 simutils    a toolkit of variant simulation
 gtrutils    a toolkit of tandem repeat detection
 gsautils    a toolkit of global strain assembly for microbiome and virome
+metutils    a toolkit of metagenome manipulation

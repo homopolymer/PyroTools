@@ -494,10 +494,23 @@ int StrainBinning::Binning()
         ssCMD.str("");
         system(CMD.c_str());
 
+        // define bed by depth
+        ssCMD << PATH_TO_XGSUTILS_DIR << "/bamutils/xBamToBedByDepth" << " "
+              << ShortSeqFile << " "
+              << "-g 10" << " "
+              << "-r " << GenomeDict[i].RefName << " "
+              << "2>/dev/null" << " "
+              << "| awk '{$1=$1+100;$2=$2-100;if($2-$1>300){print $0}}'" << " "
+              << "> " << i << "_" << GenomeDict[i].RefName << "_depth.bed";
+        CMD = ssCMD.str();
+        ssCMD.str("");
+        system(CMD.c_str());
+
         // 1.2 define locations to perform StrainCall
         // make windows on the genome
         ssCMD << "bedtools makewindows "
-              << "-g " << GenomeFile << ".fai "
+              //<< "-g " << GenomeFile << ".fai "
+              << "-b " << i << "_" << GenomeDict[i].RefName << "_depth.bed" << " "
               << "-w " << RS_width << " "
               << "-s " << RS_space << " "
               << "| awk '{if ($2>0){print}}'" << " "

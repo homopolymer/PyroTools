@@ -1,0 +1,259 @@
+#!/usr/bin/env python
+"""
+SYNOPSIS
+
+    TODO pick_representative_otus.py [-h,--help] [-v,--verbose] [-c,--clade <LEVEL>] <NEWICK> <TAXONOMY> <DEPTH> <FASTA>
+
+DESCRIPTION
+
+    TODO This script picks out the representative OTU(s) 
+    within a specified clade level.
+
+EXAMPLES
+
+    TODO: Show some examples of how to use this script.
+
+EXIT STATUS
+
+    TODO: List exit codes
+
+AUTHOR
+
+    TODO: Feng Zeng <zengfeng@xmu.edu.cn>
+
+LICENSE
+
+    This script is in the public domain, free from copyrights or restrictions.
+
+VERSION
+
+    $Id$
+"""
+
+import sys, os, traceback, optparse
+import time
+import re
+
+import operator
+import tempfile
+from contextlib import contextmanager
+from cStringIO import StringIO
+from Bio import Phylo
+from ete2 import Phyloxml,faces,AttrFace,TreeStyle,Tree
+from sets import Set
+from skbio.alignment import local_pairwise_align_ssw, Alignment
+
+# ref: http://stackoverflow.com/questions/11892623/python-stringio-and-compatibility-with-with-statement-context-manager
+@contextmanager
+def tempinput(data):
+    temp = tempfile.NamedTemporaryFile(delete=False)
+    temp.write(data)
+    temp.close()
+    yield temp.name
+    os.unlink(temp.name)
+
+
+def tree_layout(node):
+    if not node.is_leaf() and node.name:
+        #faces.add_face_to_node(AttrFace("mylabel"), node, column=1, position="branch-top")
+        faces.add_face_to_node(AttrFace("name"), node, column=1)
+
+
+def get_taxonomy(fn):
+    tax = {}
+    with open(fn) as f:
+        for line in f:
+            item = line.split()
+            tax[item[0]] = {'kingdom':item[1][:-1], \
+                            'phylum': item[2][:-1], \
+                            'class':  item[3][:-1], \
+                            'order':  item[4][:-1], \
+                            'family': item[5][:-1], \
+                            'genus':  item[6][:-1], \
+                            'species':item[7][:-1]}
+    return tax
+
+
+def add_taxonomy_for_internal_branch(tree,tax):
+    iid = 0
+    for node in tree.traverse("postorder"):
+        if node.is_leaf():
+            node.add_feature("id",node.name)
+        else:
+            node.add_feature("id","i"+str(iid))
+            tax["i"+str(iid)]={}
+            for t in ['kingdom','phylum','class','order','family','genus','species']:
+                ts = Set([tax[x.id][t] for x in node.get_children()])
+                if len(ts)==1:
+                    tax[node.id][t]=ts.pop()
+                else:
+                    tax[node.id][t]="%s__"%t[0]
+            iid = iid + 1
+    return tree
+
+
+def ssw_similarity(seq_a,seq_b):
+    a = local_pairwise_align_ssw(seq_a,seq_b)
+    return 1-a.distances()[0][1]
+
+
+def main ():
+
+    global options, args
+    # TODO: read and parse newick file
+    if options.verbose: print >> sys.stderr, "[",time.asctime(),"]",
+    if options.verbose: print >> sys.stderr, "parse newick file"
+    tree = Phylo.read(args[0],'newick')
+    # TODO: convert it to phyloxml object
+    treeXML = StringIO()
+    Phylo.write(tree,treeXML,'phyloxml')
+    # TODO: convert it to ete2 object
+    hPhylotree = Phyloxml()
+    with tempinput(treeXML.getvalue()) as tempfilename:   
+        hPhylotree.build_from_file(tempfilename)
+    # TODO: get ete2 tree object
+    tree2 = hPhylotree.get_phylogeny()[0]
+
+    # TODO: read and parse taxonomy file
+    if options.verbose: print >> sys.stderr, "[",time.asctime(),"]",
+    if options.verbose: print >> sys.stderr, "parse taxonomy file"
+    tax = get_taxonomy(args[1])
+    # TODO: add taxonomic annotations for internal branch nodes
+    tree2 = add_taxonomy_for_internal_branch(tree2,tax)
+
+    # TODO: read and parse depth file
+    if options.verbose: print >> sys.stderr, "[",time.asctime(),"]",
+    if options.verbose: print >> sys.stderr, "parse depth file"
+    depth = {}
+    with open(args[2]) as f:
+        for line in f:
+            item = line.split()
+            depth[item[0]] = float(item[1])
+
+    # TODO: the depth threshold for the specified quantile level
+    import numpy as np
+    Qdepth = np.percentile(depth.values(), options.quantile)
+    Tdepth = Qdepth
+
+    # TODO: the depth threshold for the specified percentage level
+    Ndepth = 0
+    if options.Npercent:
+        A = np.array(sorted(depth.values(),reverse=True))
+        rA = A.cumsum()*100/A.sum()
+        Ndepth = np.interp(options.Npercent, rA, A)
+
+    if Tdepth < Ndepth: Tdepth = Ndepth
+    
+    # TODO: collect clade statistics
+    clade = {}
+    for node in tree2.iter_leaves():
+        taxon = tax[node.id][options.clade]
+        if depth[node.id] > Tdepth:
+            if len(taxon) > 3:
+                if taxon in clade:
+                    clade[taxon][node.id] = depth[node.id]    
+                else:
+                    clade[taxon] = {node.id: depth[node.id]}
+            else:
+                if 'null' in clade:
+                    clade['null'][node.id] = depth[node.id]
+                else:
+                    clade['null'] = {node.id:depth[node.id]}
+    
+    # TODO: read and parse fasta file
+    from skbio.parse.sequences import parse_fasta
+    if options.verbose: print >> sys.stderr, "[",time.asctime(),"]",
+    if options.verbose: print >> sys.stderr, "parse fasta file"
+    fasta = {}
+    for id,seq in parse_fasta(args[3]):
+        if depth[id] > Tdepth:
+            fasta[id] = seq
+    
+    # TODO: pick out representative OTUs at the specified clade level
+    if options.verbose: print >> sys.stderr, "[",time.asctime(),"]",
+    if options.verbose: print >> sys.stderr, "pick representative OTUS at",options.clade,"level"
+    OTUs = Set()
+    for taxon in clade.keys():
+        if taxon == 'null': continue
+        taxon_otus = Set()
+        for id, val in sorted(clade[taxon].items(), key=operator.itemgetter(1), reverse=True):
+            if not taxon_otus:
+                taxon_otus.add(id)
+            else:
+                max_sim = 0
+                for yid in taxon_otus:
+                    sim = ssw_similarity(fasta[id],fasta[yid])
+                    if max_sim < sim: max_sim = sim
+                if max_sim < options.Tsim:
+                    taxon_otus.add(id)
+        OTUs.update(taxon_otus)
+
+    # TODO: output the picked OTUs
+    if options.verbose: print >> sys.stderr, "[",time.asctime(),"]",
+    if options.verbose: print >> sys.stderr, "output the representative OTUs"
+    print "\t".join([x for x in OTUs])
+
+    # TODO: draw the tree
+    tree3 = Tree()
+    tree3_node = {}
+    for x in OTUs:
+        n = tree3.search_nodes(name=tax[x]['kingdom'])
+        if len(n)==0:
+            n = tree3.add_child(name=tax[x]['kingdom'])
+            tree3_node[tax[x]['kingdom']] = n
+
+    for x in OTUs:
+        y_name = tax[x]['kingdom']
+        for level in ['phylum','class','order','family','genus','species']:
+            if len(tax[x][level])>3:
+                x_name = y_name+"_"+tax[x][level]
+                if x_name not in tree3_node:
+                    #if len(y_name)==0 and tax[x][level] not in tree3:
+                    #    n = tree3.add_child(name=tax[x][level])
+                    #elif len(y_name)>0:
+                    n = tree3_node[y_name].add_child(name=tax[x][level])
+                    tree3_node[x_name] = n
+                y_name = x_name
+            else:
+                n = tree3_node[y_name].add_child(name=x)
+                tree3_node[x] = n
+                break
+            if level=='species':
+                n = tree3_node[y_name].add_child(name=x)
+                tree3_node[x] = n
+
+    if options.png:
+        ts = TreeStyle()
+        ts.layout_fn = tree_layout
+        tree3.render(options.png,dpi=1024,tree_style=ts)
+                
+        
+    
+
+if __name__ == '__main__':
+    try:
+        start_time = time.time()
+        parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), usage=globals()['__doc__'], version='$Id$')
+        parser.add_option ('-v', '--verbose', action='store_true', default=False, help='verbose output')
+        parser.add_option ('-c', '--clade', default='phylum', help='specify clade level', type='str')
+        parser.add_option ('-q', '--quantile', default=99, help='specify depth quantile level for picking OTUs', type='float')
+        parser.add_option ('-n', '--Npercent', help='specify depth percentage level for picking OTUs, like the metric N50', type='float')
+        parser.add_option ('-s', '--Tsim', default=0.7, help='specify sequence similarity threshold', type='float')
+        parser.add_option ('-p', '--png', help='draw the tree for representative OTUs, specify filename', type='str')
+        (options, args) = parser.parse_args()
+        if len(args) < 4:
+            parser.error ('missing argument')
+        main()
+        if options.verbose: print >> sys.stderr, 'TOTAL TIME IN MINUTES:',
+        if options.verbose: print >> sys.stderr, (time.time() - start_time) / 60.0
+        sys.exit(0)
+    except KeyboardInterrupt, e: # Ctrl-C
+        raise e
+    except SystemExit, e: # sys.exit()
+        raise e
+    except Exception, e:
+        print 'ERROR, UNEXPECTED EXCEPTION'
+        print str(e)
+        traceback.print_exc()
+        os._exit(1)
+
