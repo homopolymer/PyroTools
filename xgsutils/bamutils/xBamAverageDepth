@@ -69,6 +69,8 @@ do
 done
 
 
-samtools mpileup $roi $mq --ff $ff $bamFiles | awk 'BEGIN{sum=0} \
-  {sum+=$4} \
-  END{if (NR==0){print "AverageDepth = 0"}else{printf("AverageDepth = %g\n",sum/NR)}}'
+#samtools mpileup $roi $mq --ff $ff $bamFiles | awk 'BEGIN{sum=0} \
+#  {sum+=$4} \
+#  END{if (NR==0){print "AverageDepth = 0"}else{printf("AverageDepth = %g\n",sum/NR)}}'
+
+samtools mpileup $roi $mq --ff $ff $bamFiles | cut -f4 | Rscript -e 'd<-scan("stdin",quiet=TRUE);cat(mean(d))' | awk '{print "AverageDepth = "$1}'

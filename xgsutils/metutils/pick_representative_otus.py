@@ -2,7 +2,7 @@
 """
 SYNOPSIS
 
-    TODO pick_representative_otus.py [-h,--help] [-v,--verbose] [-c,--clade <LEVEL>] <TAXONOMY> <DEPTH> 
+    TODO pick_representative_otus.py [-h,--help] [-v,--verbose] [-c,--clade <LEVEL>] <TAXONOMY> <DEPTH> <FASTA>
 
 DESCRIPTION
 
@@ -35,15 +35,23 @@ import time
 import re
 
 import operator
-#import tempfile
 from ete2 import Phyloxml,faces,AttrFace,TreeStyle,Tree
 from sets import Set
 import numpy as np
+from skbio.alignment import local_pairwise_align_ssw, Alignment
+
+
+def ssw_similarity(seq_a,seq_b):
+    a = local_pairwise_align_ssw(seq_a,seq_b)
+    return 1-a.distances()[0][1]
+
 
 def tree_layout(node):
     if not node.is_leaf() and node.name:
         #faces.add_face_to_node(AttrFace("mylabel"), node, column=1, position="branch-top")
         faces.add_face_to_node(AttrFace("name"), node, column=1)
+    if node.is_leaf():
+        faces.add_face_to_node(AttrFace("depth",fgcolor="red"), node, column=1)
 
 
 def get_gg_taxonomy(fn):
@@ -61,24 +69,6 @@ def get_gg_taxonomy(fn):
                        'genus':  item[5], \
                        'species':item[6]}
     return tax
-
-
-def add_taxonomy_for_internal_branch(tree,tax):
-    iid = 0
-    for node in tree.traverse("postorder"):
-        if node.is_leaf():
-            node.add_feature("id",node.name)
-        else:
-            node.add_feature("id","i"+str(iid))
-            tax["i"+str(iid)]={}
-            for t in ['kingdom','phylum','class','order','family','genus','species']:
-                ts = Set([tax[x.id][t] for x in node.get_children()])
-                if len(ts)==1:
-                    tax[node.id][t]=ts.pop()
-                else:
-                    tax[node.id][t]="%s__"%t[0]
-            iid = iid + 1
-    return tree
 
 
 def main ():
@@ -127,6 +117,14 @@ def main ():
             item = line.split()
             depth[item[0]] = float(item[1])
 
+    # TODO: read and parse fasta file
+    from skbio.parse.sequences import parse_fasta
+    if options.verbose: print >> sys.stderr, "[",time.asctime(),"]",
+    if options.verbose: print >> sys.stderr, "parse fasta file"
+    fasta = {}
+    for id,seq in parse_fasta(args[2]):
+        fasta[id] = seq
+
     # TODO: prune the tree to remove empty leaves 
     retain_nodes = Set()
     for node in tree.iter_leaves():
@@ -166,15 +164,37 @@ def main ():
 
     tree.prune(retain_nodes)
 
-    # TODO: pick out a representative OTUs for a clade
+    # TODO: pick out representative OTUs for a clade
     retain_nodes = Set()
     for taxon in clade_retain:
         t = tree & taxon
         L = {n:depth[n.name] for n in t.get_leaves()}
         l = sorted(L.items(),key=operator.itemgetter(1),reverse=True)
-        retain_nodes.add(l[0][0])
-        retain_nodes.update(Set(l[0][0].get_ancestors()))
-
+        taxon_otus = Set()
+        for n, val in l:
+            if val<T: continue
+            if not taxon_otus:
+                taxon_otus.add(n)
+            else:
+                max_sim = 0
+                for y in taxon_otus:
+                    sim = ssw_similarity(fasta[n.name],fasta[y.name])
+                    if max_sim < sim: max_sim = sim
+                if max_sim < options.Tsim:
+                    taxon_otus.add(n)
+        retain_nodes.update(taxon_otus)
+        for n in taxon_otus:
+            retain_nodes.update(Set(n.get_ancestors()))
+        
+    # TODO: pick out a representative OTUs for a clade
+    #retain_nodes = Set()
+    #for taxon in clade_retain:
+    #    t = tree & taxon
+    #    L = {n:depth[n.name] for n in t.get_leaves()}
+    #    l = sorted(L.items(),key=operator.itemgetter(1),reverse=True)
+    #    retain_nodes.add(l[0][0])
+    #    retain_nodes.update(Set(l[0][0].get_ancestors()))
+    #
     tree.prune(retain_nodes)
  
     # TODO: output representative OTUs
@@ -182,6 +202,9 @@ def main ():
         print node.name
 
     #
+    for node in tree.get_leaves():
+        node.add_feature("depth",depth[node.name])
+
     if options.png:
         ts = TreeStyle()
         ts.layout_fn = tree_layout
@@ -197,9 +220,10 @@ if __name__ == '__main__':
         parser.add_option ('-v', '--verbose', action='store_true', default=False, help='verbose output')
         parser.add_option ('-c', '--clade', default='phylum', help='specify clade level', type='str')
         parser.add_option ('-n', '--Npercent', default=95, help='specify depth percentage level for picking OTUs, like the metric N50', type='float')
+        parser.add_option ('-s', '--Tsim', default=0.85, help='specify sequence similarity threshold', type='float')
         parser.add_option ('-p', '--png', help='draw the tree for representative OTUs, specify filename', type='str')
         (options, args) = parser.parse_args()
-        if len(args) < 2:
+        if len(args) < 3:
             parser.error ('missing argument')
         main()
         if options.verbose: print >> sys.stderr, 'TOTAL TIME IN MINUTES:',

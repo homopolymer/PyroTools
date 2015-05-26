@@ -500,7 +500,7 @@ int StrainBinning::Binning()
               << "-g 10" << " "
               << "-r " << GenomeDict[i].RefName << " "
               << "2>/dev/null" << " "
-              << "| awk '{$1=$1+100;$2=$2-100;if($2-$1>300){print $0}}'" << " "
+              << "| awk '{$2=$2+100;$3=$3-100;if($3-$2>300){print $1\"\t\"$2\"\t\"$3}}'" << " "
               << "> " << i << "_" << GenomeDict[i].RefName << "_depth.bed";
         CMD = ssCMD.str();
         ssCMD.str("");
