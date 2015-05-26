@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# check samtools installed
+# reference: http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+hash samtools &> /dev/null
+if [ $? -eq 1 ]
+then
+  echo "require samtools installed"
+  echo "abort"
+  exit 1
+fi
+
+# help message
+help(){
+  >&2 echo "SYNOPSIS"
+  >&2 echo "    xBamMedianDepth <BAMFILE>"
+  >&2 echo ""
+  >&2 echo "DESCRIPTION"
+  >&2 echo "    Compute the median read depth."
+  >&2 echo ""
+  >&2 echo "OPTIONS"
+  >&2 echo "    -r,--roi     specify the region of interest [STR]"
+  >&2 echo "    -q,--mq      skip reads with mapping quality less than the value [INT]"
+  >&2 echo "    -f,--ff      skip reads with the specified flags [INT]"
+  >&2 echo "    -h,--help    print help message"
+  exit 0
+}
+
+# print help message if no arguments provided
+if [ $# = 0 ];then help;fi
+
+# set command argument parser
+PARSED_OPTIONS=$(getopt -n "$0" -o r:q:f:h --long roi:,mq:,ff:,help -- "$@")
+
+# bad argument
+if [ $? -ne 0 ];then help;fi
+
+# A little magic, necessary when using getopt
+eval set -- "$PARSED_OPTIONS"
+
+roi=""
+mq=""
+ff=0
+# parse arguments
+while true;do
+  case "$1" in
+    -h | --help )
+      help
+      shift;;
+    -r | --roi )
+      roi="-r $2"
+      shift 2;;
+    -q | --mq )
+      mq="-q $2"
+      shift 2;;
+    -f | --ff )
+      ff=$(( $ff | $2 ))
+      shift 2;;
+    -- )
+      shift
+      break;;
+  esac
+done
+
+bamFiles=""
+for bam in "$@"
+do
+  bamFiles="$bam $bamFiles"
+done
+
+
+#samtools mpileup $roi $mq --ff $ff $bamFiles | awk 'BEGIN{sum=0} \
+#  {sum+=$4} \
+#  END{if (NR==0){print "AverageDepth = 0"}else{printf("AverageDepth = %g\n",sum/NR)}}'
+
+samtools mpileup $roi $mq --ff $ff $bamFiles | cut -f4 | Rscript -e 'd<-scan("stdin",quiet=TRUE);cat(median(d))' | awk '{print "MedianDepth = "$1}'
