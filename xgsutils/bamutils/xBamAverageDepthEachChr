@@ -67,18 +67,21 @@ genomeFile=$1 && shift
 bamFile=$1
 
 # number of chromosomes
-numChr=$(wc -l "$genomeFile.fai" | awk '{print $1}')
+#numChr=$(wc -l "$genomeFile.fai" | awk '{print $1}')
 # loop over chromosomes
-for i in $(seq 1 $numChr)
-do
-  chrName=$(awk -v n=$i 'NR==n{print $1}' "$genomeFile.fai")
-  samtools view -b $rf $ff $mq $bamFile $chrName > xgstemp.bam
-  if [ -s xgstemp.bam ];then
-    samtools index xgstemp.bam
-    chrDepth=$($xgsutils_averageDepth xgstemp.bam | awk '{print $3}')
-    echo "$chrName    $chrDepth"
-    rm xgstemp.bam*
-  else
-    echo "$chrName    0"
-  fi
-done
+#for i in $(seq 1 $numChr)
+#do
+#  chrName=$(awk -v n=$i 'NR==n{print $1}' "$genomeFile.fai")
+#  samtools view -b $rf $ff $mq $bamFile $chrName > xgstemp.bam
+#  if [ -s xgstemp.bam ];then
+#    samtools index xgstemp.bam
+#    chrDepth=$($xgsutils_averageDepth xgstemp.bam | awk '{print $3}')
+#    echo "$chrName    $chrDepth"
+#    rm xgstemp.bam*
+#  else
+#    echo "$chrName    0"
+#  fi
+#done
+
+# 
+samtools mpileup  $ff $mp $bamFile 2>/dev/null | awk 'BEGIN{sum=0;c="";n=0}{if(c!="" && c!=$1){printf("%s\t%f\n",c,sum/n)}c=$1;n=n+1;sum=sum+$4;}END{printf("%s\t%f\n",c,sum/n)}'
