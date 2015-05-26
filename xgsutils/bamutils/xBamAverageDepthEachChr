@@ -76,5 +76,7 @@ do
   samtools index xgstemp.bam
   chrDepth=$($xgsutils_averageDepth xgstemp.bam | awk '{print $3}')
   echo "$chrName    $chrDepth"
-  rm xgstemp.bam*
+  if [ -e "xgstemp.bam*" ];then
+    rm xgstemp.bam*
+  fi
 done
