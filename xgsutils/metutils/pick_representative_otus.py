@@ -112,6 +112,8 @@ def main ():
     if options.verbose: print >> sys.stderr, "[",time.asctime(),"]",
     if options.verbose: print >> sys.stderr, "parse depth file"
     depth = {}
+    for node in tree.get_leaves():
+        depth[node.name] = 0.0
     with open(args[1]) as f:
         for line in f:
             item = line.split()
