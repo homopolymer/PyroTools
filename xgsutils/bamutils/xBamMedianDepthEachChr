@@ -51,7 +51,7 @@ while true;do
       mq="-q $2"
       shift 2;;
     -f | --ff )
-      ff="-F $2 $ff"
+      ff="--ff $2 $ff"
       shift 2;;
     -s | --strand )
       if [ "$2" = "+" ];then rf="-F 0x10";fi
@@ -72,15 +72,23 @@ numChr=$(wc -l "$genomeFile.fai" | awk '{print $1}')
 for i in $(seq 1 $numChr)
 do
   chrName=$(awk -v n=$i 'NR==n{print $1}' "$genomeFile.fai")
-  samtools view -b $rf $ff $mq $bamFile $chrName > xgstemp.bam
-  if [ -s "xgstemp.bam" ]
+#  samtools view -b $rf $ff $mq $bamFile $chrName > xgstemp.bam
+#  if [ -s "xgstemp.bam" ]
+#  then
+#    samtools index xgstemp.bam
+#    chrDepth=$($xgsutils_averageDepth xgstemp.bam | awk '{print $3}')
+#    echo "$chrName    $chrDepth"
+#    rm xgstemp.bam*
+#  else
+#    echo "$chrName    0"
+#    rm xgstemp.bam*
+#  fi
+  depth=$(samtools mpileup $ff $mq -r $chrName $bamFile | awk '{print $1"\t"$2"\t"$4}')
+  if [ -z "$depth" ]
   then
-    samtools index xgstemp.bam
-    chrDepth=$($xgsutils_averageDepth xgstemp.bam | awk '{print $3}')
-    echo "$chrName    $chrDepth"
-    rm xgstemp.bam*
-  else
     echo "$chrName    0"
-    rm xgstemp.bam*
+  else
+    chrDepth=$(echo $depth | awk '{print $3}' | Rscript -e 'd<-scan("stdin",quiet=TRUE);cat(median(d))')
+    echo "$chrName    $chrDepth"
   fi
 done
