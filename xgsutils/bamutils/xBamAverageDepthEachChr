@@ -73,10 +73,12 @@ for i in $(seq 1 $numChr)
 do
   chrName=$(awk -v n=$i 'NR==n{print $1}' "$genomeFile.fai")
   samtools view -b $rf $ff $mq $bamFile $chrName > xgstemp.bam
-  samtools index xgstemp.bam
-  chrDepth=$($xgsutils_averageDepth xgstemp.bam | awk '{print $3}')
-  echo "$chrName    $chrDepth"
-  if [ -e "xgstemp.bam*" ];then
+  if [ -s xgstemp.bam ];then
+    samtools index xgstemp.bam
+    chrDepth=$($xgsutils_averageDepth xgstemp.bam | awk '{print $3}')
+    echo "$chrName    $chrDepth"
     rm xgstemp.bam*
+  else
+    echo "$chrName    0"
   fi
 done
