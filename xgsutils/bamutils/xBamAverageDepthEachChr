@@ -84,4 +84,4 @@ bamFile=$1
 #done
 
 # 
-samtools mpileup  $ff $mp $bamFile 2>/dev/null | awk 'BEGIN{sum=0;c="";n=0}{if(c!="" && c!=$1){printf("%s\t%f\n",c,sum/n)}c=$1;n=n+1;sum=sum+$4;}END{printf("%s\t%f\n",c,sum/n)}'
+samtools mpileup  $ff $mp $bamFile 2>/dev/null | awk 'BEGIN{sum=0;c="";n=0}{if(c!="" && c!=$1){printf("%s\t%f\n",c,sum/n);sum=0;n=0;}c=$1;n=n+1;sum=sum+$4;}END{printf("%s\t%f\n",c,sum/n)}'
